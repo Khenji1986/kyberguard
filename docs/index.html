@@ -541,9 +541,74 @@
             .stats-grid{grid-template-columns:repeat(2,1fr);gap:24px}
             .price-grid{grid-template-columns:1fr}
         }
+
+        /* ============================================
+           TELEGRAM ONBOARDING MODAL
+           ============================================ */
+        .tg-modal-overlay{
+            display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);
+            z-index:9999;justify-content:center;align-items:center;padding:20px;
+        }
+        .tg-modal-overlay.active{display:flex}
+        .tg-modal{
+            background:#0d0d14;border:1px solid #00d4ff44;border-radius:20px;
+            padding:40px 36px;max-width:480px;width:100%;text-align:center;
+            position:relative;animation:fade-in-up 0.3s ease;
+        }
+        .tg-modal h3{color:#fff;font-size:1.4rem;font-weight:800;margin-bottom:8px}
+        .tg-modal .tg-sub{color:#999;font-size:0.9rem;margin-bottom:28px}
+        .tg-steps{display:flex;flex-direction:column;gap:16px;text-align:left;margin-bottom:28px}
+        .tg-step{display:flex;align-items:flex-start;gap:14px}
+        .tg-step-num{
+            width:32px;height:32px;border-radius:50%;background:#00d4ff22;
+            border:1px solid #00d4ff;color:#00d4ff;font-weight:700;font-size:0.9rem;
+            display:flex;align-items:center;justify-content:center;flex-shrink:0;
+        }
+        .tg-step-text{color:#ccc;font-size:0.9rem;line-height:1.5;padding-top:5px}
+        .tg-step-text strong{color:#fff}
+        .tg-modal-btn{
+            display:block;background:linear-gradient(135deg,#00d4ff,#0099cc);
+            color:#000;font-weight:800;padding:14px 28px;border-radius:12px;
+            font-size:1rem;text-decoration:none;margin-bottom:12px;
+            transition:transform 0.2s;
+        }
+        .tg-modal-btn:hover{transform:scale(1.03)}
+        .tg-modal-close{
+            position:absolute;top:16px;right:20px;background:none;border:none;
+            color:#666;font-size:1.4rem;cursor:pointer;line-height:1;
+        }
+        .tg-modal-close:hover{color:#fff}
+        .tg-modal-skip{color:#555;font-size:0.8rem;cursor:pointer;text-decoration:underline}
+        .tg-modal-skip:hover{color:#999}
     </style>
 </head>
 <body>
+
+<!-- ===================== TELEGRAM MODAL ===================== -->
+<div class="tg-modal-overlay" id="tgModal" onclick="closeTgModal(event)">
+    <div class="tg-modal">
+        <button class="tg-modal-close" onclick="document.getElementById('tgModal').classList.remove('active')">&times;</button>
+        <div style="font-size:2.5rem;margin-bottom:12px">&#x1F4AC;</div>
+        <h3 id="tg-modal-title">So startest du in 2 Minuten</h3>
+        <p class="tg-sub" id="tg-modal-sub">SecureBot AI laeuft ueber Telegram &mdash; die kostenlose Messenger-App.</p>
+        <div class="tg-steps">
+            <div class="tg-step">
+                <div class="tg-step-num">1</div>
+                <div class="tg-step-text" id="tg-step1"><strong>Telegram installieren</strong> (falls noch nicht vorhanden) &mdash; kostenlos fuer iOS, Android & Desktop.</div>
+            </div>
+            <div class="tg-step">
+                <div class="tg-step-num">2</div>
+                <div class="tg-step-text" id="tg-step2"><strong>Bot oeffnen</strong> &mdash; klicke unten auf den Button. Telegram oeffnet sich automatisch mit SecureBot.</div>
+            </div>
+            <div class="tg-step">
+                <div class="tg-step-num">3</div>
+                <div class="tg-step-text" id="tg-step3"><strong>&ldquo;Start&rdquo; druecken</strong> im Chat &mdash; fertig. Du kannst sofort Fragen stellen oder Links pruefen.</div>
+            </div>
+        </div>
+        <a href="https://t.me/Lees_Securebot" class="tg-modal-btn" id="tg-modal-cta" target="_blank">&#x1F4F1; SecureBot in Telegram oeffnen</a>
+        <div class="tg-modal-skip" id="tg-modal-skip" onclick="document.getElementById('tgModal').classList.remove('active')">Schliessen</div>
+    </div>
+</div>
 
 <!-- ===================== NAV BAR ===================== -->
 <nav class="navbar">
@@ -557,7 +622,7 @@
                 <button class="lang-btn active" data-lang="de" onclick="setLang('de')">DE</button>
                 <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
             </div>
-            <a href="https://t.me/Lees_Securebot" class="nav-cta" data-i18n="nav_cta">Jetzt testen</a>
+            <a href="#" onclick="openTgModal();return false;" class="nav-cta" data-i18n="nav_cta">Jetzt testen</a>
         </div>
     </div>
 </nav>
@@ -573,7 +638,7 @@
         </div>
         <h1 class="reveal" data-i18n="hero_h1"><span class="accent">Phishing erkannt.</span><br>In 3 Sekunden. 24/7.</h1>
         <p class="hero-sub reveal" data-i18n="hero_sub">Phishing-Mail erhalten? Unsicher ob der Link echt ist?<br><strong>Frag SecureBot - in 3 Sekunden weisst du Bescheid.</strong></p>
-        <a href="https://t.me/Lees_Securebot" class="cta-primary reveal" data-i18n="hero_cta">Jetzt kostenlos testen</a>
+        <a href="#" onclick="openTgModal();return false;" class="cta-primary reveal" data-i18n="hero_cta">Jetzt kostenlos testen</a>
         <div class="hero-trust reveal">
             <span class="hero-trust-icon">&#x1F4AC;</span>
             <span data-i18n="hero_trust">Laeuft ueber Telegram (kostenlose App fuer <a href="https://apps.apple.com/app/telegram-messenger/id686449807" style="color:#00d4ff">iOS</a>, <a href="https://play.google.com/store/apps/details?id=org.telegram.messenger" style="color:#00d4ff">Android</a> & <a href="https://desktop.telegram.org/" style="color:#00d4ff">Desktop</a>). Kein extra Login noetig.</span>
@@ -714,7 +779,7 @@
                     <li data-i18n="free_f2">5 Fragen pro Tag</li>
                     <li data-i18n="free_f3">Kompakte Antworten</li>
                 </ul>
-                <a href="https://t.me/Lees_Securebot" class="price-btn btn-free" data-i18n="free_btn">Kostenlos starten</a>
+                <a href="#" onclick="openTgModal();return false;" class="price-btn btn-free" data-i18n="free_btn">Kostenlos starten</a>
             </div>
             <!-- Pro -->
             <div class="price-card featured reveal" data-badge-de="BELIEBT" data-badge-en="POPULAR" data-badge="BELIEBT">
@@ -818,7 +883,7 @@
     <div class="container">
         <h2 class="reveal" data-i18n="final_h2">Warte nicht bis es zu spaet ist.</h2>
         <p class="reveal" data-i18n="final_p">Alle 39 Sekunden passiert ein Cyberangriff. Der naechste koennte dich treffen.</p>
-        <a href="https://t.me/Lees_Securebot" class="cta-primary reveal" data-i18n="hero_cta">Jetzt kostenlos testen</a>
+        <a href="#" onclick="openTgModal();return false;" class="cta-primary reveal" data-i18n="hero_cta">Jetzt kostenlos testen</a>
         <div class="hero-trust reveal" style="margin-top:20px">
             <span class="hero-trust-icon">&#x2615;</span>
             <span data-i18n="final_trust">Kostet weniger als ein Kaffee pro Tag. Der Free-Plan ist fuer immer kostenlos.</span>
@@ -1200,6 +1265,55 @@ const demoObserver = new IntersectionObserver((entries) => {
 }, { threshold: 0.3 });
 demoObserver.observe(document.getElementById('demo'));
 </script>
+
+/* ============================================
+   TELEGRAM ONBOARDING MODAL
+   ============================================ */
+const tgModalTexts = {
+    de: {
+        title: "So startest du in 2 Minuten",
+        sub:   "SecureBot AI l\u00e4uft \u00fcber Telegram \u2014 die kostenlose Messenger-App.",
+        s1: "<strong>Telegram installieren</strong> (falls noch nicht vorhanden) \u2014 kostenlos f\u00fcr iOS, Android & Desktop.",
+        s2: "<strong>Bot \u00f6ffnen</strong> \u2014 klicke unten auf den Button. Telegram \u00f6ffnet sich automatisch.",
+        s3: "<strong>\u201eStart\u201c dr\u00fccken</strong> im Chat \u2014 fertig. Du kannst sofort Fragen stellen oder Links pr\u00fcfen.",
+        cta: "&#x1F4F1; SecureBot in Telegram \u00f6ffnen",
+        skip: "Schlie\u00dfen"
+    },
+    en: {
+        title: "Get started in 2 minutes",
+        sub:   "SecureBot AI runs on Telegram \u2014 the free messenger app.",
+        s1: "<strong>Install Telegram</strong> (if not already) \u2014 free for iOS, Android & Desktop.",
+        s2: "<strong>Open the bot</strong> \u2014 click the button below. Telegram opens automatically.",
+        s3: "<strong>Press \u201cStart\u201d</strong> in the chat \u2014 done. You can immediately ask questions or check links.",
+        cta: "&#x1F4F1; Open SecureBot in Telegram",
+        skip: "Close"
+    }
+};
+
+function openTgModal() {
+    const lang = currentLang || 'de';
+    const t = tgModalTexts[lang] || tgModalTexts.de;
+    document.getElementById('tg-modal-title').textContent = t.title;
+    document.getElementById('tg-modal-sub').textContent   = t.sub;
+    document.getElementById('tg-step1').innerHTML  = t.s1;
+    document.getElementById('tg-step2').innerHTML  = t.s2;
+    document.getElementById('tg-step3').innerHTML  = t.s3;
+    document.getElementById('tg-modal-cta').innerHTML = t.cta;
+    document.getElementById('tg-modal-skip').textContent = t.skip;
+    document.getElementById('tgModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeTgModal(e) {
+    if (e.target === document.getElementById('tgModal')) {
+        document.getElementById('tgModal').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+}
+
+document.getElementById('tgModal').addEventListener('transitionend', function() {
+    if (!this.classList.contains('active')) document.body.style.overflow = '';
+});
 
 </body>
 </html>
