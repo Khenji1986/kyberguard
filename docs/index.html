@@ -91,7 +91,45 @@
         }
         .nav-logo span{color:#00d4ff;animation:text-glow 3s ease-in-out infinite}
         .nav-logo svg{width:28px;height:28px}
+        .nav-links{display:flex;align-items:center;gap:4px}
+        .nav-link{
+            color:#aaa;font-size:0.85rem;font-weight:500;padding:6px 12px;
+            border-radius:6px;transition:color 0.2s,background 0.2s;
+        }
+        .nav-link:hover{color:#fff;background:rgba(255,255,255,0.05)}
         .nav-right{display:flex;align-items:center;gap:16px}
+
+        /* Mobile hamburger */
+        .hamburger{
+            display:none;flex-direction:column;gap:5px;cursor:pointer;
+            background:none;border:none;padding:6px;
+        }
+        .hamburger span{
+            display:block;width:22px;height:2px;background:#aaa;
+            border-radius:2px;transition:all 0.3s;
+        }
+        .mobile-menu{
+            display:none;position:fixed;top:60px;left:0;right:0;
+            background:rgba(10,10,15,0.98);backdrop-filter:blur(12px);
+            border-bottom:1px solid rgba(0,212,255,0.15);
+            flex-direction:column;padding:16px 24px 24px;gap:4px;
+            z-index:999;
+        }
+        .mobile-menu.open{display:flex}
+        .mobile-menu a{
+            color:#ccc;font-size:1rem;padding:12px 8px;
+            border-bottom:1px solid #1a1a2e;font-weight:500;
+        }
+        .mobile-menu a:last-child{border-bottom:none}
+        .mobile-menu .mob-cta{
+            margin-top:12px;background:#00d4ff;color:#000;
+            text-align:center;padding:14px;border-radius:10px;
+            font-weight:800;border-bottom:none!important;
+        }
+        @media(max-width:720px){
+            .nav-links{display:none}
+            .hamburger{display:flex}
+        }
         .lang-toggle{
             display:flex;align-items:center;gap:6px;
             background:rgba(255,255,255,0.05);
@@ -617,15 +655,29 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             Secure<span>Bot AI</span>
         </a>
+        <nav class="nav-links">
+            <a href="#features" class="nav-link" data-i18n="nav_features">Features</a>
+            <a href="#pricing" class="nav-link" data-i18n="nav_pricing">Preise</a>
+            <a href="#faq" class="nav-link" data-i18n="nav_faq">FAQ</a>
+        </nav>
         <div class="nav-right">
             <div class="lang-toggle" aria-label="Language switcher">
                 <button class="lang-btn active" data-lang="de" onclick="setLang('de')">DE</button>
                 <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
             </div>
             <a href="#" onclick="openTgModal();return false;" class="nav-cta" data-i18n="nav_cta">Jetzt testen</a>
+            <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
+                <span></span><span></span><span></span>
+            </button>
         </div>
     </div>
 </nav>
+<div class="mobile-menu" id="mobileMenu">
+    <a href="#features" onclick="closeMobileMenu()" data-i18n="nav_features">Features</a>
+    <a href="#pricing" onclick="closeMobileMenu()" data-i18n="nav_pricing">Preise</a>
+    <a href="#faq" onclick="closeMobileMenu()" data-i18n="nav_faq">FAQ</a>
+    <a href="#" onclick="closeMobileMenu();openTgModal();return false;" class="mob-cta" data-i18n="nav_cta">Jetzt testen</a>
+</div>
 
 <!-- ===================== HERO ===================== -->
 <section class="hero" id="hero">
@@ -654,7 +706,11 @@
 <section class="demo" id="demo">
     <div class="container">
         <h2 class="reveal" data-i18n="demo_h2">Sieh selbst, wie es funktioniert</h2>
-        <p class="demo-sub reveal" data-i18n="demo_sub">Echte Phishing-Erkennung. In Echtzeit.</p>
+        <p class="demo-sub reveal" data-i18n="demo_sub">Echte KI-Analyse. In Echtzeit.</p>
+        <div class="reveal" style="display:flex;justify-content:center;gap:8px;margin-bottom:24px">
+            <button id="tab-phishing" onclick="switchTab('phishing')" style="padding:8px 20px;border-radius:20px;border:1px solid #00d4ff;background:#00d4ff;color:#000;font-weight:700;font-size:0.85rem;cursor:pointer;transition:all 0.2s">&#x1F6E1; Phishing-Check</button>
+            <button id="tab-viper" onclick="switchTab('viper')" style="padding:8px 20px;border-radius:20px;border:1px solid #333;background:transparent;color:#888;font-weight:700;font-size:0.85rem;cursor:pointer;transition:all 0.2s">&#x1F4E1; VIPER Anruf-Check</button>
+        </div>
         <div class="chat-window reveal">
             <div class="chat-header">
                 <div class="chat-avatar">&#x1F6E1;</div>
@@ -849,6 +905,20 @@
                 </button>
                 <div class="faq-answer"><p data-i18n="faq4_a">Ja! Mit dem Business-Plan kannst du bis zu 5 Team-Mitglieder hinzufuegen. Alle erhalten Zugang zu allen Pro-Features.</p></div>
             </div>
+            <div class="faq-item reveal">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    <span data-i18n="faq5_q">Was ist VIPER und wie nutze ich es?</span>
+                    <span class="faq-arrow">&#9662;</span>
+                </button>
+                <div class="faq-answer"><p data-i18n="faq5_a">VIPER ist unser Anruf-Schutz-System. Einfach die unbekannte Nummer im Bot eintippen (z.B. +49151...) und SecureBot prueft sie sofort gegen Deutschlands groesste Spam-Datenbank. Kostenlos fuer alle Nutzer. Pro-User erhalten zusaetzlich Kampagnen-Analyse und Taeter-Muster.</p></div>
+            </div>
+            <div class="faq-item reveal">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    <span data-i18n="faq6_q">Wie melde ich eine Spam-Nummer?</span>
+                    <span class="faq-arrow">&#9662;</span>
+                </button>
+                <div class="faq-answer"><p data-i18n="faq6_a">Im Bot einfach /vreport +49151... eingeben. Die Meldung ist vollstaendig anonym und hilft der Community. Je mehr Meldungen, desto besser wird VIPER fuer alle.</p></div>
+            </div>
         </div>
     </div>
 </section>
@@ -934,6 +1004,13 @@
 const T = {
 de: {
     nav_cta: "Jetzt testen",
+    nav_features: "Features",
+    nav_pricing: "Preise",
+    nav_faq: "FAQ",
+    faq5_q: "Was ist VIPER und wie nutze ich es?",
+    faq5_a: "VIPER ist unser Anruf-Schutz-System. Einfach die unbekannte Nummer im Bot eintippen (z.B. +49151...) und SecureBot pr\u00fcft sie sofort gegen Deutschlands gr\u00f6\u00dfte Spam-Datenbank. Kostenlos f\u00fcr alle Nutzer. Pro-User erhalten zus\u00e4tzlich Kampagnen-Analyse und T\u00e4ter-Muster.",
+    faq6_q: "Wie melde ich eine Spam-Nummer?",
+    faq6_a: "Im Bot einfach /vreport +49151... eingeben. Die Meldung ist vollst\u00e4ndig anonym und hilft der Community. Je mehr Meldungen, desto besser wird VIPER f\u00fcr alle.",
     hero_stat: "Cyberangriffe seit du diese Seite ge\u00f6ffnet hast",
     hero_h1: '<span class="accent">Phishing erkannt.</span><br>In 3 Sekunden. 24/7.',
     hero_sub: 'Phishing-Mail erhalten? Unsicher ob der Link echt ist?<br><strong>Frag SecureBot \u2013 in 3 Sekunden wei\u00dft du Bescheid.</strong>',
@@ -1014,6 +1091,13 @@ de: {
 },
 en: {
     nav_cta: "Try now",
+    nav_features: "Features",
+    nav_pricing: "Pricing",
+    nav_faq: "FAQ",
+    faq5_q: "What is VIPER and how do I use it?",
+    faq5_a: "VIPER is our call protection system. Simply type the unknown number in the bot (e.g. +49151...) and SecureBot checks it instantly against Germany\u2019s largest spam database. Free for all users. Pro users also get campaign analysis and fraud pattern recognition.",
+    faq6_q: "How do I report a spam number?",
+    faq6_a: "In the bot, simply type /vreport +49151... The report is completely anonymous and helps the community. The more reports, the better VIPER gets for everyone.",
     hero_stat: "Cyberattacks since you opened this page",
     hero_h1: '<span class="accent">Phishing detected.</span><br>In 3 seconds. 24/7.',
     hero_sub: 'Received a phishing email? Unsure if a link is legit?<br><strong>Ask SecureBot \u2013 know in 3 seconds.</strong>',
@@ -1170,11 +1254,15 @@ function restartChat() {
     if (chatTimeout) clearTimeout(chatTimeout);
     const body = document.getElementById('chat-body');
     const typing = document.getElementById('typing');
-    // Remove old messages
     body.querySelectorAll('.chat-msg').forEach(m => m.remove());
     typing.classList.remove('visible');
     chatRunning = true;
-    const msgs = currentLang === 'en' ? chatEN : chatDE;
+    let msgs;
+    if (activeTab === 'viper') {
+        msgs = currentLang === 'en' ? viperEN : viperDE;
+    } else {
+        msgs = currentLang === 'en' ? chatEN : chatDE;
+    }
     runChat(msgs, 0, body, typing);
 }
 
@@ -1267,6 +1355,51 @@ demoObserver.observe(document.getElementById('demo'));
 </script>
 
 <script>
+/* ============================================
+   MOBILE MENU
+   ============================================ */
+function toggleMobileMenu() {
+    document.getElementById('mobileMenu').classList.toggle('open');
+}
+function closeMobileMenu() {
+    document.getElementById('mobileMenu').classList.remove('open');
+}
+
+/* ============================================
+   DEMO TABS (Phishing / VIPER)
+   ============================================ */
+const viperDE = [
+    {type:'user', text:'+49151 23456789 hat mich angerufen. Spam?'},
+    {type:'bot', html:'&#x1F4E1; <strong>VIPER Analyse l\u00e4uft...</strong>'},
+    {type:'bot', html:'<span class="warn-badge">SPAM ERKANNT</span><br><span class="risk-score">Score: 82/100</span> \u2013 Hohes Risiko<br><strong>Carrier:</strong> VoIP (nicht Telekom/Vodafone)<br><strong>Tellows:</strong> 8/9 &bull; 47 gemeldete Anrufe<br><strong>Kampagne:</strong> Fake-Bankberater NRW'},
+    {type:'user', text:'Was tue ich?'},
+    {type:'bot', html:'<span class="safe-action">\u2713 Empfehlung:</span><br>1. Nummer <strong>blockieren</strong><br>2. <strong>Nicht zur\u00fcckrufen</strong> (kostenpflichtige Hotline)<br>3. Melden: /vreport +4915123456789 bank'}
+];
+const viperEN = [
+    {type:'user', text:'+49151 23456789 called me. Spam?'},
+    {type:'bot', html:'&#x1F4E1; <strong>VIPER analysis running...</strong>'},
+    {type:'bot', html:'<span class="warn-badge">SPAM DETECTED</span><br><span class="risk-score">Score: 82/100</span> \u2013 High risk<br><strong>Carrier:</strong> VoIP (not Telekom/Vodafone)<br><strong>Tellows:</strong> 8/9 &bull; 47 reported calls<br><strong>Campaign:</strong> Fake bank advisor NRW'},
+    {type:'user', text:'What should I do?'},
+    {type:'bot', html:'<span class="safe-action">\u2713 Recommendation:</span><br>1. <strong>Block</strong> the number<br>2. Do <strong>NOT call back</strong> (premium rate trap)<br>3. Report: /vreport +4915123456789 bank'}
+];
+
+let activeTab = 'phishing';
+function switchTab(tab) {
+    activeTab = tab;
+    const btnP = document.getElementById('tab-phishing');
+    const btnV = document.getElementById('tab-viper');
+    if (tab === 'phishing') {
+        btnP.style.cssText = 'padding:8px 20px;border-radius:20px;border:1px solid #00d4ff;background:#00d4ff;color:#000;font-weight:700;font-size:0.85rem;cursor:pointer;transition:all 0.2s';
+        btnV.style.cssText = 'padding:8px 20px;border-radius:20px;border:1px solid #333;background:transparent;color:#888;font-weight:700;font-size:0.85rem;cursor:pointer;transition:all 0.2s';
+    } else {
+        btnV.style.cssText = 'padding:8px 20px;border-radius:20px;border:1px solid #00d4ff;background:#00d4ff;color:#000;font-weight:700;font-size:0.85rem;cursor:pointer;transition:all 0.2s';
+        btnP.style.cssText = 'padding:8px 20px;border-radius:20px;border:1px solid #333;background:transparent;color:#888;font-weight:700;font-size:0.85rem;cursor:pointer;transition:all 0.2s';
+    }
+    restartChat();
+}
+
+const _origRunChat = restartChat;
+
 /* ============================================
    TELEGRAM ONBOARDING MODAL
    ============================================ */
