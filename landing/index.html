@@ -1266,6 +1266,7 @@ const demoObserver = new IntersectionObserver((entries) => {
 demoObserver.observe(document.getElementById('demo'));
 </script>
 
+<script>
 /* ============================================
    TELEGRAM ONBOARDING MODAL
    ============================================ */
@@ -1314,6 +1315,7 @@ function closeTgModal(e) {
 document.getElementById('tgModal').addEventListener('transitionend', function() {
     if (!this.classList.contains('active')) document.body.style.overflow = '';
 });
+</script>
 
 </body>
 </html>
