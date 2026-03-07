@@ -699,6 +699,10 @@
             <span class="hero-trust-icon">&#x2705;</span>
             <span style="color:#00d4ff;font-weight:600">Live seit 2026 &mdash; Server Frankfurt, Deutschland.</span>
         </div>
+        <div class="hero-trust reveal" style="margin-top:8px">
+            <span class="hero-trust-icon">&#x1F512;</span>
+            <span style="color:#00c896;font-weight:600" data-i18n="hero_quantum">Quantum-Safe Infrastruktur &mdash; NIST FIPS 203 zertifiziert. Schuetzt deine Daten auch gegen kuenftige Quantencomputer.</span>
+        </div>
     </div>
 </section>
 
@@ -751,6 +755,10 @@
                 <div class="pain-icon">&#x260E;&#xFE0F;</div>
                 <p data-i18n="pain_4">Eine unbekannte Nummer ruft an. Deine Bank? Polizei? Microsoft-Support? Oder doch Betrug? 2 Milliarden Spam-Anrufe passieren jeden Monat.</p>
             </div>
+            <div class="pain-card reveal">
+                <div class="pain-icon">&#x1F576;&#xFE0F;</div>
+                <p data-i18n="pain_5">Irgendwo da draussen liegt deine E-Mail-Adresse offen im Darknet &mdash; gestohlen bei einem Hackerangriff auf einen Online-Shop, eine App oder ein Forum. 12 Milliarden Accounts betroffen. Weisst du ob deine dabei ist?</p>
+            </div>
         </div>
         <p class="pain-answer reveal" data-i18n="pain_answer">SecureBot AI ist dein Security-Experte.<br>Rund um die Uhr. Fuer einen Bruchteil der Kosten.</p>
     </div>
@@ -785,6 +793,12 @@
                 <h3 data-i18n="tool4_h3">VIPER Anruf-Schutz</h3>
                 <span class="tool-badge badge-free" data-i18n="badge_free">KOSTENLOS</span>
                 <p data-i18n="tool4_p">Unbekannte Nummer angerufen? Einfach Nummer eintippen - sofortiger Spam-Score aus Deutschlands groesster Telefon-Datenbank. Schuetzt vor Betrug, Fake-Banken und Support-Scams.</p>
+            </div>
+            <div class="tool-card reveal">
+                <div class="tool-icon">&#x1F576;&#xFE0F;</div>
+                <h3 data-i18n="tool5_h3">Dark Web Monitor</h3>
+                <span class="tool-badge badge-pro">PRO & BUSINESS</span>
+                <p data-i18n="tool5_p">Stell dir vor jemand bricht in einen Online-Shop ein und stiehlt Millionen Passwoerter &mdash; die landen dann im Darknet. SecureBot prueft taeglich ob deine E-Mail-Adresse dabei ist und warnt dich sofort per Telegram. Damit du als Erster weisst, bevor jemand dein Konto uebernimmt.</p>
             </div>
         </div>
     </div>
@@ -846,6 +860,7 @@
                     <li class="hl" data-i18n="pro_f1">Security Audit mit KI-Empfehlungen</li>
                     <li class="hl" data-i18n="pro_f2">Phishing KI-Tiefenanalyse</li>
                     <li class="hl" data-i18n="pro_f6">VIPER Vollanalyse + Kampagnen-Intel</li>
+                    <li class="hl" data-i18n="pro_f7">Dark Web Monitor (3 E-Mails, taeglich)</li>
                     <li data-i18n="pro_f3">20 Fragen pro Tag</li>
                     <li data-i18n="pro_f4">Ausfuehrlichere Antworten</li>
                     <li data-i18n="pro_f5">Staerkeres KI-Modell</li>
@@ -862,6 +877,7 @@
                     <li class="hl" data-i18n="biz_f5">Team-Zugang (bis 5 User)</li>
                     <li class="hl" data-i18n="biz_f2">Incident Response Guide</li>
                     <li class="hl" data-i18n="biz_f1">Alles aus Pro inklusive</li>
+                    <li class="hl" data-i18n="biz_f6">Dark Web Monitor (10 E-Mails, taeglich)</li>
                     <li data-i18n="biz_f3">30 Fragen pro Tag</li>
                     <li data-i18n="biz_f4">Code-Beispiele & Anleitungen</li>
                 </ul>
@@ -918,6 +934,20 @@
                     <span class="faq-arrow">&#9662;</span>
                 </button>
                 <div class="faq-answer"><p data-i18n="faq6_a">Im Bot einfach /vreport +49151... eingeben. Die Meldung ist vollstaendig anonym und hilft der Community. Je mehr Meldungen, desto besser wird VIPER fuer alle.</p></div>
+            </div>
+            <div class="faq-item reveal">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    <span data-i18n="faq7_q">Was ist der Dark Web Monitor und wie funktioniert er?</span>
+                    <span class="faq-arrow">&#9662;</span>
+                </button>
+                <div class="faq-answer"><p data-i18n="faq7_a">Wenn Hacker einen Online-Shop angreifen, landen Millionen E-Mail-Adressen und Passwoerter im Darknet. Der Dark Web Monitor prueft taeglich ob deine E-Mail-Adresse in solchen gestohlenen Datensaetzen auftaucht &mdash; und sendet dir sofort eine Telegram-Benachrichtigung damit du dein Passwort aendern kannst bevor jemand dein Konto uebernimmt. Verfuegbar ab Pro.</p></div>
+            </div>
+            <div class="faq-item reveal">
+                <button class="faq-question" onclick="toggleFaq(this)">
+                    <span data-i18n="faq8_q">Was bedeutet &ldquo;Quantum-Safe&rdquo;?</span>
+                    <span class="faq-arrow">&#9662;</span>
+                </button>
+                <div class="faq-answer"><p data-i18n="faq8_a">In einigen Jahren werden Quantencomputer die heutige Verschluesselung knacken koennen. Geheimdienste sammeln bereits heute verschluesselte Daten um sie dann zu entschluesseln. SecureBot nutzt eine neue Verschluesselungsmethode (ML-KEM-768, NIST FIPS 203) die selbst Quantencomputer nicht brechen koennen &mdash; deine Daten bleiben also auch in Zukunft sicher.</p></div>
             </div>
         </div>
     </div>
@@ -1055,25 +1085,35 @@ de: {
     pro_f1: "Security Audit mit KI-Empfehlungen",
     pro_f2: "Phishing KI-Tiefenanalyse",
     pro_f6: "VIPER Vollanalyse + Kampagnen-Intel",
+    pro_f7: "Dark Web Monitor (3 E-Mails, t\u00e4glich)",
     pro_f3: "20 Fragen pro Tag",
     pro_f4: "Ausf\u00fchrlichere Antworten",
     pro_f5: "St\u00e4rkeres KI-Modell",
     pro_btn: "Pro w\u00e4hlen",
-    biz_f1: "Alles aus Pro +",
+    biz_f1: "Alles aus Pro inklusive",
     biz_f2: "Incident Response Guide",
     biz_f3: "30 Fragen pro Tag",
     biz_f4: "Code-Beispiele & Anleitungen",
     biz_f5: "Team-Zugang (bis 5 User)",
+    biz_f6: "Dark Web Monitor (10 E-Mails, t\u00e4glich)",
     biz_btn: "Business w\u00e4hlen",
+    tool5_h3: "Dark Web Monitor",
+    tool5_p: "Stell dir vor jemand bricht in einen Online-Shop ein und stiehlt Millionen Passw\u00f6rter \u2014 die landen dann im Darknet. SecureBot pr\u00fcft t\u00e4glich ob deine E-Mail-Adresse dabei ist und warnt dich sofort per Telegram. Damit du als Erster wei\u00dft, bevor jemand dein Konto \u00fcbernimmt.",
+    pain_5: "Irgendwo da drau\u00dfen liegt deine E-Mail-Adresse offen im Darknet \u2014 gestohlen bei einem Hackerangriff auf einen Online-Shop, eine App oder ein Forum. 12 Milliarden Accounts betroffen. Wei\u00dft du ob deine dabei ist?",
+    hero_quantum: "Quantum-Safe Infrastruktur \u2014 NIST FIPS 203 zertifiziert. Sch\u00fctzt deine Daten auch gegen k\u00fcnftige Quantencomputer.",
     faq_h2: "H\u00e4ufige Fragen",
     faq1_q: "Ist SecureBot AI kostenlos?",
-    faq1_a: "Ja! Der Free-Plan beinhaltet den Phishing-Checker ohne Limit und 5 Security-Fragen pro Tag. F\u00fcr erweiterte Features wie Security Audit gibt es Pro und Business.",
+    faq1_a: "Ja! Der Free-Plan beinhaltet den Phishing-Checker ohne Limit und 5 Security-Fragen pro Tag. F\u00fcr erweiterte Features wie Security Audit und Dark Web Monitor gibt es Pro und Business.",
     faq2_q: "Brauche ich technisches Wissen?",
     faq2_a: "Nein. Einfach deine Frage tippen oder einen verd\u00e4chtigen Link senden. SecureBot erkl\u00e4rt alles verst\u00e4ndlich \u2013 egal ob Anf\u00e4nger oder Profi.",
     faq3_q: "Wo werden meine Daten gespeichert?",
     faq3_a: "Auf einem Server in Frankfurt, Deutschland. Vollst\u00e4ndig DSGVO-konform. Du kannst jederzeit deine Daten einsehen (/meinedaten) oder l\u00f6schen (/loeschen).",
     faq4_q: "Kann ich SecureBot im Team nutzen?",
     faq4_a: "Ja! Mit dem Business-Plan kannst du bis zu 5 Team-Mitglieder hinzuf\u00fcgen. Alle erhalten Zugang zu allen Pro-Features.",
+    faq7_q: "Was ist der Dark Web Monitor und wie funktioniert er?",
+    faq7_a: "Wenn Hacker einen Online-Shop angreifen, landen Millionen E-Mail-Adressen und Passw\u00f6rter im Darknet. Der Dark Web Monitor pr\u00fcft t\u00e4glich ob deine E-Mail-Adresse in solchen gestohlenen Datens\u00e4tzen auftaucht \u2014 und sendet dir sofort eine Telegram-Benachrichtigung damit du dein Passwort \u00e4ndern kannst bevor jemand dein Konto \u00fcbernimmt. Verf\u00fcgbar ab Pro.",
+    faq8_q: "Was bedeutet \u201eQuantum-Safe\u201c?",
+    faq8_a: "In einigen Jahren werden Quantencomputer die heutige Verschl\u00fcsselung knacken k\u00f6nnen. Geheimdienste sammeln bereits heute verschl\u00fcsselte Daten um sie dann zu entschl\u00fcsseln. SecureBot nutzt eine neue Verschl\u00fcsselungsmethode (ML-KEM-768, NIST FIPS 203) die selbst Quantencomputer nicht brechen k\u00f6nnen \u2014 deine Daten bleiben also auch in Zukunft sicher.",
     final_h2: "Warte nicht bis es zu sp\u00e4t ist.",
     final_p: "Alle 39 Sekunden passiert ein Cyberangriff. Der n\u00e4chste k\u00f6nnte dich treffen.",
     final_trust: "Kostet weniger als ein Kaffee pro Tag. Der Free-Plan ist f\u00fcr immer kostenlos.",
@@ -1142,25 +1182,35 @@ en: {
     pro_f1: "Security Audit with AI recommendations",
     pro_f2: "Phishing AI deep analysis",
     pro_f6: "VIPER full analysis + campaign intel",
+    pro_f7: "Dark Web Monitor (3 emails, daily)",
     pro_f3: "20 questions per day",
     pro_f4: "More detailed answers",
     pro_f5: "Stronger AI model",
     pro_btn: "Choose Pro",
-    biz_f1: "Everything in Pro +",
+    biz_f1: "Everything in Pro included",
     biz_f2: "Incident Response Guide",
     biz_f3: "30 questions per day",
     biz_f4: "Code examples & guides",
     biz_f5: "Team access (up to 5 users)",
+    biz_f6: "Dark Web Monitor (10 emails, daily)",
     biz_btn: "Choose Business",
+    tool5_h3: "Dark Web Monitor",
+    tool5_p: "Imagine someone breaks into an online shop and steals millions of passwords \u2014 those end up on the dark web. SecureBot checks daily whether your email address is among them and alerts you instantly via Telegram. So you\u2019re the first to know, before anyone takes over your account.",
+    pain_5: "Somewhere out there your email address is exposed on the dark web \u2014 stolen in a hack of an online shop, app or forum. 12 billion accounts affected. Do you know if yours is one of them?",
+    hero_quantum: "Quantum-Safe Infrastructure \u2014 NIST FIPS 203 certified. Protects your data even against future quantum computers.",
     faq_h2: "Frequently asked questions",
     faq1_q: "Is SecureBot AI free?",
-    faq1_a: "Yes! The Free plan includes the Phishing Checker with no limits and 5 security questions per day. For advanced features like Security Audit, there's Pro and Business.",
+    faq1_a: "Yes! The Free plan includes the Phishing Checker with no limits and 5 security questions per day. For advanced features like Security Audit and Dark Web Monitor, there's Pro and Business.",
     faq2_q: "Do I need technical knowledge?",
     faq2_a: "No. Just type your question or send a suspicious link. SecureBot explains everything clearly \u2013 whether you're a beginner or a pro.",
     faq3_q: "Where is my data stored?",
     faq3_a: "On a server in Frankfurt, Germany. Fully GDPR compliant. You can view your data (/meinedaten) or delete it (/loeschen) anytime.",
     faq4_q: "Can I use SecureBot with my team?",
     faq4_a: "Yes! With the Business plan, you can add up to 5 team members. Everyone gets access to all Pro features.",
+    faq7_q: "What is the Dark Web Monitor and how does it work?",
+    faq7_a: "When hackers attack an online shop, millions of email addresses and passwords end up on the dark web. The Dark Web Monitor checks daily whether your email appears in such stolen datasets \u2014 and sends you an instant Telegram notification so you can change your password before anyone takes over your account. Available from Pro.",
+    faq8_q: "What does \u201cQuantum-Safe\u201d mean?",
+    faq8_a: "In a few years, quantum computers will be able to break today\u2019s encryption. Intelligence agencies are already collecting encrypted data today to decrypt it later. SecureBot uses a new encryption method (ML-KEM-768, NIST FIPS 203) that even quantum computers cannot break \u2014 so your data stays secure in the future too.",
     final_h2: "Don\u2019t wait until it\u2019s too late.",
     final_p: "A cyberattack happens every 39 seconds. The next one could hit you.",
     final_trust: "Costs less than a coffee per day. The Free plan is free forever.",
