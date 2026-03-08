@@ -18,6 +18,9 @@ backups/
 # Guardian Status
 data/guardian_status.json
 
+# Audit Logs
+data/audit.log
+
 # IDE
 .vscode/
 .idea/

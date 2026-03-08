@@ -1,0 +1,95 @@
+ALLGEMEINE GESCHÄFTSBEDINGUNGEN (AGB)
+SecureBot AI - Ein Dienst von AP Digital Solution
+
+Stand: 5. Februar 2026
+
+§1 GELTUNGSBEREICH
+
+(1) Diese AGB gelten für die Nutzung des Telegram-Bots "SecureBot AI" (nachfolgend "Dienst"), betrieben von AP Digital Solution, Inhaber Alexander Potzahr (nachfolgend "Anbieter").
+
+(2) Mit der Nutzung des Dienstes akzeptiert der Nutzer diese AGB.
+
+§2 LEISTUNGSBESCHREIBUNG
+
+(1) SecureBot AI ist ein KI-gestützter Chatbot, der allgemeine Informationen und Orientierungshilfe im Bereich IT-Sicherheit bietet.
+
+(2) Der Dienst ist in folgenden Varianten verfügbar:
+- Free: 5 Anfragen pro Tag, kostenlos
+- Pro: Unbegrenzte Anfragen, 9,99 EUR/Monat
+- Business: Unbegrenzte Anfragen + Zusatzfunktionen, 29,99 EUR/Monat
+
+(3) Der Anbieter behält sich vor, den Funktionsumfang jederzeit anzupassen.
+
+§3 WICHTIGER HAFTUNGSAUSSCHLUSS
+
+(1) Die Antworten des Bots werden durch künstliche Intelligenz (Claude AI von Anthropic Inc.) generiert und stellen KEINE professionelle IT-Security-Beratung, Rechtsberatung oder verbindliche Empfehlung dar.
+
+(2) Die Nutzung der Informationen erfolgt auf eigenes Risiko des Nutzers. Der Anbieter haftet nicht für Schäden, die durch die Anwendung der Bot-Antworten entstehen.
+
+(3) Für kritische Sicherheitsvorfälle wird ausdrücklich empfohlen, professionelle IT-Sicherheitsberater hinzuzuziehen.
+
+(4) Der Anbieter haftet nur bei Vorsatz und grober Fahrlässigkeit. Die Haftung für leichte Fahrlässigkeit ist ausgeschlossen, soweit gesetzlich zulässig.
+
+§4 NUTZUNGSBEDINGUNGEN
+
+(1) Der Nutzer verpflichtet sich, den Dienst nicht für illegale Zwecke zu nutzen.
+
+(2) Insbesondere ist untersagt:
+- Planung oder Durchführung von Cyberangriffen
+- Erstellung von Malware oder Schadcode
+- Social Engineering gegen Dritte
+- Missbrauch der Informationen für kriminelle Handlungen
+- Automatisierte Massenanfragen (Spam)
+- Weiterverkauf der Bot-Antworten
+
+(3) Bei Verstoß gegen diese Bedingungen kann der Anbieter den Zugang sperren.
+
+§5 VERTRAGSSCHLUSS UND ZAHLUNG
+
+(1) Der kostenlose Dienst (Free) wird durch Start des Bots aktiviert.
+
+(2) Kostenpflichtige Abonnements (Pro, Business) werden über den Zahlungsdienstleister Stripe abgewickelt.
+
+(3) Die Preise verstehen sich inklusive aller Steuern (Kleinunternehmerregelung §19 UStG - keine Umsatzsteuer).
+
+(4) Pro- und Business-Abonnements verlängern sich automatisch um einen Monat, sofern nicht vor Ablauf gekündigt wird.
+
+§6 WIDERRUFSRECHT
+
+(1) Verbraucher haben ein 14-tägiges Widerrufsrecht nach Vertragsschluss.
+
+(2) Der Widerruf ist per E-Mail an securebot.ai.contact@gmail.com zu richten.
+
+(3) Im Falle des Widerrufs werden bereits geleistete Zahlungen innerhalb von 14 Tagen erstattet.
+
+§7 KÜNDIGUNG
+
+(1) Der Free-Plan kann jederzeit durch Blockieren des Bots beendet werden.
+
+(2) Kostenpflichtige Abonnements können jederzeit zum Ende des Abrechnungszeitraums per E-Mail gekündigt werden.
+
+(3) Der Anbieter kann den Dienst mit einer Frist von 30 Tagen einstellen.
+
+§8 VERFÜGBARKEIT
+
+(1) Der Anbieter bemüht sich um eine hohe Verfügbarkeit, garantiert jedoch keine unterbrechungsfreie Erreichbarkeit.
+
+(2) Wartungsarbeiten und technische Störungen begründen keine Schadensersatzansprüche.
+
+§9 ÄNDERUNGEN DER AGB
+
+(1) Der Anbieter behält sich vor, diese AGB zu ändern.
+
+(2) Nutzer werden über Änderungen informiert. Die weitere Nutzung gilt als Zustimmung.
+
+§10 SCHLUSSBESTIMMUNGEN
+
+(1) Es gilt das Recht der Bundesrepublik Deutschland.
+
+(2) Gerichtsstand ist Hamburg, soweit gesetzlich zulässig.
+
+(3) Sollten einzelne Bestimmungen unwirksam sein, bleibt die Wirksamkeit der übrigen Bestimmungen unberührt.
+
+AP Digital Solution
+Alexander Potzahr
+Hamburg, 5. Februar 2026

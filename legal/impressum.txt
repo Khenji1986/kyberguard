@@ -1,0 +1,28 @@
+IMPRESSUM
+
+Angaben gemäß § 5 TMG:
+
+AP Digital Solution
+Inhaber: Alexander Potzahr
+Hahnenkamp 2
+22765 Hamburg
+Deutschland
+
+Kontakt:
+E-Mail: securebot.ai.contact@gmail.com
+Telefon: [DEINE TELEFONNUMMER - optional aber empfohlen]
+
+Umsatzsteuer:
+Kleinunternehmer gemäß § 19 UStG.
+Es wird keine Umsatzsteuer ausgewiesen.
+
+Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV:
+Alexander Potzahr
+Hahnenkamp 2
+22765 Hamburg
+
+Haftungshinweis:
+Trotz sorgfältiger inhaltlicher Kontrolle übernehmen wir keine Haftung für die Inhalte externer Links. Für den Inhalt der verlinkten Seiten sind ausschließlich deren Betreiber verantwortlich.
+
+AI-Hinweis:
+SecureBot AI nutzt künstliche Intelligenz (Claude AI von Anthropic) zur Beantwortung von Fragen. Die Antworten stellen keine rechtsverbindliche Beratung dar und ersetzen keine professionelle IT-Security Beratung.

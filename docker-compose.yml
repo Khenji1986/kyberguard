@@ -1,31 +1,70 @@
 version: '3.8'
 
+networks:
+  bot-net:
+    driver: bridge
+    internal: false
+  guardian-net:
+    driver: bridge
+    internal: false
+
 services:
-  securebot:
+  kyberguard:
     build: .
-    container_name: securebot-ai
+    container_name: kyberguard
     restart: unless-stopped
     env_file:
       - .env
     volumes:
       - ./data:/app/data
+    networks:
+      - bot-net
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp:size=50M
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
     healthcheck:
-      test: ["CMD", "python", "-c", "import os; exit(0 if os.path.exists('/app/data/securebot.db') else 1)"]
+      test: ["CMD", "python", "-c", "import os; exit(0 if os.path.exists('/app/data/kyberguard.db') else 1)"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 15s
 
+  quantum-nginx:
+    image: openquantumsafe/nginx
+    container_name: kyberguard-quantum-nginx
+    restart: unless-stopped
+    ports:
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/opt/nginx/nginx-conf/nginx.conf:ro
+      - ./nginx/certs/server.crt:/opt/nginx/pki/server.crt:ro
+      - ./nginx/certs/server.key:/opt/nginx/pki/server.key:ro
+      - ./nginx/html:/opt/nginx/html:ro
+    networks:
+      - bot-net
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+          cpus: '0.10'
+
   guardian:
     build:
       context: .
       dockerfile: Dockerfile.guardian
-    container_name: securebot-guardian
+    container_name: kyberguard-guardian
     restart: unless-stopped
     env_file:
       - .env
@@ -35,8 +74,16 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /proc:/host/proc:ro
       - /var/log:/host/log:ro
+    networks:
+      - guardian-net
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp:size=20M
     depends_on:
-      - securebot
+      kyberguard:
+        condition: service_healthy
     logging:
       driver: "json-file"
       options:

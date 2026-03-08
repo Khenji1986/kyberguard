@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-SecureBot AI - AI Security Berater
+KyberGuard - AI Security Berater
 Ein Produkt von Friegün für Lee
 
 Powered by Claude AI (Anthropic)
@@ -12,7 +12,10 @@ import json
 import time
 import logging
 import sqlite3
-from datetime import datetime, timedelta
+import hashlib
+import asyncio
+import aiohttp
+from datetime import datetime, timedelta, time as dt_time
 from typing import Optional
 from urllib.parse import urlparse
 
@@ -27,6 +30,7 @@ from telegram.ext import (
 )
 from anthropic import Anthropic
 import stripe
+import viper
 
 # Logging Setup
 logging.basicConfig(
@@ -48,6 +52,7 @@ except ValueError:
     logger.error(f"ADMIN_USER_ID ist keine gültige Zahl: '{_admin_id_str}' - Admin-Funktionen deaktiviert!")
     ADMIN_USER_ID = None
 STRIPE_API_KEY = os.getenv("STRIPE_API_KEY")
+HIBP_API_KEY = os.getenv("HIBP_API_KEY")
 
 # Stripe Setup
 stripe.api_key = STRIPE_API_KEY
@@ -97,7 +102,7 @@ async def check_burst_limit(update: Update, user_id: int) -> bool:
     return False
 
 # System Prompt für Security-Expertise
-SYSTEM_PROMPT = """Du bist SecureBot AI, ein erfahrener IT-Security Berater.
+SYSTEM_PROMPT = """Du bist KyberGuard, ein erfahrener IT-Security Berater.
 
 DEINE EXPERTISE:
 - Cybersecurity & IT-Sicherheit (Wissen vermitteln, Konzepte erklären)
@@ -131,13 +136,13 @@ DEIN STIL:
 Du arbeitest für Lee (Alexander Potzahr) und das Reich Friegün."""
 
 # Support Agent System Prompt
-SUPPORT_PROMPT = """Du bist der Support-Agent von SecureBot AI (AP Digital Solution).
+SUPPORT_PROMPT = """Du bist der Support-Agent von KyberGuard (AP Digital Solution).
 
 DEIN JOB: Kundenanfragen freundlich, schnell und kompetent beantworten.
 
 INFORMATIONEN ÜBER DEN DIENST:
 - Anbieter: AP Digital Solution, Alexander Potzahr, Hamburg
-- Dienst: SecureBot AI - KI-gestützter IT-Security Berater
+- Dienst: KyberGuard - KI-gestützter IT-Security Berater
 - Free Plan: 5 Fragen/Tag (kostenlos, kompakte Antworten)
 - Pro Plan: 9,99€/Monat (20 Fragen/Tag, ausführlichere Antworten, stärkeres KI-Modell)
 - Business Plan: 29,99€/Monat (30 Fragen/Tag, maximale Antworttiefe mit Code-Beispielen, Team bis 5 User)
@@ -170,7 +175,7 @@ BEENDE jede Antwort mit:
 """
 
 # Priority Support Agent - für Business Kunden (KI-gestützt, transparent)
-PRIORITY_SUPPORT_PROMPT = """Du bist Alex, ein KI-gestützter Senior Support-Assistent bei SecureBot AI (AP Digital Solution).
+PRIORITY_SUPPORT_PROMPT = """Du bist Alex, ein KI-gestützter Senior Support-Assistent bei KyberGuard (AP Digital Solution).
 
 WICHTIG: Der Kunde wurde als Business-Priority-Kunde an dich weitergeleitet.
 - Schreibe natürlich und persönlich, nicht roboterhaft
@@ -181,7 +186,7 @@ WICHTIG: Der Kunde wurde als Business-Priority-Kunde an dich weitergeleitet.
 - Unterschreibe mit "Beste Grüße, Alex - KI-Assistent, Senior Support"
 
 DEIN WISSEN:
-- Alles über SecureBot AI (Free/Pro/Business Pläne)
+- Alles über KyberGuard (Free/Pro/Business Pläne)
 - IT-Security Expertise auf Senior-Level
 - Billing, Abos, Stripe-Zahlungen
 - Technische Probleme lösen
@@ -203,7 +208,7 @@ DEINE REGELN:
 # Database Setup
 def init_db():
     """Initialisiert die SQLite Datenbank"""
-    conn = sqlite3.connect('/app/data/securebot.db')
+    conn = sqlite3.connect('/app/data/kyberguard.db')
     c = conn.cursor()
 
     # Users Tabelle
@@ -328,13 +333,29 @@ def init_db():
         )
     ''')
 
+    # Dark Web Monitor Tabelle
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS darkweb_monitors (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            email TEXT,
+            last_checked TIMESTAMP,
+            known_breaches TEXT DEFAULT '[]',
+            added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(user_id, email)
+        )
+    ''')
+
+    # VIPER Tabellen
+    viper.init_viper_tables(conn)
+
     conn.commit()
     conn.close()
 
 
 def get_or_create_user(user_id: int, username: str = None, first_name: str = None) -> dict:
     """Holt oder erstellt einen User"""
-    conn = sqlite3.connect('/app/data/securebot.db')
+    conn = sqlite3.connect('/app/data/kyberguard.db')
     c = conn.cursor()
 
     c.execute('SELECT * FROM users WHERE user_id = ?', (user_id,))
@@ -362,7 +383,7 @@ def get_or_create_user(user_id: int, username: str = None, first_name: str = Non
 
 def get_daily_usage(user_id: int) -> int:
     """Holt die heutige Nutzung"""
-    conn = sqlite3.connect('/app/data/securebot.db')
+    conn = sqlite3.connect('/app/data/kyberguard.db')
     c = conn.cursor()
 
     today = datetime.now().date()
@@ -378,7 +399,7 @@ def get_daily_usage(user_id: int) -> int:
 
 def increment_usage(user_id: int, query: str, response: str):
     """Erhöht die Nutzung und speichert die Anfrage"""
-    conn = sqlite3.connect('/app/data/securebot.db')
+    conn = sqlite3.connect('/app/data/kyberguard.db')
     c = conn.cursor()
 
     today = datetime.now().date()
@@ -411,7 +432,7 @@ def get_effective_subscription(user_id: int) -> str:
                 return user['subscription']
 
     # Team-Mitglied eines Business Users? → bekommt Pro-Level (nicht volles Business)
-    conn = sqlite3.connect('/app/data/securebot.db')
+    conn = sqlite3.connect('/app/data/kyberguard.db')
     c = conn.cursor()
     c.execute('''
         SELECT u.subscription, u.subscription_end FROM team_members t
@@ -656,7 +677,7 @@ def analyze_text_for_phishing(text: str) -> dict:
 
 def log_phishing_check(user_id: int, input_text: str, urls: list, risk_score: int, findings: list):
     """Speichert Phishing-Check in DB"""
-    conn = sqlite3.connect('/app/data/securebot.db')
+    conn = sqlite3.connect('/app/data/kyberguard.db')
     c = conn.cursor()
     c.execute(
         'INSERT INTO phishing_checks (user_id, input_text, urls_found, risk_score, findings) VALUES (?, ?, ?, ?, ?)',
@@ -671,7 +692,7 @@ async def handle_phishing_check(update: Update, context: ContextTypes.DEFAULT_TY
     user_id = update.effective_user.id
 
     # Phishing Rate-Limit prüfen
-    conn = sqlite3.connect('/app/data/securebot.db')
+    conn = sqlite3.connect('/app/data/kyberguard.db')
     c = conn.cursor()
     today = datetime.now().strftime('%Y-%m-%d')
     c.execute("SELECT COUNT(*) FROM phishing_checks WHERE user_id = ? AND date(created_at) = ?", (user_id, today))
@@ -916,7 +937,7 @@ async def finish_audit(message, context):
         except Exception:
             user_id = 0
 
-    conn = sqlite3.connect('/app/data/securebot.db')
+    conn = sqlite3.connect('/app/data/kyberguard.db')
     c = conn.cursor()
     c.execute(
         'INSERT INTO security_audits (user_id, grade, score, max_score, answers) VALUES (?, ?, ?, ?, ?)',
@@ -1043,7 +1064,7 @@ async def handle_incident_callback(query, context):
             )
             # DB speichern
             try:
-                conn = sqlite3.connect('/app/data/securebot.db')
+                conn = sqlite3.connect('/app/data/kyberguard.db')
                 c = conn.cursor()
                 c.execute(
                     'INSERT INTO incident_responses (user_id, incident_type, phases_completed, completed) VALUES (?, ?, ?, 1)',
@@ -1106,7 +1127,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     get_or_create_user(user.id, user.username, user.first_name)
 
     welcome_text = f"""
-🛡️ **Willkommen bei SecureBot AI, {user.first_name}!**
+🛡️ **Willkommen bei KyberGuard, {user.first_name}!**
 
 Ich bin dein persönlicher AI Security Berater.
 
@@ -1141,7 +1162,7 @@ Schritt-für-Schritt Hilfe bei Security-Vorfällen.
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Help Command"""
     help_text = """
-🛡️ **SecureBot AI - Hilfe**
+🛡️ **KyberGuard - Hilfe**
 
 **Befehle:**
 /start - Bot starten
@@ -1208,7 +1229,7 @@ async def trial(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """7-Tage Pro Trial - einmalig pro User"""
     user_id = update.effective_user.id
 
-    conn = sqlite3.connect('/app/data/securebot.db')
+    conn = sqlite3.connect('/app/data/kyberguard.db')
     c = conn.cursor()
 
     # User prüfen
@@ -1283,7 +1304,7 @@ async def upgrade(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     upgrade_text = """
-⬆️ **Upgrade dein SecureBot AI**
+⬆️ **Upgrade dein KyberGuard**
 
 **Pro Plan**
 ✓ 20 Fragen pro Tag
@@ -1450,7 +1471,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         increment_usage(user_id, question, response)
 
     # Antwort senden
-    await thinking_msg.edit_text(f"🛡️ **SecureBot AI:**\n\n{response}", parse_mode='Markdown')
+    await thinking_msg.edit_text(f"🛡️ **KyberGuard:**\n\n{response}", parse_mode='Markdown')
     if user_data['subscription'] == 'free':
         remaining = FREE_DAILY_LIMIT - get_daily_usage(user_id)
         if remaining <= 2:
@@ -1473,7 +1494,7 @@ E-Mail: securebot.ai.contact@gmail.com
 Kleinunternehmer gem. § 19 UStG.
 
 **AI-Hinweis:**
-SecureBot AI nutzt KI (Claude AI von Anthropic). Antworten stellen keine rechtsverbindliche Beratung dar.
+KyberGuard nutzt KI (Claude AI von Anthropic). Antworten stellen keine rechtsverbindliche Beratung dar.
 
 Vollständiges Impressum: /impressum
 """
@@ -1487,7 +1508,7 @@ async def agb(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 **Anbieter:** AP Digital Solution, Alexander Potzahr
 
-**Dienst:** SecureBot AI - KI-gestützter IT-Security Berater
+**Dienst:** KyberGuard - KI-gestützter IT-Security Berater
 
 **Pläne:**
 • Free: 5 Fragen/Tag (kostenlos)
@@ -1550,7 +1571,7 @@ async def meinedaten(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """DSGVO Art. 15 - Auskunftsrecht: Zeigt dem User alle gespeicherten Daten"""
     user_id = update.effective_user.id
 
-    conn = sqlite3.connect('/app/data/securebot.db')
+    conn = sqlite3.connect('/app/data/kyberguard.db')
     c = conn.cursor()
 
     # User-Daten
@@ -1622,7 +1643,7 @@ async def loeschen(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Löschung durchführen
     context.user_data.pop('confirm_delete', None)
 
-    conn = sqlite3.connect('/app/data/securebot.db')
+    conn = sqlite3.connect('/app/data/kyberguard.db')
     c = conn.cursor()
 
     c.execute('DELETE FROM usage WHERE user_id = ?', (user_id,))
@@ -1691,7 +1712,7 @@ async def support_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     await update.message.reply_text(
-        "🎧 **SecureBot Support**\n\n"
+        "🎧 **KyberGuard Support**\n\n"
         "Wie kann ich dir helfen? Wähle ein Thema oder beschreibe dein Anliegen direkt.\n\n"
         "Tippe /end um den Support zu beenden.",
         reply_markup=reply_markup,
@@ -1729,7 +1750,7 @@ async def handle_support_callback(query, context):
     response = await ask_support_agent(topic, user_info)
 
     # Support-Ticket speichern
-    conn = sqlite3.connect('/app/data/securebot.db')
+    conn = sqlite3.connect('/app/data/kyberguard.db')
     c = conn.cursor()
     escalated = 1 if '[ESKALATION]' in response else 0
     c.execute(
@@ -1837,7 +1858,7 @@ async def handle_support_message(update: Update, context: ContextTypes.DEFAULT_T
             response = "Entschuldigung, ich habe gerade ein technisches Problem. Ich leite Sie an einen Kollegen weiter. [ESKALATION]"
 
         # Ticket speichern
-        conn = sqlite3.connect('/app/data/securebot.db')
+        conn = sqlite3.connect('/app/data/kyberguard.db')
         c = conn.cursor()
         escalated = 1 if '[ESKALATION]' in response else 0
         c.execute(
@@ -1875,7 +1896,7 @@ async def handle_support_message(update: Update, context: ContextTypes.DEFAULT_T
     response = await ask_support_agent(question, user_info)
 
     # Ticket speichern
-    conn = sqlite3.connect('/app/data/securebot.db')
+    conn = sqlite3.connect('/app/data/kyberguard.db')
     c = conn.cursor()
     escalated = 1 if '[ESKALATION]' in response else 0
     c.execute(
@@ -1967,7 +1988,7 @@ async def team_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     action = args[0].lower()
-    conn = sqlite3.connect('/app/data/securebot.db')
+    conn = sqlite3.connect('/app/data/kyberguard.db')
     c = conn.cursor()
 
     if action == 'add' and len(args) >= 2:
@@ -2013,7 +2034,7 @@ async def team_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await context.bot.send_message(
                     chat_id=member[0],
                     text="🏢 **Du wurdest einem Business-Team hinzugefügt!**\n\n"
-                         "Du hast jetzt Pro-Zugang zu SecureBot AI (20 Fragen/Tag, detaillierte Analysen).",
+                         "Du hast jetzt Pro-Zugang zu KyberGuard (20 Fragen/Tag, detaillierte Analysen).",
                     parse_mode='Markdown'
                 )
             except Exception:
@@ -2068,7 +2089,7 @@ async def check_stripe_payments(context: ContextTypes.DEFAULT_TYPE):
         # Timestamp-Validierung: Sessions älter als 24h ignorieren (Security)
         cutoff_time = int(time.time()) - 86400
 
-        conn = sqlite3.connect('/app/data/securebot.db')
+        conn = sqlite3.connect('/app/data/kyberguard.db')
         c = conn.cursor()
 
         for session in sessions.data:
@@ -2198,7 +2219,7 @@ async def check_stripe_payments(context: ContextTypes.DEFAULT_TYPE):
 
 async def check_subscription_expiry(context: ContextTypes.DEFAULT_TYPE):
     """Prüft Abo-Status: Stripe Subscriptions + Einmalzahlungen mit Ablaufdatum"""
-    conn = sqlite3.connect('/app/data/securebot.db')
+    conn = sqlite3.connect('/app/data/kyberguard.db')
     c = conn.cursor()
 
     today = datetime.now().date()
@@ -2349,7 +2370,7 @@ async def admin_activate(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❌ Plan muss 'pro', 'business' oder 'free' sein.")
         return
 
-    conn = sqlite3.connect('/app/data/securebot.db')
+    conn = sqlite3.connect('/app/data/kyberguard.db')
     c = conn.cursor()
 
     end_date = (datetime.now() + timedelta(days=days)).strftime('%Y-%m-%d') if plan != 'free' else None
@@ -2379,7 +2400,7 @@ async def admin_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not is_admin(user_id):
         return
 
-    conn = sqlite3.connect('/app/data/securebot.db')
+    conn = sqlite3.connect('/app/data/kyberguard.db')
     c = conn.cursor()
 
     # Stats sammeln
@@ -2398,7 +2419,7 @@ async def admin_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
     conn.close()
 
     stats_text = f"""
-📊 **Admin Stats - SecureBot AI**
+📊 **Admin Stats - KyberGuard**
 
 **Users:**
 • Total: {total_users}
@@ -2430,6 +2451,10 @@ async def soc_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             with open(status_file, 'r') as f:
                 s = json.load(f)
 
+            audit_icon = "✅" if s.get('audit_chain_ok', False) else "🚨"
+            env_icon = "✅" if s.get('env_vars_ok', False) else "⚠️"
+            bot_icon = "✅" if s.get('bot_running', False) else "🚨"
+
             text = (
                 "🛡️ **SOC Guardian Status**\n\n"
                 f"**System:**\n"
@@ -2439,10 +2464,17 @@ async def soc_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"**Guardian:**\n"
                 f"• Letzter Check: {s.get('last_check', '?')}\n"
                 f"• Uptime: {s.get('uptime_hours', 0):.1f}h\n"
-                f"• Alerts heute: {s.get('alerts_today', 0)}\n\n"
+                f"• Alerts heute: {s.get('alerts_today', 0)}\n"
+                f"• Version: {s.get('version', '?')}\n\n"
                 f"**Daten:**\n"
+                f"• {bot_icon} Bot: {'Running' if s.get('bot_running') else 'DOWN!'}\n"
                 f"• DB: {s.get('db_size_kb', '?')} KB\n"
                 f"• Letztes Backup: {s.get('last_backup', 'Noch nie')}\n"
+                f"• Backups: {s.get('backup_count', 0)}\n\n"
+                f"**Sicherheit:**\n"
+                f"• {audit_icon} Audit-Chain: {'OK' if s.get('audit_chain_ok') else 'KOMPROMITTIERT!'} ({s.get('audit_entries', 0)} Einträge)\n"
+                f"• {env_icon} Env-Vars: {'OK' if s.get('env_vars_ok') else 'FEHLER'}\n"
+                f"• SSH Failed: {s.get('ssh_failed_today', 0)}\n"
             )
         except Exception as e:
             text = f"⚠️ SOC Status Fehler: {e}"
@@ -2450,6 +2482,344 @@ async def soc_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         text = "⚠️ Guardian läuft nicht oder hat noch keinen Status geschrieben."
 
     await update.message.reply_text(text, parse_mode='Markdown')
+
+
+async def visher_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    /visher +49151... - Telefonnummer auf Vishing/Scam pruefen
+    Free: Spam-Score | Pro/Business: Vollanalyse mit Kampagnen-Kontext
+    """
+    user_id = update.effective_user.id
+    if await check_burst_limit(update, user_id):
+        return
+
+    if not context.args:
+        await update.message.reply_text(
+            "*VIPER - Vishing Intelligence*\n\n"
+            "Nutzung: `/visher +49151...`\n"
+            "Beispiel: `/visher +4915123456789`\n\n"
+            "Free: Spam-Score\n"
+            "Pro/Business: Vollanalyse + Kampagnen-Kontext",
+            parse_mode="Markdown",
+        )
+        return
+
+    number = context.args[0]
+    user = get_or_create_user(
+        user_id,
+        update.effective_user.username,
+        update.effective_user.first_name,
+    )
+    subscription = user.get("subscription", "free")
+    is_pro = subscription in ("pro", "business")
+
+    await update.message.reply_text("Analysiere Nummer...", parse_mode="Markdown")
+
+    conn = sqlite3.connect("/app/data/kyberguard.db")
+    try:
+        result = await viper.analyze(number, is_pro, conn)
+    finally:
+        conn.close()
+
+    await update.message.reply_text(result, parse_mode="Markdown")
+
+
+async def vreport_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    /vreport +49151... [typ] - Scam-Nummer anonym melden
+    Typ optional: bank | support | behörde | paket | sonstige
+    """
+    user_id = update.effective_user.id
+    if await check_burst_limit(update, user_id):
+        return
+
+    if not context.args:
+        await update.message.reply_text(
+            "*VIPER - Nummer melden*\n\n"
+            "Nutzung: `/vreport +49151... [typ]`\n\n"
+            "Typen: `bank` | `support` | `behoerde` | `paket` | `sonstige`\n"
+            "Beispiel: `/vreport +4915123456789 bank`\n\n"
+            "_Alle Meldungen sind anonym. Kein Nutzerbezug wird gespeichert._",
+            parse_mode="Markdown",
+        )
+        return
+
+    number_raw = context.args[0]
+    scam_type = context.args[1].lower() if len(context.args) > 1 else "sonstige"
+    valid_types = {"bank", "support", "behoerde", "paket", "sonstige"}
+    if scam_type not in valid_types:
+        scam_type = "sonstige"
+
+    norm = viper.normalize_number(number_raw)
+    if not viper.is_valid_number(norm):
+        await update.message.reply_text(
+            "Ungueltige Nummer. Format: `/vreport +49151...`",
+            parse_mode="Markdown",
+        )
+        return
+
+    conn = sqlite3.connect("/app/data/kyberguard.db")
+    try:
+        viper.db_add_report(norm, scam_type, "", conn)
+    finally:
+        conn.close()
+
+    await update.message.reply_text(
+        f"Meldung eingegangen.\n`{norm}` wurde als *{scam_type}* gemeldet.\n\n"
+        "_Danke - du schuetzt andere Nutzer!_",
+        parse_mode="Markdown",
+    )
+
+
+async def viper_stats_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Admin: VIPER Statistiken"""
+    if not is_admin(update.effective_user.id):
+        return
+    conn = sqlite3.connect("/app/data/kyberguard.db")
+    try:
+        stats = viper.db_get_stats(conn)
+    finally:
+        conn.close()
+    await update.message.reply_text(
+        f"*VIPER Statistiken*\n\n"
+        f"Nummern gesamt: {stats['total']}\n"
+        f"Hohes Risiko (>=75): {stats['high_risk']}\n"
+        f"Community-Reports: {stats['reports']}\n"
+        f"Aktive Kampagnen: {stats['campaigns']}",
+        parse_mode="Markdown",
+    )
+
+
+async def hibp_check_email(email: str) -> dict:
+    """Prüft eine E-Mail gegen HaveIBeenPwned API v3. Gibt dict mit Ergebnis zurück."""
+    if not HIBP_API_KEY:
+        return {"error": "no_key"}
+    url = f"https://haveibeenpwned.com/api/v3/breachedaccount/{email}?truncateResponse=false"
+    headers = {
+        "hibp-api-key": HIBP_API_KEY,
+        "user-agent": "KyberGuard-AI-Frieguen/1.0",
+    }
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, headers=headers, timeout=aiohttp.ClientTimeout(total=10)) as resp:
+                if resp.status == 200:
+                    breaches = await resp.json()
+                    return {"found": True, "breaches": breaches, "count": len(breaches)}
+                elif resp.status == 404:
+                    return {"found": False, "breaches": [], "count": 0}
+                elif resp.status == 429:
+                    return {"error": "rate_limit"}
+                else:
+                    return {"error": f"http_{resp.status}"}
+    except Exception as e:
+        logger.error(f"HIBP API Fehler: {e}")
+        return {"error": str(e)}
+
+
+def _darkweb_result_text(email: str, result: dict) -> str:
+    """Formatiert das HIBP-Ergebnis als Telegram-Nachricht."""
+    if result.get("error") == "no_key":
+        return "⚙️ *Dark Web Monitor nicht konfiguriert.*\nDer API-Key fehlt. Bitte Admin kontaktieren."
+    if result.get("error") == "rate_limit":
+        return "⏳ Zu viele Anfragen. Bitte kurz warten."
+    if result.get("error"):
+        return f"❌ Fehler bei der Abfrage: `{result['error']}`"
+
+    if not result["found"]:
+        return (
+            f"✅ *Kein Leak gefunden!*\n\n"
+            f"E-Mail `{email}` wurde in keiner bekannten Datenpanne gefunden.\n\n"
+            f"_Quelle: HaveIBeenPwned — {datetime.now().strftime('%d.%m.%Y')}_"
+        )
+
+    breaches = result["breaches"]
+    count = result["count"]
+    lines = [f"🚨 *{count} Datenpanne(n) gefunden!*\n\nE-Mail: `{email}`\n"]
+    for b in breaches[:5]:
+        date = b.get("BreachDate", "?")
+        title = b.get("Title", b.get("Name", "?"))
+        pwn = b.get("PwnCount", 0)
+        data_classes = ", ".join(b.get("DataClasses", [])[:3])
+        lines.append(f"🔴 *{title}* ({date})\n   Betroffene: {pwn:,} | Daten: {data_classes}")
+    if count > 5:
+        lines.append(f"\n_...und {count - 5} weitere Datenpannen._")
+    lines.append(f"\n_Quelle: HaveIBeenPwned — {datetime.now().strftime('%d.%m.%Y')}_")
+    return "\n".join(lines)
+
+
+async def darkweb_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """/darkweb [email] — Dark Web E-Mail-Monitoring (Pro/Business)"""
+    user = update.effective_user
+    user_data = get_or_create_user(user.id, user.username, user.first_name)
+    sub = get_effective_subscription(user.id)
+
+    if sub == "free":
+        await update.message.reply_text(
+            "🔒 *Dark Web Monitor — Pro & Business Feature*\n\n"
+            "Prüfe ob deine E-Mail in Datenlecks auftaucht und erhalte automatische Benachrichtigungen.\n\n"
+            "👉 Upgrade mit /upgrade",
+            parse_mode="Markdown",
+        )
+        return
+
+    args = context.args
+    if not args:
+        # Zeige überwachte E-Mails
+        conn = sqlite3.connect("/app/data/kyberguard.db")
+        try:
+            c = conn.cursor()
+            c.execute("SELECT email, last_checked, known_breaches FROM darkweb_monitors WHERE user_id=? ORDER BY added_at", (user.id,))
+            rows = c.fetchall()
+        finally:
+            conn.close()
+
+        if not rows:
+            await update.message.reply_text(
+                "📡 *Dark Web Monitor*\n\n"
+                "Keine E-Mails überwacht.\n\n"
+                "Füge eine E-Mail hinzu:\n`/darkweb deine@email.de`\n\n"
+                "_Prüfung erfolgt sofort + täglich automatisch._",
+                parse_mode="Markdown",
+            )
+            return
+
+        max_monitors = 3 if sub == "pro" else 10
+        lines = [f"📡 *Dark Web Monitor* ({len(rows)}/{max_monitors} E-Mails)\n"]
+        for email, last_checked, known_json in rows:
+            try:
+                known = json.loads(known_json or "[]")
+            except Exception:
+                known = []
+            status = f"🔴 {len(known)} Leak(s)" if known else "✅ Sauber"
+            checked = last_checked[:10] if last_checked else "Nie"
+            lines.append(f"• `{email}` — {status} _(geprüft: {checked})_")
+        lines.append(f"\n_Neue E-Mail: /darkweb neue@email.de_")
+        lines.append(f"_Entfernen: /darkweb remove email@example.com_")
+        await update.message.reply_text("\n".join(lines), parse_mode="Markdown")
+        return
+
+    # remove Befehl
+    if args[0].lower() == "remove" and len(args) >= 2:
+        email = args[1].lower().strip()
+        conn = sqlite3.connect("/app/data/kyberguard.db")
+        try:
+            conn.execute("DELETE FROM darkweb_monitors WHERE user_id=? AND email=?", (user.id, email))
+            conn.commit()
+        finally:
+            conn.close()
+        await update.message.reply_text(f"🗑️ `{email}` aus dem Monitoring entfernt.", parse_mode="Markdown")
+        return
+
+    # E-Mail prüfen und hinzufügen
+    email = args[0].lower().strip()
+    if "@" not in email or "." not in email.split("@")[-1]:
+        await update.message.reply_text("❌ Ungültige E-Mail-Adresse.", parse_mode="Markdown")
+        return
+
+    max_monitors = 3 if sub == "pro" else 10
+    conn = sqlite3.connect("/app/data/kyberguard.db")
+    try:
+        c = conn.cursor()
+        c.execute("SELECT COUNT(*) FROM darkweb_monitors WHERE user_id=?", (user.id,))
+        count = c.fetchone()[0]
+    finally:
+        conn.close()
+
+    if count >= max_monitors:
+        await update.message.reply_text(
+            f"⚠️ Limit erreicht ({max_monitors} E-Mails für {sub.capitalize()}).\n"
+            f"Entferne eine E-Mail mit `/darkweb remove email@example.com`",
+            parse_mode="Markdown",
+        )
+        return
+
+    await update.message.reply_text(f"🔍 Prüfe `{email}` gegen {3_000_000_000:,} kompromittierte Accounts...", parse_mode="Markdown")
+
+    result = await hibp_check_email(email)
+    text = _darkweb_result_text(email, result)
+
+    # In DB speichern
+    known_names = [b.get("Name", "") for b in result.get("breaches", [])]
+    conn = sqlite3.connect("/app/data/kyberguard.db")
+    try:
+        conn.execute(
+            "INSERT OR REPLACE INTO darkweb_monitors (user_id, email, last_checked, known_breaches) VALUES (?, ?, ?, ?)",
+            (user.id, email, datetime.now().isoformat(), json.dumps(known_names)),
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
+    await update.message.reply_text(text, parse_mode="Markdown")
+
+    if result.get("found"):
+        await update.message.reply_text(
+            "💡 *Empfohlene Sofortmaßnahmen:*\n\n"
+            "1. Passwort sofort ändern (alle betroffenen Dienste)\n"
+            "2. Einzigartiges Passwort pro Dienst (Passwort-Manager)\n"
+            "3. 2-Faktor-Authentifizierung aktivieren\n"
+            "4. Prüfe ob Passwörter wiederverwendet wurden\n\n"
+            "_Diese E-Mail wird ab jetzt täglich überwacht — du wirst bei neuen Leaks benachrichtigt._",
+            parse_mode="Markdown",
+        )
+    else:
+        await update.message.reply_text(
+            "_Diese E-Mail wird ab jetzt täglich überwacht — du wirst bei neuen Leaks benachrichtigt._",
+            parse_mode="Markdown",
+        )
+
+
+async def check_darkweb_monitors(context: ContextTypes.DEFAULT_TYPE):
+    """Täglicher Job: prüft alle überwachten E-Mails auf neue Datenpannen."""
+    if not HIBP_API_KEY:
+        return
+
+    conn = sqlite3.connect("/app/data/kyberguard.db")
+    try:
+        c = conn.cursor()
+        c.execute("SELECT id, user_id, email, known_breaches FROM darkweb_monitors")
+        rows = c.fetchall()
+    finally:
+        conn.close()
+
+    for row_id, user_id, email, known_json in rows:
+        try:
+            known = set(json.loads(known_json or "[]"))
+        except Exception:
+            known = set()
+
+        await asyncio.sleep(1.5)  # HIBP Rate-Limit: max 1 Req/1.5s
+        result = await hibp_check_email(email)
+
+        if result.get("error"):
+            continue
+
+        new_names = set(b.get("Name", "") for b in result.get("breaches", []))
+        new_breaches = new_names - known
+
+        if new_breaches:
+            new_details = [b for b in result.get("breaches", []) if b.get("Name") in new_breaches]
+            lines = [f"🚨 *Neuer Datenleak entdeckt!*\n\nE-Mail: `{email}`\n"]
+            for b in new_details:
+                lines.append(f"🔴 *{b.get('Title', b.get('Name'))}* ({b.get('BreachDate', '?')})\n   Daten: {', '.join(b.get('DataClasses', [])[:3])}")
+            lines.append("\n⚡ Passwort sofort ändern + 2FA aktivieren!")
+            try:
+                await context.bot.send_message(chat_id=user_id, text="\n".join(lines), parse_mode="Markdown")
+            except Exception as e:
+                logger.warning(f"DarkWeb Alert konnte nicht gesendet werden (user {user_id}): {e}")
+
+        # Immer aktualisieren
+        conn = sqlite3.connect("/app/data/kyberguard.db")
+        try:
+            conn.execute(
+                "UPDATE darkweb_monitors SET last_checked=?, known_breaches=? WHERE id=?",
+                (datetime.now().isoformat(), json.dumps(list(new_names)), row_id),
+            )
+            conn.commit()
+        finally:
+            conn.close()
+
+    logger.info(f"Dark Web Monitor: {len(rows)} E-Mails geprüft.")
 
 
 def main():
@@ -2478,9 +2848,13 @@ def main():
     application.add_handler(CommandHandler("reply", admin_reply))
     application.add_handler(CommandHandler("team", team_command))
     application.add_handler(CommandHandler("check", check_command))
+    application.add_handler(CommandHandler("visher", visher_command))
+    application.add_handler(CommandHandler("vreport", vreport_command))
+    application.add_handler(CommandHandler("vstats", viper_stats_command))
     application.add_handler(CommandHandler("audit", audit_command))
     application.add_handler(CommandHandler("incident", incident_command))
     application.add_handler(CommandHandler("soc", soc_command))
+    application.add_handler(CommandHandler("darkweb", darkweb_command))
     application.add_handler(CallbackQueryHandler(button_callback))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
@@ -2495,8 +2869,13 @@ def main():
     application.job_queue.run_repeating(check_subscription_expiry, interval=21600, first=60)
     logger.info("Abo-Ablauf-Checker aktiviert (alle 6h)")
 
+    # Dark Web Monitor: täglich alle überwachten E-Mails prüfen (02:00 UTC)
+    if HIBP_API_KEY:
+        application.job_queue.run_daily(check_darkweb_monitors, time=dt_time(2, 0))
+        logger.info("Dark Web Monitor aktiviert (täglich 02:00 UTC)")
+
     # Bot starten
-    logger.info("SecureBot AI startet...")
+    logger.info("KyberGuard startet...")
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 

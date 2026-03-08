@@ -1,0 +1,123 @@
+DATENSCHUTZERKLÄRUNG
+SecureBot AI - Ein Dienst von AP Digital Solution
+
+Stand: 5. Februar 2026
+
+1. VERANTWORTLICHER
+
+AP Digital Solution
+Inhaber: Alexander Potzahr
+Hahnenkamp 2
+22765 Hamburg
+Deutschland
+E-Mail: securebot.ai.contact@gmail.com
+
+2. WELCHE DATEN WIR ERHEBEN
+
+Bei der Nutzung von SecureBot AI werden folgende Daten verarbeitet:
+
+a) Telegram-Nutzerdaten (automatisch durch Telegram übermittelt):
+- Telegram User ID (Nummer)
+- Telegram Benutzername
+- Vorname
+
+b) Nutzungsdaten:
+- Gestellte Fragen (Anfragen an den Bot)
+- Antworten des Bots
+- Zeitpunkt der Nutzung
+- Tägliche Nutzungsanzahl
+
+c) Abo-Daten (bei Pro/Business):
+- Abo-Status (Free/Pro/Business)
+- Abo-Laufzeit
+
+3. ZWECK DER DATENVERARBEITUNG
+
+Wir verarbeiten Ihre Daten für folgende Zwecke:
+
+a) Bereitstellung des Dienstes (Art. 6 Abs. 1 lit. b DSGVO)
+- Beantwortung Ihrer IT-Security-Fragen
+- Verwaltung Ihres Nutzerkontos
+- Durchsetzung der täglichen Nutzungslimits
+
+b) Berechtigte Interessen (Art. 6 Abs. 1 lit. f DSGVO)
+- Verbesserung des Dienstes
+- Missbrauchserkennung
+
+4. DRITTANBIETER UND DATENÜBERMITTLUNG
+
+a) Telegram (Telegram FZ-LLC, Dubai):
+- Die Kommunikation läuft über Telegram-Server
+- Es gilt die Datenschutzerklärung von Telegram
+- Wir haben keinen Einfluss auf die Datenverarbeitung durch Telegram
+
+b) Anthropic (Anthropic PBC, USA):
+- Ihre Fragen werden an die Claude AI API übermittelt
+- Anthropic verarbeitet die Anfragen zur Generierung von Antworten
+- Datenübermittlung in die USA auf Basis von Standardvertragsklauseln (SCCs)
+- Anthropic Datenschutzrichtlinie: https://www.anthropic.com/privacy
+
+c) Stripe (Stripe Inc., USA) - nur bei Bezahlung:
+- Zahlungsabwicklung für Pro/Business-Abonnements
+- Wir speichern keine Kreditkartendaten
+- Stripe Datenschutzrichtlinie: https://stripe.com/de/privacy
+
+5. SPEICHERUNG
+
+a) Speicherort: SQLite-Datenbank auf unserem Server (Deutschland/EU)
+
+b) Speicherdauer:
+- Nutzerdaten: Bis zur Löschung des Accounts
+- Nutzungsdaten: 90 Tage, danach automatische Löschung
+- Abrechnungsdaten: 10 Jahre (gesetzliche Aufbewahrungspflicht)
+
+6. IHRE RECHTE (BETROFFENENRECHTE)
+
+Sie haben folgende Rechte nach DSGVO:
+
+a) Auskunftsrecht (Art. 15 DSGVO)
+- Welche Daten wir über Sie gespeichert haben
+
+b) Recht auf Berichtigung (Art. 16 DSGVO)
+- Korrektur falscher Daten
+
+c) Recht auf Löschung (Art. 17 DSGVO)
+- Löschung Ihrer Daten ("Recht auf Vergessenwerden")
+
+d) Recht auf Einschränkung (Art. 18 DSGVO)
+- Einschränkung der Verarbeitung
+
+e) Recht auf Datenübertragbarkeit (Art. 20 DSGVO)
+- Export Ihrer Daten in maschinenlesbarem Format
+
+f) Widerspruchsrecht (Art. 21 DSGVO)
+- Widerspruch gegen die Verarbeitung
+
+Zur Ausübung Ihrer Rechte kontaktieren Sie uns per E-Mail: securebot.ai.contact@gmail.com
+
+7. BESCHWERDERECHT
+
+Sie haben das Recht, sich bei einer Aufsichtsbehörde zu beschweren:
+
+Der Hamburgische Beauftragte für Datenschutz und Informationsfreiheit
+Ludwig-Erhard-Straße 22
+20459 Hamburg
+https://datenschutz-hamburg.de
+
+8. DATENSICHERHEIT
+
+Wir setzen technische und organisatorische Maßnahmen ein:
+- Verschlüsselte Kommunikation (HTTPS/TLS)
+- Zugriffskontrolle auf Datenbanken
+- Regelmäßige Sicherheitsupdates
+- Minimierung der erhobenen Daten (Datensparsamkeit)
+
+9. ÄNDERUNGEN
+
+Wir behalten uns vor, diese Datenschutzerklärung anzupassen. Die aktuelle Version ist jederzeit über den Bot-Befehl /datenschutz abrufbar.
+
+10. KONTAKT BEI DATENSCHUTZFRAGEN
+
+AP Digital Solution
+Alexander Potzahr
+E-Mail: securebot.ai.contact@gmail.com

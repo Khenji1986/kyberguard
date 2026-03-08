@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-SecureBot AI Guardian - Mini-SOC Monitor
+SecureBot AI Guardian - Mini-SOC Monitor v1.1
 Ueberwacht System, Bot, DB, SSH und sendet Alerts via Telegram.
+v1.1: Tamper-Proof Audit-Log (Hash-Chain), Environment-Monitor, Security-Haertung
 
 Ein Produkt von Frieguen fuer Lee.
 """
@@ -43,6 +44,7 @@ class GuardianConfig:
     BOT_CONTAINER = 'securebot-ai'
     BACKUP_DIR = '/app/backups'
     STATUS_FILE = '/app/data/guardian_status.json'
+    AUDIT_LOG = '/app/data/audit.log'
     CHECK_INTERVAL = 300  # 5 Minuten
     BACKUP_HOUR = 3       # 03:00 UTC
     REPORT_HOUR = 7       # 07:00 UTC (08:00 CET)
@@ -63,12 +65,98 @@ class GuardianConfig:
 
 
 # ============================================================
-# AlertManager - Telegram Alerts mit Deduplication
+# AuditLogger - Tamper-Proof Hash-Chain Log
+# ============================================================
+class AuditLogger:
+    """Append-only Audit-Log mit SHA256 Hash-Chain.
+    Jeder Eintrag referenziert den Hash des vorherigen.
+    Manipulation wird sofort erkannt."""
+
+    def __init__(self, log_file: str):
+        self.log_file = log_file
+        self.last_hash = '0' * 64
+        self.entry_count = 0
+        self._load_last_hash()
+
+    def _load_last_hash(self):
+        try:
+            if not os.path.exists(self.log_file):
+                return
+            with open(self.log_file, 'r') as f:
+                last_line = None
+                for line in f:
+                    self.entry_count += 1
+                    last_line = line
+                if last_line:
+                    entry = json.loads(last_line.strip())
+                    self.last_hash = entry.get('hash', '0' * 64)
+        except Exception:
+            self.last_hash = '0' * 64
+
+    def log(self, event: str, details: str, severity: str = 'INFO'):
+        entry = {
+            'ts': datetime.now().isoformat(),
+            'seq': self.entry_count,
+            'event': event,
+            'severity': severity,
+            'details': details[:500],
+            'prev_hash': self.last_hash
+        }
+        raw = json.dumps(entry, sort_keys=True).encode()
+        entry_hash = hashlib.sha256(raw).hexdigest()
+        entry['hash'] = entry_hash
+        self.last_hash = entry_hash
+        self.entry_count += 1
+
+        try:
+            with open(self.log_file, 'a') as f:
+                f.write(json.dumps(entry) + '\n')
+        except Exception as e:
+            logger.error(f"Audit Log Fehler: {e}")
+
+    def verify_chain(self) -> tuple:
+        """Verifiziere die gesamte Hash-Chain. Returns (ok, count, message)."""
+        try:
+            if not os.path.exists(self.log_file):
+                return (True, 0, "Kein Log vorhanden")
+
+            expected_prev = '0' * 64
+            count = 0
+
+            with open(self.log_file, 'r') as f:
+                for line in f:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    entry = json.loads(line)
+
+                    if entry.get('prev_hash') != expected_prev:
+                        return (False, count, f"Chain gebrochen bei #{count}")
+
+                    stored_hash = entry.pop('hash')
+                    raw = json.dumps(entry, sort_keys=True).encode()
+                    computed = hashlib.sha256(raw).hexdigest()
+                    entry['hash'] = stored_hash
+
+                    if computed != stored_hash:
+                        return (False, count, f"Hash-Mismatch bei #{count}")
+
+                    expected_prev = stored_hash
+                    count += 1
+
+            return (True, count, f"{count} Eintraege OK")
+        except Exception as e:
+            return (False, -1, str(e))
+
+
+# ============================================================
+# AlertManager - Telegram Alerts mit Deduplication + Audit
 # ============================================================
 class AlertManager:
-    def __init__(self, token: str, admin_id: int):
+    def __init__(self, token: str, admin_id: int, audit: AuditLogger = None):
         self.bot = Bot(token=token)
         self.admin_id = admin_id
+        self.audit = audit
         self.history: dict[str, float] = {}
         self.cooldown = 3600  # 60 Min Dedup
         self.alerts_today = 0
@@ -101,6 +189,10 @@ class AlertManager:
             logger.info(f"Alert gesendet: [{severity}] {title}")
         except Exception as e:
             logger.error(f"Alert senden fehlgeschlagen: {e}")
+
+        # Automatisch ins Audit-Log
+        if self.audit:
+            self.audit.log(f"ALERT:{title}", msg[:200], severity)
 
     async def send_report(self, text: str):
         try:
@@ -265,7 +357,7 @@ class DatabaseMonitor:
 # FileIntegrityMonitor - SHA256 Hashes
 # ============================================================
 class FileIntegrityMonitor:
-    WATCHED = ['/app/bot.py', '/app/requirements.txt']
+    WATCHED = ['/app/bot.py', '/app/requirements.txt', '/app/security_monitor.py']
 
     def __init__(self):
         self.baseline: dict[str, str] = {}
@@ -338,6 +430,41 @@ class SSHMonitor:
 
 
 # ============================================================
+# EnvironmentMonitor - Prueft kritische Env-Vars
+# ============================================================
+class EnvironmentMonitor:
+    """Stellt sicher dass kritische Umgebungsvariablen gesetzt sind.
+    Speichert nur Hashes - niemals die Werte selbst."""
+
+    REQUIRED = ['TELEGRAM_TOKEN', 'ANTHROPIC_API_KEY', 'STRIPE_API_KEY', 'ADMIN_USER_ID']
+
+    def __init__(self):
+        self.baseline: dict[str, str] = {}
+        for var in self.REQUIRED:
+            val = os.getenv(var, '')
+            if val:
+                self.baseline[var] = hashlib.sha256(val.encode()).hexdigest()
+
+    def check(self) -> list:
+        issues = []
+        for var in self.REQUIRED:
+            val = os.getenv(var, '')
+            if var in self.baseline:
+                if not val:
+                    issues.append(f"{var}: VERSCHWUNDEN")
+            elif not val:
+                issues.append(f"{var}: nicht gesetzt")
+        return issues
+
+    def status_summary(self) -> str:
+        set_count = len(self.baseline)
+        missing = [v for v in self.REQUIRED if v not in self.baseline]
+        if not missing:
+            return f"{set_count}/{len(self.REQUIRED)} gesetzt"
+        return f"{set_count}/{len(self.REQUIRED)} ({', '.join(missing)} fehlt)"
+
+
+# ============================================================
 # BackupManager - SQLite Backup + Rotation
 # ============================================================
 class BackupManager:
@@ -398,35 +525,66 @@ class BackupManager:
 class Guardian:
     def __init__(self, cfg: GuardianConfig):
         self.cfg = cfg
-        self.alert = AlertManager(cfg.TELEGRAM_TOKEN, cfg.ADMIN_USER_ID)
+        self.audit = AuditLogger(cfg.AUDIT_LOG)
+        self.alert = AlertManager(cfg.TELEGRAM_TOKEN, cfg.ADMIN_USER_ID, self.audit)
         self.sys = SystemMonitor(cfg.PROC_PATH)
         self.docker = DockerMonitor()
         self.db = DatabaseMonitor()
         self.fim = FileIntegrityMonitor()
         self.ssh = SSHMonitor(cfg.LOG_PATH)
+        self.env_mon = EnvironmentMonitor()
         self.backup = BackupManager(cfg.BACKUP_DIR, cfg.BACKUP_RETENTION_DAYS)
         self.start_time = datetime.now()
         self.last_db_size = 0
         self.last_backup_date = None
         self.last_report_date = None
         self.last_restart_count = 0
+        self.audit_chain_ok = True
         # Tages-Maxima fuer Report
         self.max_cpu = 0.0
         self.max_ram = 0.0
 
     async def run(self):
-        logger.info("Guardian startet...")
+        logger.info("Guardian v1.1 startet...")
+
+        # Audit-Chain Integritaet pruefen
+        chain_ok, chain_count, chain_msg = self.audit.verify_chain()
+        self.audit_chain_ok = chain_ok
+        if chain_ok:
+            logger.info(f"Audit-Chain OK: {chain_msg}")
+        else:
+            logger.error(f"AUDIT-CHAIN KOMPROMITTIERT: {chain_msg}")
+
+        self.audit.log("GUARDIAN_START", f"v1.1 | Chain: {chain_msg} | Env: {self.env_mon.status_summary()}")
+
         self.fim.create_baseline()
 
         # Erste CPU-Messung (braucht 2 Lesungen)
         self.sys.get_cpu()
         await asyncio.sleep(2)
 
-        await self.alert.send("INFO", "Guardian gestartet",
+        # Env-Vars pruefen
+        env_issues = self.env_mon.check()
+        env_status = "OK" if not env_issues else ", ".join(env_issues)
+
+        startup_msg = (
             f"Ueberwache: {self.cfg.BOT_CONTAINER}\n"
             f"DB: {self.cfg.DB_PATH}\n"
             f"Check-Intervall: {self.cfg.CHECK_INTERVAL}s\n"
-            f"Backup: taeglich {self.cfg.BACKUP_HOUR}:00 UTC")
+            f"Backup: taeglich {self.cfg.BACKUP_HOUR}:00 UTC\n"
+            f"Audit-Chain: {'OK' if chain_ok else 'KOMPROMITTIERT!'} ({chain_count} Eintraege)\n"
+            f"Env-Vars: {env_status}"
+        )
+
+        if not chain_ok:
+            await self.alert.send("CRITICAL", "AUDIT-CHAIN KOMPROMITTIERT",
+                f"Audit-Log wurde manipuliert!\n{chain_msg}", key=None)
+
+        await self.alert.send("INFO", "Guardian v1.1 gestartet", startup_msg)
+
+        if env_issues:
+            await self.alert.send("WARNING", "Env-Vars Problem",
+                f"Fehlende Variablen: {', '.join(env_issues)}", key="env_issues")
 
         while True:
             try:
@@ -435,6 +593,8 @@ class Guardian:
                 await self._check_db()
                 await self._check_fim()
                 await self._check_ssh()
+                await self._check_env()
+                await self._check_audit_chain()
                 await self._check_backup()
                 await self._check_report()
                 self._write_status()
@@ -510,7 +670,7 @@ class Guardian:
     async def _check_fim(self):
         changed = self.fim.check()
         if changed:
-            files_str = '\n'.join(f"• {f}" for f in changed)
+            files_str = '\n'.join(f"\u2022 {f}" for f in changed)
             await self.alert.send("CRITICAL", "DATEI VERAENDERT",
                 f"Folgende Dateien wurden modifiziert:\n{files_str}\n\n"
                 f"Moeglicher Einbruch!", key=None)  # Kein Dedup fuer FIM!
@@ -522,7 +682,7 @@ class Guardian:
 
         if total >= self.cfg.SSH_FAIL_CRIT_TOTAL:
             top = sorted(ips.items(), key=lambda x: x[1], reverse=True)[:5]
-            top_str = '\n'.join(f"• {ip}: {c}x" for ip, c in top)
+            top_str = '\n'.join(f"\u2022 {ip}: {c}x" for ip, c in top)
             await self.alert.send("CRITICAL", "SSH unter Beschuss",
                 f"Total: {total} fehlgeschlagene Logins\n"
                 f"Unique IPs: {len(ips)}\n\nTop Angreifer:\n{top_str}", key="ssh_crit")
@@ -531,6 +691,25 @@ class Guardian:
                 if count >= self.cfg.SSH_FAIL_WARN_PER_IP:
                     await self.alert.send("WARNING", "SSH Brute-Force",
                         f"{count} fehlgeschlagene Logins von {ip}", key=f"ssh_{ip}")
+
+    async def _check_env(self):
+        issues = self.env_mon.check()
+        if issues:
+            await self.alert.send("CRITICAL", "Env-Vars FEHLEN",
+                f"Kritische Variablen:\n" +
+                '\n'.join(f"\u2022 {i}" for i in issues), key="env_missing")
+
+    async def _check_audit_chain(self):
+        """Pruefe Audit-Chain alle 5 Min auf Manipulation"""
+        ok, count, msg = self.audit.verify_chain()
+        if not ok and self.audit_chain_ok:
+            # War OK, jetzt nicht mehr = Manipulation!
+            self.audit_chain_ok = False
+            await self.alert.send("CRITICAL", "AUDIT-LOG MANIPULIERT",
+                f"Hash-Chain Integritaet verletzt!\n{msg}\n\n"
+                f"Jemand hat das Audit-Log veraendert!", key=None)
+        elif ok:
+            self.audit_chain_ok = True
 
     async def _check_backup(self):
         now = datetime.now()
@@ -542,8 +721,10 @@ class Guardian:
             if ok:
                 self.backup.rotate()
                 info = self.backup.info()
+                self.audit.log("BACKUP_OK", f"{info['count']} Backups, {info['total_kb']} KB")
                 logger.info(f"Backup OK: {info['count']} Backups, {info['total_kb']} KB")
             else:
+                self.audit.log("BACKUP_FAIL", result, "CRITICAL")
                 await self.alert.send("CRITICAL", "Backup FEHLGESCHLAGEN",
                     f"Fehler: {result}", key=None)
 
@@ -551,14 +732,19 @@ class Guardian:
         now = datetime.now()
         if now.hour == self.cfg.REPORT_HOUR and self.last_report_date != now.date():
             self.last_report_date = now.date()
-            report = await self._generate_report()
+
+            # Audit-Chain nochmal pruefen fuer Report
+            chain_ok, chain_count, chain_msg = self.audit.verify_chain()
+            self.audit.log("DAILY_REPORT", f"Chain: {chain_msg}, Alerts: {self.alert.alerts_today}")
+
+            report = await self._generate_report(chain_ok, chain_count)
             await self.alert.send_report(report)
             # Reset Tages-Werte
             self.max_cpu = 0.0
             self.max_ram = 0.0
             self.ssh.reset_daily()
 
-    async def _generate_report(self) -> str:
+    async def _generate_report(self, chain_ok: bool = True, chain_count: int = 0) -> str:
         mem = self.sys.get_memory()
         disk = self.sys.get_disk()
         cpu = self.sys.get_cpu()
@@ -571,6 +757,7 @@ class Guardian:
         ok, _ = self.db.check_integrity(self.cfg.DB_PATH)
         bk = self.backup.info()
         fim = self.fim.check()
+        env_issues = self.env_mon.check()
         uptime = (datetime.now() - self.start_time).total_seconds() / 3600
 
         return (
@@ -588,12 +775,14 @@ class Guardian:
             f"\u2022 Queries heute: {queries}\n\n"
             f"**Daten:**\n"
             f"\u2022 DB: {db_size} KB | Integritaet: {'OK' if ok else 'FEHLER!'}\n"
-            f"\u2022 Backup: {bk['latest']} ({bk['count']} gesamt, {bk['total_kb']} KB)\n\n"
+            f"\u2022 Backup: {bk['latest']} ({bk['count']} gesamt)\n\n"
             f"**Sicherheit:**\n"
             f"\u2022 SSH Failed: {ssh['total']} ({len(ssh['ips'])} IPs)\n"
             f"\u2022 File Integrity: {'OK' if not fim else 'WARNUNG!'}\n"
+            f"\u2022 Audit-Chain: {'OK' if chain_ok else 'KOMPROMITTIERT!'} ({chain_count} Eintraege)\n"
+            f"\u2022 Env-Vars: {'OK' if not env_issues else ', '.join(env_issues)}\n"
             f"\u2022 Alerts heute: {self.alert.alerts_today}\n\n"
-            f"_Guardian Uptime: {uptime:.1f}h_"
+            f"_Guardian v1.1 | Uptime: {uptime:.1f}h_"
         )
 
     def _write_status(self):
@@ -615,6 +804,10 @@ class Guardian:
                 'bot_running': self.docker.get_status(self.cfg.BOT_CONTAINER).get('running', False),
                 'backup_count': bk['count'],
                 'ssh_failed_today': self.ssh.total_failed,
+                'audit_chain_ok': self.audit_chain_ok,
+                'audit_entries': self.audit.entry_count,
+                'env_vars_ok': len(self.env_mon.check()) == 0,
+                'version': '1.1',
             }
 
             tmp = f'{self.cfg.STATUS_FILE}.tmp'
