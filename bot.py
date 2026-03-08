@@ -31,6 +31,7 @@ from telegram.ext import (
 from anthropic import Anthropic
 import stripe
 import viper
+import phone_audit
 
 # Logging Setup
 logging.basicConfig(
@@ -1146,6 +1147,9 @@ Sende einen verdächtigen Link und ich analysiere ihn sofort. Kostenlos!
 
 🚨 **NEU: Incident Response** (/incident)
 Schritt-für-Schritt Hilfe bei Security-Vorfällen.
+
+📱 **NEU: Phone Audit** (/phoneaudit)
+Analysiere deine Android-Apps auf Spyware & Tracking.
 
 **Dein Plan:** Free ({FREE_DAILY_LIMIT} Fragen/Tag)
 
@@ -2769,6 +2773,89 @@ async def darkweb_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
 
+async def phoneaudit_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """/phoneaudit — Android App Sicherheitsanalyse (Free: Top-Risiken | Pro/Business: Vollreport)"""
+    user = update.effective_user
+    user_data = get_or_create_user(user.id, user.username, user.first_name)
+    sub = get_effective_subscription(user.id)
+    is_pro = sub in ("pro", "business")
+
+    if await check_burst_limit(update, user.id):
+        return
+
+    args_text = " ".join(context.args) if context.args else ""
+
+    if not args_text:
+        await update.message.reply_text(
+            "🔍 *KyberGuard Phone Audit*\n\n"
+            "Analysiere deine installierten Android-Apps auf Sicherheitsrisiken.\n\n"
+            "*So geht's:*\n"
+            "1️⃣ Öffne auf deinem Android-Handy die *Einstellungen*\n"
+            "2️⃣ Gehe zu *Apps* → Liste aller Apps\n"
+            "3️⃣ Sende mir die App-Namen oder Package-Namen:\n\n"
+            "`/phoneaudit Instagram Facebook TikTok Signal WhatsApp`\n\n"
+            "Oder Package-Namen:\n"
+            "`/phoneaudit com.instagram.android com.facebook.katana`\n\n"
+            "🔒 *Pro/Business:* Vollständiger Report mit allen Risiken + Quantum-Score Analyse\n"
+            "👉 /upgrade",
+            parse_mode="Markdown",
+        )
+        return
+
+    await update.message.reply_text("🔍 Analysiere Apps...", parse_mode="Markdown")
+
+    # Package-Liste aus Argumenten extrahieren
+    # Unterstützt: komma-getrennt, leerzeichen-getrennt, zeilenweise
+    raw = args_text.replace(",", " ").replace("\n", " ").replace(";", " ")
+    packages = [p.strip() for p in raw.split() if p.strip()]
+
+    # Name-zu-Package Mapping für häufig verwendete App-Namen
+    NAME_MAP = {
+        "instagram": "com.instagram.android",
+        "facebook": "com.facebook.katana",
+        "messenger": "com.facebook.orca",
+        "whatsapp": "com.whatsapp",
+        "tiktok": "com.zhiliaoapp.musically",
+        "signal": "org.thoughtcrime.securesms",
+        "telegram": "org.telegram.messenger",
+        "youtube": "com.google.android.youtube",
+        "chrome": "com.android.chrome",
+        "brave": "com.brave.browser",
+        "metamask": "io.metamask",
+        "binance": "com.binance.dev",
+        "coinbase": "com.coinbase.android",
+        "kucoin": "com.kubi.kucoin",
+        "ledger": "com.ledger.live",
+        "tailscale": "com.tailscale.ipn.android",
+        "surfshark": "com.surfshark.vpnclient.android",
+        "protonvpn": "com.protonvpn.android",
+        "mullvad": "net.mullvad.mullvadvpn",
+        "avast": "com.avast.android.mobilesecurity",
+        "avira": "com.avira.android",
+        "bitdefender": "com.bitdefender.security",
+        "bitwarden": "com.bitwarden.mobile",
+        "nextcloud": "com.nextcloud.client",
+        "tor": "org.torproject.android",
+        "temu": "com.temu.android",
+        "shein": "com.shein.rome",
+        "wechat": "com.tencent.mm",
+        "aliexpress": "com.alibaba.aliexpresshd",
+    }
+
+    resolved = []
+    for pkg in packages:
+        pkg_lower = pkg.lower()
+        if pkg_lower in NAME_MAP:
+            resolved.append(NAME_MAP[pkg_lower])
+        else:
+            resolved.append(pkg)
+
+    result = phone_audit.analyze_packages(resolved, is_pro)
+    report = phone_audit.format_report(result)
+
+    await update.message.reply_text(report, parse_mode="Markdown")
+
+
 async def check_darkweb_monitors(context: ContextTypes.DEFAULT_TYPE):
     """Täglicher Job: prüft alle überwachten E-Mails auf neue Datenpannen."""
     if not HIBP_API_KEY:
@@ -2855,6 +2942,7 @@ def main():
     application.add_handler(CommandHandler("incident", incident_command))
     application.add_handler(CommandHandler("soc", soc_command))
     application.add_handler(CommandHandler("darkweb", darkweb_command))
+    application.add_handler(CommandHandler("phoneaudit", phoneaudit_command))
     application.add_handler(CallbackQueryHandler(button_callback))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
