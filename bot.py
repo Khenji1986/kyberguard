@@ -28,7 +28,7 @@ from telegram.ext import (
     ContextTypes,
     filters,
 )
-from anthropic import Anthropic
+from anthropic import AsyncAnthropic
 import stripe
 import viper
 import phone_audit
@@ -54,6 +54,9 @@ except ValueError:
     ADMIN_USER_ID = None
 STRIPE_API_KEY = os.getenv("STRIPE_API_KEY")
 HIBP_API_KEY = os.getenv("HIBP_API_KEY")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+
+GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 # Stripe Setup
 stripe.api_key = STRIPE_API_KEY
@@ -70,8 +73,8 @@ def is_admin(user_id: int) -> bool:
     """Prüft ob user_id der Admin (Lee) ist. Typsicherer int-Vergleich."""
     return ADMIN_USER_ID is not None and isinstance(user_id, int) and user_id == ADMIN_USER_ID
 
-# Claude Client
-client = Anthropic(api_key=ANTHROPIC_API_KEY)
+# Claude Client (async — blockiert nicht den Telegram Event-Loop)
+client = AsyncAnthropic(api_key=ANTHROPIC_API_KEY)
 
 # URL-Erkennung für Phishing-Checker
 URL_PATTERN = re.compile(
@@ -100,6 +103,12 @@ async def check_burst_limit(update: Update, user_id: int) -> bool:
         await update.message.reply_text("⚠️ Bitte warte kurz zwischen Anfragen.")
         return True
     LAST_REQUEST_TIME[user_id] = now
+    # Alte Einträge bereinigen (>60s) — verhindert unbegrenztes Wachstum
+    if len(LAST_REQUEST_TIME) > 1000:
+        cutoff = now - 60
+        expired = [uid for uid, ts in LAST_REQUEST_TIME.items() if ts < cutoff]
+        for uid in expired:
+            del LAST_REQUEST_TIME[uid]
     return False
 
 # System Prompt für Security-Expertise
@@ -134,7 +143,7 @@ DEIN STIL:
 - Verständlich auch für Nicht-Experten
 - Mit konkreten Beispielen wenn hilfreich
 
-Du arbeitest für Lee (Alexander Potzahr) und das Reich Friegün."""
+Du arbeitest für AP Digital Solution."""
 
 # Support Agent System Prompt
 SUPPORT_PROMPT = """Du bist der Support-Agent von KyberGuard (AP Digital Solution).
@@ -477,7 +486,7 @@ def get_plan_config(subscription: str) -> dict:
     """Gibt die Konfiguration basierend auf dem Plan zurück"""
     if subscription == 'business':
         return {
-            'max_tokens': 4096,
+            'max_tokens': 1536,
             'model': 'claude-sonnet-4-20250514',
             'prompt_addon': (
                 "\n\nDIESER USER HAT DEN BUSINESS PLAN. Antworte MAXIMAL detailliert:\n"
@@ -528,7 +537,7 @@ async def ask_claude(question: str, subscription: str = 'free') -> str:
                 "text": config['prompt_addon']
             })
 
-        message = client.messages.create(
+        message = await client.messages.create(
             model=config['model'],
             max_tokens=config['max_tokens'],
             system=system_blocks,
@@ -540,6 +549,109 @@ async def ask_claude(question: str, subscription: str = 'free') -> str:
     except Exception as e:
         logger.error(f"Claude API Error: {e}")
         return "Entschuldigung, es gab einen Fehler bei der Verarbeitung. Bitte versuche es erneut."
+
+
+# Schlüsselwörter für einfache Allgemein-Fragen
+_SIMPLE_KEYWORDS = [
+    'was ist', 'was sind', 'was bedeutet', 'erkläre', 'erkläre mir',
+    'what is', 'what are', 'what does', 'explain', 'define',
+    'tipp', 'tipps', 'tip', 'tips', 'empfehlung', 'empfehlungen',
+    'wie funktioniert', 'how does', 'how do', 'how can',
+    'unterschied zwischen', 'difference between', 'was macht',
+    'warum', 'why is', 'what should',
+]
+
+# Vokabular das immer Claude benötigt (Incidents, komplexe Analyse)
+_COMPLEX_KEYWORDS = [
+    'gehackt', 'hack', 'angriff', 'attack', 'ransomware', 'malware',
+    'virus', 'breach', 'kompromittiert', 'infiziert', 'infected',
+    'notfall', 'emergency', 'gesperrt', 'locked', 'erpressung',
+    'passwort gestohlen', 'password stolen', 'konto übernommen',
+]
+
+
+def is_simple_question(question: str) -> bool:
+    """Erkennt einfache Allgemein-Fragen die Groq effizient beantworten kann."""
+    q = question.lower().strip()
+    # URLs immer an Claude (brauchen tiefe Analyse)
+    if URL_PATTERN.search(question):
+        return False
+    # Sehr lange Fragen sind meist komplex
+    if len(question) > 200:
+        return False
+    # Incident / Notfall → immer Claude
+    if any(kw in q for kw in _COMPLEX_KEYWORDS):
+        return False
+    # Einfache Erklär- oder Rat-Fragen
+    return any(kw in q for kw in _SIMPLE_KEYWORDS)
+
+
+async def ask_groq(question: str, subscription: str = 'free') -> str:
+    """Fragt Groq AI — schnell (~300 T/s), günstig, für einfache Fragen.
+    Fällt automatisch auf Claude zurück bei Fehler oder Rate-Limit."""
+    if not GROQ_API_KEY:
+        return await ask_claude(question, subscription)
+
+    # Pro bekommt das stärkere 70B-Modell, Free das schnelle 8B
+    model = (
+        'llama-3.3-70b-versatile'
+        if subscription == 'pro'
+        else 'llama-3.1-8b-instant'
+    )
+
+    headers = {
+        'Authorization': f'Bearer {GROQ_API_KEY}',
+        'Content-Type': 'application/json',
+    }
+    payload = {
+        'model': model,
+        'messages': [
+            {'role': 'system', 'content': SYSTEM_PROMPT},
+            {'role': 'user', 'content': question},
+        ],
+        'max_tokens': 768,
+        'temperature': 0.3,
+    }
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                GROQ_API_URL,
+                headers=headers,
+                json=payload,
+                timeout=aiohttp.ClientTimeout(total=15),
+            ) as resp:
+                if resp.status == 200:
+                    data = await resp.json()
+                    return data['choices'][0]['message']['content']
+                elif resp.status == 429:
+                    logger.warning("Groq Rate-Limit erreicht — Fallback zu Claude")
+                    return await ask_claude(question, subscription)
+                else:
+                    logger.error(f"Groq API Fehler {resp.status} — Fallback zu Claude")
+                    return await ask_claude(question, subscription)
+    except asyncio.TimeoutError:
+        logger.warning("Groq Timeout — Fallback zu Claude")
+        return await ask_claude(question, subscription)
+    except Exception as e:
+        logger.error(f"Groq Fehler: {e} — Fallback zu Claude")
+        return await ask_claude(question, subscription)
+
+
+async def ask_ai(question: str, subscription: str = 'free') -> str:
+    """Haupt-Router: wählt Groq (günstig/schnell) oder Claude (komplex/Premium).
+
+    Business → immer Claude Sonnet (zahlen für beste Qualität)
+    Pro/Free + einfache Frage → Groq (8–15× günstiger, ~300 T/s)
+    Pro/Free + komplexe Frage → Claude (Sonnet/Haiku je nach Plan)
+    """
+    if subscription == 'business':
+        return await ask_claude(question, subscription)
+
+    if is_simple_question(question):
+        return await ask_groq(question, subscription)
+
+    return await ask_claude(question, subscription)
 
 
 # ========== FEATURE 1: PHISHING-CHECKER ==========
@@ -748,7 +860,7 @@ async def handle_phishing_check(update: Update, context: ContextTypes.DEFAULT_TY
     subscription = get_effective_subscription(user_id)
     if subscription in ['pro', 'business'] and combined_score >= 3:
         try:
-            ai_msg = client.messages.create(
+            ai_msg = await client.messages.create(
                 model='claude-haiku-4-5-20251001',
                 max_tokens=256,
                 system="Du bist ein Phishing-Experte. Analysiere die URL/Text. Antworte in 2-3 Sätzen: Risiko und Empfehlung. BESUCHE KEINE URLs.",
@@ -919,7 +1031,7 @@ async def finish_audit(message, context):
     if weak:
         try:
             prompt = f"User hat Security Audit Note {grade}. Schwächen: {', '.join(weak)}. Gib 3 priorisierte, konkrete Verbesserungen (je 1 Satz). Deutsch."
-            ai_msg = client.messages.create(
+            ai_msg = await client.messages.create(
                 model='claude-haiku-4-5-20251001', max_tokens=512,
                 system="Du bist IT-Security Berater. Kurz, praktisch, konkret.",
                 messages=[{"role": "user", "content": prompt}]
@@ -1432,7 +1544,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.user_data['incident'] = inc
         thinking_msg = await update.message.reply_text("🔍 Analysiere...")
         try:
-            ai_msg = client.messages.create(
+            ai_msg = await client.messages.create(
                 model='claude-haiku-4-5-20251001', max_tokens=512,
                 system=f"Du bist ein Incident Response Spezialist. Vorfall: {inc_type}. Phase: {phase['name']} - {phase['desc']}. Antworte kontextbezogen, konkret, deutsch.",
                 messages=[{"role": "user", "content": question}]
@@ -1467,8 +1579,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Thinking Message
     thinking_msg = await update.message.reply_text("🔍 Analysiere deine Frage...")
 
-    # Claude fragen - mit Plan-spezifischer Tiefe
-    response = await ask_claude(question, subscription)
+    # KI fragen - Groq (schnell/günstig) oder Claude (komplex/Business)
+    response = await ask_ai(question, subscription)
 
     # Usage nur tracken wenn Antwort erfolgreich (nicht bei Fehler)
     if not response.startswith("Entschuldigung, es gab einen Fehler"):
@@ -1687,7 +1799,7 @@ async def loeschen(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def ask_support_agent(question: str, user_info: str) -> str:
     """Fragt den Support-Agent"""
     try:
-        message = client.messages.create(
+        message = await client.messages.create(
             model="claude-haiku-4-5-20251001",
             max_tokens=512,
             system=SUPPORT_PROMPT,
@@ -1848,7 +1960,7 @@ async def handle_support_message(update: Update, context: ContextTypes.DEFAULT_T
         thinking_msg = await update.message.reply_text("💬 Alex tippt...")
 
         try:
-            message = client.messages.create(
+            message = await client.messages.create(
                 model="claude-sonnet-4-20250514",
                 max_tokens=2048,
                 system=PRIORITY_SUPPORT_PROMPT,

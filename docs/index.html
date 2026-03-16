@@ -1,1504 +1,1604 @@
 <!DOCTYPE html>
 <html lang="de" data-lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KyberGuard - Dein KI-Sicherheitsberater. 24/7.</title>
-    <meta name="description" content="Phishing-Mail erhalten? Unsicher ob der Link echt ist? Frag KyberGuard - in 3 Sekunden weisst du Bescheid. Kostenlos auf Telegram.">
-    <meta name="keywords" content="Phishing Checker, AI Security, Cybersecurity Bot, Telegram Security Bot, DSGVO, KI Sicherheit">
-    <meta property="og:title" content="KyberGuard - Dein KI-Sicherheitsberater. 24/7.">
-    <meta property="og:description" content="Phishing erkennen, Security Audit, Incident Response - kostenlos auf Telegram.">
-    <meta property="og:type" content="website">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x1F6E1;</text></svg>">
-    <style>
-        /* ============================================
-           RESET & BASE
-           ============================================ */
-        *{margin:0;padding:0;box-sizing:border-box}
-        html{scroll-behavior:smooth}
-        body{
-            font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
-            color:#e0e0e0;
-            background:#0a0a0f;
-            line-height:1.6;
-            overflow-x:hidden;
-        }
-        .container{max-width:1000px;margin:0 auto;padding:0 24px}
-        a{text-decoration:none;color:inherit}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KyberGuard — KI-Sicherheitsberater. 24/7. Made in Germany.</title>
+<meta name="description" content="Phishing erkannt. Dark Web Monitor. Incident Response. KyberGuard ist dein KI-Security-Experte auf Telegram — kostenlos starten.">
+<meta name="keywords" content="Phishing Checker, KI Security, Cybersecurity Bot, Telegram Bot, Dark Web Monitor, DSGVO, Quantum-Safe">
+<meta property="og:title" content="KyberGuard — KI-Sicherheitsberater. 24/7.">
+<meta property="og:description" content="Phishing erkennen, Security Audit, Dark Web Monitor — ab 0 EUR auf Telegram.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://kyberguard.de/og-image.png">
+<link rel="canonical" href="https://kyberguard.de/">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2'><path d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/></svg>">
+<style>
+/* ============================================================
+   CSS CUSTOM PROPERTIES — Precision Dark Theme
+   ============================================================ */
+:root {
+  --bg:          #050810;
+  --bg-2:        #080d18;
+  --bg-card:     #0c1220;
+  --bg-card-h:   #101828;
+  --indigo:      #6366f1;
+  --indigo-l:    #818cf8;
+  --cyan:        #22d3ee;
+  --cyan-d:      #0891b2;
+  --emerald:     #10b981;
+  --red:         #ef4444;
+  --amber:       #f59e0b;
+  --text:        #f1f5f9;
+  --muted:       #94a3b8;
+  --muted-2:     #475569;
+  --border:      rgba(99,102,241,0.18);
+  --border-c:    rgba(34,211,238,0.2);
+  --glow-i:      rgba(99,102,241,0.25);
+  --glow-c:      rgba(34,211,238,0.2);
+  --radius:      12px;
+  --radius-lg:   20px;
+  --font:        -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+}
 
-        /* ============================================
-           ANIMATIONS - KEYFRAMES
-           ============================================ */
-        @keyframes glow-pulse{
-            0%,100%{box-shadow:0 0 20px rgba(0,212,255,0.3),0 0 40px rgba(0,212,255,0.1)}
-            50%{box-shadow:0 0 30px rgba(0,212,255,0.5),0 0 60px rgba(0,212,255,0.2)}
-        }
-        @keyframes float{
-            0%,100%{transform:translateY(0)}
-            50%{transform:translateY(-6px)}
-        }
-        @keyframes grid-move{
-            0%{background-position:0 0}
-            100%{background-position:50px 50px}
-        }
-        @keyframes fade-in-up{
-            from{opacity:0;transform:translateY(30px)}
-            to{opacity:1;transform:translateY(0)}
-        }
-        @keyframes typing-dots{
-            0%,60%,100%{opacity:.3;transform:translateY(0)}
-            30%{opacity:1;transform:translateY(-4px)}
-        }
-        @keyframes counter-glow{
-            0%,100%{text-shadow:0 0 20px rgba(255,51,102,0.4)}
-            50%{text-shadow:0 0 40px rgba(255,51,102,0.7)}
-        }
-        @keyframes scan-line{
-            0%{top:-100%}
-            100%{top:100%}
-        }
-        @keyframes text-glow{
-            0%,100%{text-shadow:0 0 10px rgba(0,212,255,0.3)}
-            50%{text-shadow:0 0 20px rgba(0,212,255,0.6),0 0 40px rgba(0,212,255,0.2)}
-        }
-        @keyframes border-glow{
-            0%,100%{border-color:rgba(0,212,255,0.3)}
-            50%{border-color:rgba(0,212,255,0.7)}
-        }
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; font-size:16px; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+a { text-decoration:none; color:inherit; }
+button { cursor:pointer; font-family:inherit; }
+svg { display:block; }
+img { max-width:100%; }
+.container { max-width:1080px; margin:0 auto; padding:0 24px; }
 
-        /* Scroll reveal */
-        .reveal{opacity:0;transform:translateY(30px);transition:opacity 0.7s ease,transform 0.7s ease}
-        .reveal.visible{opacity:1;transform:translateY(0)}
+/* ============================================================
+   KEYFRAME ANIMATIONS
+   ============================================================ */
+@keyframes fadeUp   { from { opacity:0; transform:translateY(28px); } to { opacity:1; transform:translateY(0); } }
+@keyframes glowPulse { 0%,100% { box-shadow:0 0 24px var(--glow-i), 0 4px 24px rgba(0,0,0,.4); } 50% { box-shadow:0 0 40px rgba(99,102,241,.5), 0 4px 24px rgba(0,0,0,.4); } }
+@keyframes cyanGlow  { 0%,100% { box-shadow:0 0 20px var(--glow-c); } 50% { box-shadow:0 0 36px rgba(34,211,238,.4); } }
+@keyframes float     { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-6px); } }
+@keyframes scanLine  { 0% { top:-100%; } 100% { top:200%; } }
+@keyframes countGlow { 0%,100% { text-shadow:0 0 16px rgba(239,68,68,.4); } 50% { text-shadow:0 0 32px rgba(239,68,68,.7); } }
+@keyframes typeDot   { 0%,60%,100% { opacity:.25; transform:translateY(0); } 30% { opacity:1; transform:translateY(-4px); } }
+@keyframes spin      { to { transform:rotate(360deg); } }
 
-        /* ============================================
-           NAV BAR
-           ============================================ */
-        .navbar{
-            position:fixed;top:0;left:0;right:0;z-index:1000;
-            background:rgba(10,10,15,0.9);
-            backdrop-filter:blur(12px);
-            border-bottom:1px solid rgba(0,212,255,0.1);
-            transition:background 0.3s;
-        }
-        .navbar .container{
-            display:flex;align-items:center;justify-content:space-between;
-            height:60px;
-        }
-        .nav-logo{
-            font-size:1.2rem;font-weight:800;color:#fff;
-            display:flex;align-items:center;gap:8px;
-            white-space:nowrap;
-        }
-        .nav-logo span{color:#00d4ff;animation:text-glow 3s ease-in-out infinite}
-        .nav-logo svg{width:28px;height:28px}
-        .nav-links{display:flex;align-items:center;gap:4px}
-        .nav-link{
-            color:#aaa;font-size:0.85rem;font-weight:500;padding:6px 12px;
-            border-radius:6px;transition:color 0.2s,background 0.2s;
-        }
-        .nav-link:hover{color:#fff;background:rgba(255,255,255,0.05)}
-        .nav-right{display:flex;align-items:center;gap:16px}
+/* ============================================================
+   SCROLL REVEAL
+   ============================================================ */
+.reveal {
+  opacity:0;
+  transform:translateY(24px);
+  transition: opacity .65s ease, transform .65s ease;
+}
+.reveal.visible { opacity:1; transform:translateY(0); }
 
-        /* Mobile hamburger */
-        .hamburger{
-            display:none;flex-direction:column;gap:5px;cursor:pointer;
-            background:none;border:none;padding:6px;
-        }
-        .hamburger span{
-            display:block;width:22px;height:2px;background:#aaa;
-            border-radius:2px;transition:all 0.3s;
-        }
-        .mobile-menu{
-            display:none;position:fixed;top:60px;left:0;right:0;
-            background:rgba(10,10,15,0.98);backdrop-filter:blur(12px);
-            border-bottom:1px solid rgba(0,212,255,0.15);
-            flex-direction:column;padding:16px 24px 24px;gap:4px;
-            z-index:999;
-        }
-        .mobile-menu.open{display:flex}
-        .mobile-menu a{
-            color:#ccc;font-size:1rem;padding:12px 8px;
-            border-bottom:1px solid #1a1a2e;font-weight:500;
-        }
-        .mobile-menu a:last-child{border-bottom:none}
-        .mobile-menu .mob-cta{
-            margin-top:12px;background:#00d4ff;color:#000;
-            text-align:center;padding:14px;border-radius:10px;
-            font-weight:800;border-bottom:none!important;
-        }
-        @media(max-width:720px){
-            .nav-links{display:none}
-            .hamburger{display:flex}
-        }
-        .lang-toggle{
-            display:flex;align-items:center;gap:6px;
-            background:rgba(255,255,255,0.05);
-            border:1px solid rgba(255,255,255,0.1);
-            border-radius:20px;padding:4px 6px;cursor:pointer;
-            font-size:0.8rem;
-        }
-        .lang-btn{
-            padding:4px 10px;border-radius:16px;
-            color:#888;font-weight:600;transition:all 0.2s;
-            border:none;background:none;cursor:pointer;font-size:0.8rem;
-        }
-        .lang-btn.active{background:#00d4ff;color:#000}
-        .nav-cta{
-            background:#00d4ff;color:#000;padding:8px 20px;
-            border-radius:6px;font-weight:700;font-size:0.85rem;
-            transition:box-shadow 0.3s;
-        }
-        .nav-cta:hover{box-shadow:0 0 20px rgba(0,212,255,0.4)}
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+.navbar {
+  position:fixed; top:0; left:0; right:0; z-index:1000;
+  background:rgba(5,8,16,.88);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  transition:background .3s;
+}
+.navbar .container {
+  display:flex; align-items:center; justify-content:space-between;
+  height:62px;
+}
+.nav-logo {
+  display:flex; align-items:center; gap:9px;
+  font-size:1.15rem; font-weight:800; color:var(--text);
+  white-space:nowrap;
+}
+.nav-logo svg { width:26px; height:26px; }
+.nav-logo .logo-ky  { color:var(--indigo); }
+.nav-logo .logo-ber { color:var(--cyan); }
+.nav-links { display:flex; align-items:center; gap:2px; }
+.nav-link {
+  color:var(--muted); font-size:.875rem; font-weight:500;
+  padding:6px 14px; border-radius:8px;
+  transition:color .2s, background .2s;
+}
+.nav-link:hover { color:var(--text); background:rgba(255,255,255,.06); }
+.nav-right { display:flex; align-items:center; gap:14px; }
+.lang-toggle {
+  display:flex; align-items:center;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:20px; padding:3px 4px;
+}
+.lang-btn {
+  padding:3px 10px; border-radius:16px;
+  color:var(--muted-2); font-weight:600; font-size:.8rem;
+  border:none; background:none; transition:all .2s;
+}
+.lang-btn.active { background:var(--indigo); color:#fff; }
+.nav-cta {
+  background:var(--indigo); color:#fff;
+  padding:8px 20px; border-radius:8px;
+  font-weight:700; font-size:.875rem;
+  transition:box-shadow .25s, transform .2s;
+}
+.nav-cta:hover { box-shadow:0 0 22px var(--glow-i); transform:translateY(-1px); }
+.hamburger {
+  display:none; flex-direction:column; gap:5px;
+  background:none; border:none; padding:6px;
+}
+.hamburger span {
+  display:block; width:22px; height:2px;
+  background:var(--muted); border-radius:2px; transition:all .3s;
+}
+@media(max-width:720px) {
+  .nav-links { display:none; }
+  .hamburger { display:flex; }
+}
+.mobile-menu {
+  display:none; position:fixed; top:62px; left:0; right:0;
+  background:rgba(5,8,16,.98); backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  flex-direction:column; padding:16px 24px 24px; gap:4px; z-index:999;
+}
+.mobile-menu.open { display:flex; }
+.mobile-menu a {
+  color:var(--muted); font-size:1rem; padding:12px 8px;
+  border-bottom:1px solid rgba(255,255,255,.05); font-weight:500;
+}
+.mobile-menu a:last-child { border-bottom:none; }
+.mob-cta {
+  margin-top:12px; background:var(--indigo); color:#fff !important;
+  text-align:center; padding:14px; border-radius:10px;
+  font-weight:800; border-bottom:none !important;
+}
 
-        /* ============================================
-           HERO SECTION
-           ============================================ */
-        .hero{
-            position:relative;
-            text-align:center;
-            padding:140px 24px 80px;
-            overflow:hidden;
-            min-height:90vh;
-            display:flex;align-items:center;justify-content:center;
-        }
-        .hero-bg{
-            position:absolute;inset:0;
-            background:
-                linear-gradient(135deg,#0a0a0f 0%,#0d1020 30%,#1a1a2e 50%,#0d1020 70%,#0a0a0f 100%);
-            z-index:0;
-        }
-        .hero-grid{
-            position:absolute;inset:0;z-index:1;
-            background-image:
-                linear-gradient(rgba(0,212,255,0.03) 1px,transparent 1px),
-                linear-gradient(90deg,rgba(0,212,255,0.03) 1px,transparent 1px);
-            background-size:50px 50px;
-            animation:grid-move 8s linear infinite;
-        }
-        .hero-grid::after{
-            content:'';position:absolute;inset:0;
-            background:radial-gradient(ellipse at center,transparent 0%,#0a0a0f 70%);
-        }
-        .hero-content{position:relative;z-index:2;max-width:750px}
+/* ============================================================
+   TG MODAL
+   ============================================================ */
+.tg-overlay {
+  display:none; position:fixed; inset:0; z-index:2000;
+  background:rgba(0,0,0,.75); backdrop-filter:blur(4px);
+  align-items:center; justify-content:center; padding:24px;
+}
+.tg-overlay.active { display:flex; }
+.tg-modal {
+  background:var(--bg-card); border:1px solid var(--border);
+  border-radius:var(--radius-lg); padding:40px 36px;
+  max-width:440px; width:100%; position:relative;
+  animation:fadeUp .3s ease;
+}
+.tg-close {
+  position:absolute; top:16px; right:16px;
+  background:none; border:none; color:var(--muted);
+  font-size:1.4rem; line-height:1; transition:color .2s;
+}
+.tg-close:hover { color:var(--text); }
+.tg-modal h3 { font-size:1.3rem; font-weight:800; margin-bottom:8px; }
+.tg-sub { color:var(--muted); font-size:.95rem; margin-bottom:28px; }
+.tg-steps { display:flex; flex-direction:column; gap:16px; margin-bottom:28px; }
+.tg-step { display:flex; gap:14px; align-items:flex-start; }
+.tg-step-num {
+  width:32px; height:32px; border-radius:50%; flex-shrink:0;
+  background:var(--indigo); color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  font-weight:800; font-size:.85rem;
+}
+.tg-step-text { color:var(--muted); font-size:.9rem; line-height:1.6; padding-top:4px; }
+.tg-step-text strong { color:var(--text); }
+.tg-modal-btn {
+  display:block; text-align:center;
+  background:var(--indigo); color:#fff;
+  padding:16px; border-radius:10px; font-weight:800;
+  font-size:1rem; transition:box-shadow .25s, transform .2s;
+}
+.tg-modal-btn:hover { box-shadow:0 0 24px var(--glow-i); transform:translateY(-2px); }
+.tg-modal-skip {
+  text-align:center; margin-top:14px;
+  color:var(--muted-2); font-size:.85rem; cursor:pointer;
+}
+.tg-modal-skip:hover { color:var(--muted); }
 
-        /* Stat Counter */
-        .hero-stat{
-            margin-bottom:32px;
-        }
-        .hero-stat-number{
-            font-size:3.5rem;font-weight:900;color:#ff3366;
-            animation:counter-glow 2s ease-in-out infinite;
-            line-height:1.1;
-        }
-        .hero-stat-label{
-            font-size:1.1rem;color:#ff6b8a;font-weight:500;
-            margin-top:4px;
-        }
-        @media(min-width:768px){
-            .hero-stat-number{font-size:4.5rem}
-        }
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero {
+  position:relative; min-height:92vh;
+  display:flex; align-items:center; justify-content:center;
+  text-align:center; padding:140px 24px 80px; overflow:hidden;
+}
+.hero-bg {
+  position:absolute; inset:0; z-index:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(99,102,241,.14) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(34,211,238,.07) 0%, transparent 60%),
+    var(--bg);
+}
+.hero-grid {
+  position:absolute; inset:0; z-index:1;
+  background-image:
+    linear-gradient(rgba(99,102,241,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99,102,241,.04) 1px, transparent 1px);
+  background-size:60px 60px;
+}
+.hero-grid::after {
+  content:''; position:absolute; inset:0;
+  background:radial-gradient(ellipse at center, transparent 30%, var(--bg) 80%);
+}
+.hero-content { position:relative; z-index:2; max-width:780px; }
 
-        .hero h1{
-            font-size:2.2rem;color:#fff;margin-bottom:16px;
-            font-weight:800;line-height:1.2;
-        }
-        .hero h1 .accent{color:#00d4ff}
-        @media(min-width:768px){.hero h1{font-size:3rem}}
+/* Audience switcher */
+.audience-switcher {
+  display:inline-flex; gap:6px; padding:5px;
+  background:rgba(255,255,255,.04); border:1px solid var(--border);
+  border-radius:var(--radius-lg); margin-bottom:32px;
+}
+.aud-btn {
+  padding:7px 18px; border-radius:12px; border:none;
+  background:none; color:var(--muted); font-size:.85rem; font-weight:600;
+  transition:all .25s;
+}
+.aud-btn.active {
+  background:var(--indigo); color:#fff;
+  box-shadow:0 2px 12px rgba(99,102,241,.35);
+}
 
-        .hero-sub{
-            font-size:1.1rem;color:#a0a0b0;max-width:600px;
-            margin:0 auto 36px;line-height:1.7;
-        }
-        .hero-sub strong{color:#fff}
+/* Counter */
+.hero-counter { margin-bottom:28px; }
+.counter-num {
+  font-size:3.5rem; font-weight:900; color:var(--red);
+  animation:countGlow 2.5s ease-in-out infinite; line-height:1.1;
+}
+.counter-label { color:#f87171; font-size:1rem; font-weight:500; margin-top:4px; }
+@media(min-width:768px) { .counter-num { font-size:4.5rem; } }
 
-        .cta-primary{
-            display:inline-block;
-            background:#00d4ff;color:#000;
-            padding:18px 48px;border-radius:10px;
-            font-weight:800;font-size:1.15rem;
-            animation:glow-pulse 2s ease-in-out infinite;
-            transition:transform 0.2s;
-        }
-        .cta-primary:hover{transform:translateY(-3px) scale(1.02)}
+.hero h1 {
+  font-size:2.2rem; font-weight:900; color:var(--text);
+  margin-bottom:18px; line-height:1.18; letter-spacing:-.02em;
+}
+.hero h1 .accent-i { color:var(--indigo-l); }
+.hero h1 .accent-c { color:var(--cyan); }
+@media(min-width:768px) { .hero h1 { font-size:3.1rem; } }
 
-        .hero-trust{
-            margin-top:20px;color:#999;font-size:0.85rem;
-            display:flex;align-items:center;justify-content:center;gap:6px;
-        }
-        .hero-trust-icon{color:#00d4ff}
+.hero-sub {
+  font-size:1.1rem; color:var(--muted); max-width:600px;
+  margin:0 auto 36px; line-height:1.75;
+}
+.hero-sub strong { color:var(--text); }
 
-        /* ============================================
-           LIVE DEMO - ANIMATED CHAT
-           ============================================ */
-        .demo{
-            padding:80px 24px;
-            background:linear-gradient(180deg,#0a0a0f 0%,#0e0e1a 50%,#0a0a0f 100%);
-        }
-        .demo h2{
-            text-align:center;font-size:1.8rem;color:#fff;
-            margin-bottom:8px;font-weight:800;
-        }
-        .demo-sub{
-            text-align:center;color:#888;margin-bottom:48px;font-size:1rem;
-        }
-        .chat-window{
-            max-width:480px;margin:0 auto;
-            background:#0c0c14;
-            border:1px solid rgba(0,212,255,0.15);
-            border-radius:16px;
-            overflow:hidden;
-            box-shadow:0 20px 60px rgba(0,0,0,0.5),0 0 40px rgba(0,212,255,0.05);
-        }
-        .chat-header{
-            background:linear-gradient(90deg,#12121e,#1a1a2e);
-            padding:14px 20px;
-            display:flex;align-items:center;gap:12px;
-            border-bottom:1px solid rgba(0,212,255,0.1);
-        }
-        .chat-avatar{
-            width:36px;height:36px;border-radius:50%;
-            background:linear-gradient(135deg,#00d4ff,#0088aa);
-            display:flex;align-items:center;justify-content:center;
-            font-size:1rem;
-        }
-        .chat-header-info h4{color:#fff;font-size:0.9rem;margin-bottom:1px}
-        .chat-header-info span{color:#00d4ff;font-size:0.7rem}
-        .chat-body{
-            padding:20px 16px;min-height:340px;
-            display:flex;flex-direction:column;gap:12px;
-        }
-        .chat-msg{
-            max-width:85%;padding:10px 14px;border-radius:12px;
-            font-size:0.9rem;line-height:1.5;
-            opacity:0;transform:translateY(10px);
-            transition:opacity 0.4s ease,transform 0.4s ease;
-        }
-        .chat-msg.visible{opacity:1;transform:translateY(0)}
-        .chat-msg.user{
-            align-self:flex-end;
-            background:#1a3a4a;color:#e0e0e0;
-            border-bottom-right-radius:4px;
-        }
-        .chat-msg.bot{
-            align-self:flex-start;
-            background:#1a1a2e;color:#e0e0e0;
-            border:1px solid rgba(0,212,255,0.1);
-            border-bottom-left-radius:4px;
-        }
-        .chat-msg.bot.warning{border-color:rgba(255,51,102,0.3)}
-        .chat-msg .warn-badge{
-            display:inline-block;
-            background:#ff3366;color:#fff;
-            font-size:0.7rem;font-weight:800;
-            padding:2px 8px;border-radius:4px;margin-bottom:6px;
-        }
-        .chat-msg .risk-score{color:#ff3366;font-weight:700}
-        .chat-msg .safe-action{color:#00ff88;font-weight:600}
-        .typing-indicator{
-            align-self:flex-start;
-            display:flex;gap:4px;padding:10px 16px;
-            background:#1a1a2e;border-radius:12px;
-            border-bottom-left-radius:4px;
-            opacity:0;transition:opacity 0.3s;
-        }
-        .typing-indicator.visible{opacity:1}
-        .typing-dot{
-            width:7px;height:7px;border-radius:50%;
-            background:#00d4ff;
-        }
-        .typing-dot:nth-child(1){animation:typing-dots 1.4s infinite 0s}
-        .typing-dot:nth-child(2){animation:typing-dots 1.4s infinite 0.2s}
-        .typing-dot:nth-child(3){animation:typing-dots 1.4s infinite 0.4s}
+.cta-primary {
+  display:inline-flex; align-items:center; gap:8px;
+  background:var(--indigo); color:#fff;
+  padding:18px 48px; border-radius:var(--radius);
+  font-weight:800; font-size:1.1rem;
+  animation:glowPulse 2.5s ease-in-out infinite;
+  transition:transform .2s;
+  border:none;
+}
+.cta-primary:hover { transform:translateY(-3px) scale(1.02); }
 
-        /* ============================================
-           PROBLEM / PAIN SECTION
-           ============================================ */
-        .pain{padding:80px 24px}
-        .pain h2{
-            text-align:center;font-size:1.8rem;color:#fff;
-            margin-bottom:48px;font-weight:800;
-        }
-        .pain-grid{
-            display:grid;
-            grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-            gap:24px;max-width:900px;margin:0 auto 48px;
-        }
-        .pain-card{
-            background:linear-gradient(135deg,#12121a,#1a1a24);
-            border:1px solid #222;
-            border-radius:14px;padding:28px 24px;
-            transition:border-color 0.3s,transform 0.3s;
-        }
-        .pain-card:hover{
-            border-color:rgba(255,51,102,0.3);
-            transform:translateY(-4px);
-        }
-        .pain-icon{font-size:2rem;margin-bottom:12px}
-        .pain-card p{color:#aaa;font-size:0.95rem;line-height:1.6}
-        .pain-answer{
-            text-align:center;font-size:1.15rem;color:#00d4ff;
-            font-weight:600;max-width:700px;margin:0 auto;
-            line-height:1.7;
-        }
+.hero-tags {
+  display:flex; flex-wrap:wrap; gap:10px;
+  justify-content:center; margin-top:24px;
+}
+.hero-tag {
+  display:flex; align-items:center; gap:6px;
+  color:var(--muted); font-size:.82rem; font-weight:500;
+}
+.hero-tag .dot {
+  width:6px; height:6px; border-radius:50%; background:var(--emerald);
+  box-shadow:0 0 6px rgba(16,185,129,.6);
+}
+.hero-tag .dot-c { background:var(--cyan); box-shadow:0 0 6px var(--glow-c); }
+.hero-tag .dot-i { background:var(--indigo-l); box-shadow:0 0 6px var(--glow-i); }
 
-        /* ============================================
-           FEATURES / TOOLS
-           ============================================ */
-        .tools{padding:80px 24px;background:#0e0e16}
-        .tools h2{
-            text-align:center;font-size:1.8rem;color:#fff;
-            margin-bottom:8px;font-weight:800;
-        }
-        .tools-sub{text-align:center;color:#888;margin-bottom:48px;font-size:1rem}
-        .tool-grid{
-            display:grid;
-            grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-            gap:24px;
-        }
-        .tool-card{
-            background:linear-gradient(135deg,#12121a,#1a1a24);
-            border:1px solid #1e1e2e;
-            border-radius:14px;padding:32px 24px;
-            transition:border-color 0.4s,transform 0.3s,box-shadow 0.4s;
-            position:relative;overflow:hidden;
-        }
-        .tool-card::before{
-            content:'';position:absolute;top:0;left:0;right:0;height:2px;
-            background:linear-gradient(90deg,transparent,#00d4ff,transparent);
-            opacity:0;transition:opacity 0.4s;
-        }
-        .tool-card:hover::before{opacity:1}
-        .tool-card:hover{
-            border-color:rgba(0,212,255,0.3);
-            transform:translateY(-4px);
-            box-shadow:0 12px 40px rgba(0,212,255,0.08);
-        }
-        .tool-card.free-highlight{
-            border-color:rgba(0,212,255,0.3);
-            animation:border-glow 3s ease-in-out infinite;
-        }
-        .tool-icon{
-            width:48px;height:48px;border-radius:12px;
-            display:flex;align-items:center;justify-content:center;
-            font-size:1.5rem;margin-bottom:16px;
-            background:rgba(0,212,255,0.08);
-        }
-        .tool-card h3{color:#fff;font-size:1.15rem;margin-bottom:4px}
-        .tool-badge{
-            display:inline-block;font-size:0.7rem;font-weight:800;
-            padding:3px 10px;border-radius:10px;margin-bottom:12px;
-        }
-        .badge-free{background:#00d4ff;color:#000}
-        .badge-pro{background:transparent;color:#00d4ff;border:1px solid #00d4ff}
-        .tool-card p{color:#999;font-size:0.9rem;line-height:1.6}
+/* ============================================================
+   TRUST BAR
+   ============================================================ */
+.trust-bar {
+  padding:24px 0; border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border); background:var(--bg-2);
+}
+.trust-bar .container {
+  display:flex; flex-wrap:wrap; gap:12px;
+  align-items:center; justify-content:center;
+}
+.trust-item {
+  display:flex; align-items:center; gap:8px;
+  color:var(--muted); font-size:.85rem; font-weight:500;
+}
+.trust-item svg { width:16px; height:16px; stroke:var(--cyan); }
+.trust-sep { color:var(--muted-2); }
+@media(max-width:480px) { .trust-sep { display:none; } }
 
-        /* ============================================
-           STATS BAR
-           ============================================ */
-        .stats{
-            padding:48px 24px;
-            background:linear-gradient(90deg,#0d1020,#12121e,#0d1020);
-            border-top:1px solid rgba(0,212,255,0.08);
-            border-bottom:1px solid rgba(0,212,255,0.08);
-        }
-        .stats-grid{
-            display:grid;
-            grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-            gap:32px;text-align:center;
-        }
-        .stat-item .stat-value{
-            font-size:1.8rem;font-weight:800;color:#00d4ff;
-            margin-bottom:4px;
-        }
-        .stat-item .stat-label{color:#888;font-size:0.85rem}
+/* Quantum badge with tooltip */
+.quantum-badge { position:relative; cursor:default; }
+.quantum-badge .qt-tip {
+  display:none; position:absolute; bottom:calc(100% + 10px); left:50%;
+  transform:translateX(-50%); white-space:nowrap;
+  background:var(--bg-card); border:1px solid var(--border);
+  border-radius:8px; padding:10px 14px; font-size:.8rem;
+  color:var(--muted); max-width:280px; white-space:normal;
+  box-shadow:0 8px 24px rgba(0,0,0,.5); z-index:10;
+}
+.quantum-badge:hover .qt-tip { display:block; }
 
-        /* ============================================
-           PRICING
-           ============================================ */
-        .pricing{padding:80px 24px}
-        .pricing h2{
-            text-align:center;font-size:1.8rem;color:#fff;
-            margin-bottom:40px;font-weight:800;
-        }
-        .price-toggle{
-            display:flex;justify-content:center;align-items:center;
-            gap:12px;margin-bottom:40px;
-        }
-        .price-toggle span{color:#999;font-size:0.95rem;cursor:pointer}
-        .price-toggle span.active{color:#fff;font-weight:600}
-        .toggle-switch{
-            width:48px;height:26px;background:#1a1a2e;
-            border-radius:13px;cursor:pointer;position:relative;
-            border:1px solid #333;transition:background 0.2s;
-        }
-        .toggle-switch::after{
-            content:'';position:absolute;top:3px;left:3px;
-            width:18px;height:18px;background:#00d4ff;
-            border-radius:50%;transition:transform 0.2s;
-        }
-        .toggle-switch.yearly::after{transform:translateX(22px)}
-        .toggle-switch.yearly{background:rgba(0,212,255,0.1);border-color:rgba(0,212,255,0.3)}
-        .price-yearly{display:none}
-        .price-save{
-            background:#00d4ff;color:#000;font-size:0.7rem;
-            padding:2px 8px;border-radius:10px;font-weight:700;margin-left:6px;
-        }
-        .price-grid{
-            display:grid;
-            grid-template-columns:repeat(auto-fit,minmax(270px,1fr));
-            gap:24px;
-        }
-        .price-card{
-            background:linear-gradient(135deg,#12121a,#1a1a24);
-            border:1px solid #1e1e2e;border-radius:14px;
-            padding:36px 28px;text-align:center;
-            transition:transform 0.3s,box-shadow 0.3s;
-        }
-        .price-card:hover{transform:translateY(-4px)}
-        .price-card.featured{
-            border-color:rgba(0,212,255,0.4);position:relative;
-            box-shadow:0 0 40px rgba(0,212,255,0.08);
-        }
-        .price-card.featured::before{
-            content:attr(data-badge);
-            position:absolute;top:-13px;left:50%;transform:translateX(-50%);
-            background:#00d4ff;color:#000;padding:4px 18px;
-            border-radius:20px;font-size:0.75rem;font-weight:800;
-        }
-        .price-card h3{color:#fff;font-size:1.3rem;margin-bottom:8px}
-        .price-amount{
-            font-size:2.4rem;font-weight:800;color:#00d4ff;margin:16px 0;
-        }
-        .price-amount span{font-size:0.9rem;color:#999}
-        .price-features{list-style:none;text-align:left;margin:24px 0}
-        .price-features li{
-            padding:7px 0;color:#bbb;font-size:0.92rem;
-        }
-        .price-features li::before{content:'\2713 ';color:#00d4ff;font-weight:700}
-        .price-features li.hl{color:#fff;font-weight:600}
-        .price-btn{
-            display:inline-block;padding:14px 36px;border-radius:8px;
-            font-weight:700;font-size:1rem;transition:all 0.3s;
-        }
-        .btn-free{background:#1a1a2e;color:#fff;border:1px solid #333}
-        .btn-free:hover{border-color:#00d4ff}
-        .btn-pro{background:#00d4ff;color:#000}
-        .btn-pro:hover{box-shadow:0 0 30px rgba(0,212,255,0.4)}
-        .btn-biz{background:#1a1a2e;color:#fff;border:1px solid #00d4ff}
-        .btn-biz:hover{box-shadow:0 0 30px rgba(0,212,255,0.2)}
+/* ============================================================
+   DEMO SECTION
+   ============================================================ */
+.demo { padding:90px 24px; background:var(--bg); }
+.section-label {
+  display:inline-block; padding:4px 14px; border-radius:20px;
+  background:rgba(99,102,241,.12); border:1px solid rgba(99,102,241,.25);
+  color:var(--indigo-l); font-size:.78rem; font-weight:700;
+  letter-spacing:.06em; text-transform:uppercase; margin-bottom:16px;
+}
+.section-h2 {
+  font-size:1.9rem; font-weight:900; color:var(--text);
+  margin-bottom:10px; letter-spacing:-.02em;
+}
+@media(min-width:768px) { .section-h2 { font-size:2.3rem; } }
+.section-sub { color:var(--muted); font-size:1rem; margin-bottom:48px; }
+.section-header { text-align:center; }
 
-        /* ============================================
-           FAQ
-           ============================================ */
-        .faq{padding:80px 24px;background:#0e0e16}
-        .faq h2{
-            text-align:center;font-size:1.8rem;color:#fff;
-            margin-bottom:48px;font-weight:800;
-        }
-        .faq-list{max-width:700px;margin:0 auto}
-        .faq-item{
-            border-bottom:1px solid #1e1e2e;
-        }
-        .faq-question{
-            width:100%;background:none;border:none;color:#e0e0e0;
-            font-size:1rem;font-weight:600;padding:20px 0;
-            cursor:pointer;display:flex;align-items:center;
-            justify-content:space-between;text-align:left;
-            font-family:inherit;
-        }
-        .faq-question:hover{color:#00d4ff}
-        .faq-arrow{
-            color:#00d4ff;font-size:1.2rem;
-            transition:transform 0.3s;flex-shrink:0;margin-left:16px;
-        }
-        .faq-item.open .faq-arrow{transform:rotate(180deg)}
-        .faq-answer{
-            max-height:0;overflow:hidden;
-            transition:max-height 0.4s ease,padding 0.4s ease;
-        }
-        .faq-item.open .faq-answer{max-height:200px;padding-bottom:20px}
-        .faq-answer p{color:#999;font-size:0.92rem;line-height:1.7}
+.demo-tabs {
+  display:flex; justify-content:center; gap:8px; margin-bottom:28px;
+}
+.demo-tab {
+  padding:8px 22px; border-radius:20px; border:1px solid var(--border);
+  background:none; color:var(--muted); font-weight:700; font-size:.85rem;
+  transition:all .2s;
+}
+.demo-tab.active {
+  background:var(--indigo); border-color:var(--indigo); color:#fff;
+}
 
-        /* ============================================
-           FINAL CTA
-           ============================================ */
-        .final-cta{
-            padding:80px 24px;text-align:center;
-            background:linear-gradient(180deg,#0a0a0f,#0d1020,#0a0a0f);
-            position:relative;
-        }
-        .final-cta h2{
-            font-size:2rem;color:#fff;margin-bottom:16px;font-weight:800;
-        }
-        .final-cta p{
-            color:#888;font-size:1.05rem;margin-bottom:36px;
-            max-width:500px;margin-left:auto;margin-right:auto;
-        }
+.chat-window {
+  max-width:500px; margin:0 auto;
+  background:var(--bg-card); border:1px solid var(--border);
+  border-radius:var(--radius-lg); overflow:hidden;
+  box-shadow:0 24px 64px rgba(0,0,0,.5), 0 0 0 1px var(--border);
+}
+.chat-header {
+  background:linear-gradient(90deg, #0c1220, #101828);
+  padding:14px 20px; display:flex; align-items:center; gap:12px;
+  border-bottom:1px solid var(--border);
+}
+.chat-avatar {
+  width:38px; height:38px; border-radius:50%; flex-shrink:0;
+  background:linear-gradient(135deg, var(--indigo), var(--cyan-d));
+  display:flex; align-items:center; justify-content:center; font-size:1rem;
+}
+.chat-header-info h4 { color:var(--text); font-size:.9rem; margin-bottom:1px; }
+.chat-online { color:var(--emerald); font-size:.72rem; font-weight:600; }
+.chat-status-dot {
+  display:inline-block; width:6px; height:6px;
+  background:var(--emerald); border-radius:50%; margin-right:4px;
+  box-shadow:0 0 6px rgba(16,185,129,.6);
+}
+.chat-body {
+  padding:20px 16px; min-height:340px;
+  display:flex; flex-direction:column; gap:10px;
+}
+.chat-msg {
+  max-width:88%; padding:10px 14px; border-radius:12px;
+  font-size:.88rem; line-height:1.55;
+  opacity:0; transform:translateY(8px);
+  transition:opacity .35s ease, transform .35s ease;
+}
+.chat-msg.vis { opacity:1; transform:translateY(0); }
+.chat-msg.user {
+  align-self:flex-end;
+  background:rgba(99,102,241,.18); color:var(--text);
+  border:1px solid rgba(99,102,241,.2);
+  border-bottom-right-radius:4px;
+}
+.chat-msg.bot {
+  align-self:flex-start;
+  background:var(--bg-card-h); color:var(--text);
+  border:1px solid var(--border);
+  border-bottom-left-radius:4px;
+}
+.chat-msg.bot.warn { border-color:rgba(239,68,68,.3); }
+.warn-badge {
+  display:inline-block; background:var(--red); color:#fff;
+  font-size:.7rem; font-weight:800; padding:2px 8px;
+  border-radius:4px; margin-bottom:6px;
+}
+.risk-score { color:var(--red); font-weight:700; }
+.safe-action { color:var(--emerald); font-weight:700; }
+.typing-indicator {
+  align-self:flex-start; display:flex; gap:4px;
+  padding:12px 16px; background:var(--bg-card-h);
+  border:1px solid var(--border); border-radius:12px;
+  border-bottom-left-radius:4px; opacity:0; transition:opacity .3s;
+}
+.typing-indicator.vis { opacity:1; }
+.typing-dot {
+  width:7px; height:7px; background:var(--muted); border-radius:50%;
+  animation:typeDot 1.2s ease-in-out infinite;
+}
+.typing-dot:nth-child(2) { animation-delay:.2s; }
+.typing-dot:nth-child(3) { animation-delay:.4s; }
 
-        /* ============================================
-           FOOTER
-           ============================================ */
-        .footer{
-            padding:40px 24px;text-align:center;
-            border-top:1px solid #1a1a2e;
-        }
-        .footer-links{margin-bottom:16px}
-        .footer-links a{
-            color:#00d4ff;margin:0 14px;font-size:0.9rem;
-            transition:opacity 0.2s;
-        }
-        .footer-links a:hover{opacity:0.7}
-        .footer-trust{
-            display:flex;justify-content:center;gap:24px;
-            margin-bottom:16px;flex-wrap:wrap;
-        }
-        .trust-badge{
-            display:flex;align-items:center;gap:6px;
-            color:#aaa;font-size:0.8rem;
-        }
-        .trust-badge svg{width:16px;height:16px;fill:#00d4ff}
-        .footer-legal{color:#999;font-size:0.8rem;line-height:1.6}
-        .footer-legal a{color:#00d4ff}
+/* ============================================================
+   PAIN SECTION
+   ============================================================ */
+.pain { padding:90px 24px; background:var(--bg-2); }
+.pain-grid {
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));
+  gap:16px; margin-top:48px;
+}
+.pain-card {
+  background:var(--bg-card); border:1px solid var(--border);
+  border-radius:var(--radius); padding:28px;
+  transition:border-color .25s, transform .25s;
+}
+.pain-card:hover { border-color:rgba(99,102,241,.35); transform:translateY(-3px); }
+.pain-icon { font-size:2rem; margin-bottom:14px; }
+.pain-card p { color:var(--muted); font-size:.93rem; line-height:1.7; }
+.pain-answer {
+  text-align:center; margin-top:48px;
+  font-size:1.2rem; font-weight:700; color:var(--text); line-height:1.6;
+}
+.pain-answer span { color:var(--indigo-l); }
 
-        .ai-notice{
-            text-align:center;padding:16px 24px;
-            background:#08080c;color:#aaa;font-size:0.8rem;
-        }
+/* ============================================================
+   FEATURES / TOOLS
+   ============================================================ */
+.tools { padding:90px 24px; background:var(--bg); }
+.tool-grid {
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(290px, 1fr));
+  gap:16px; margin-top:48px;
+}
+.tool-card {
+  background:var(--bg-card); border:1px solid var(--border);
+  border-radius:var(--radius); padding:28px;
+  position:relative; overflow:hidden;
+  transition:border-color .25s, transform .25s, box-shadow .25s;
+}
+.tool-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg, var(--indigo), var(--cyan));
+  opacity:0; transition:opacity .25s;
+}
+.tool-card:hover {
+  border-color:rgba(99,102,241,.35);
+  transform:translateY(-4px);
+  box-shadow:0 12px 40px rgba(0,0,0,.35);
+}
+.tool-card:hover::before { opacity:1; }
+.tool-icon { font-size:2rem; margin-bottom:14px; }
+.tool-card h3 { font-size:1.05rem; font-weight:800; margin-bottom:8px; color:var(--text); }
+.tool-badge {
+  display:inline-block; font-size:.7rem; font-weight:800;
+  padding:2px 10px; border-radius:20px; margin-bottom:12px;
+  letter-spacing:.04em;
+}
+.badge-free { background:rgba(16,185,129,.15); color:var(--emerald); border:1px solid rgba(16,185,129,.3); }
+.badge-pro  { background:rgba(99,102,241,.12); color:var(--indigo-l); border:1px solid rgba(99,102,241,.25); }
+.tool-card p { color:var(--muted); font-size:.9rem; line-height:1.7; }
+.tool-card.featured-tool {
+  border-color:rgba(34,211,238,.25);
+  box-shadow:0 0 30px rgba(34,211,238,.06);
+}
 
-        /* ============================================
-           RESPONSIVE
-           ============================================ */
-        @media(max-width:600px){
-            .hero h1{font-size:1.7rem}
-            .hero-stat-number{font-size:2.8rem}
-            .hero-sub{font-size:0.95rem}
-            .cta-primary{padding:16px 36px;font-size:1rem}
-            .demo h2,.pain h2,.tools h2,.pricing h2,.faq h2{font-size:1.4rem}
-            .chat-body{min-height:300px}
-            .nav-cta{display:none}
-            .stats-grid{grid-template-columns:repeat(2,1fr);gap:24px}
-            .price-grid{grid-template-columns:1fr}
-        }
+/* ============================================================
+   STATS BAR
+   ============================================================ */
+.stats-bar {
+  padding:48px 24px;
+  background:linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+  border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+}
+.stats-grid {
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));
+  gap:32px; text-align:center;
+}
+.stat-val {
+  font-size:2rem; font-weight:900; color:var(--cyan);
+  margin-bottom:6px; letter-spacing:-.01em;
+}
+.stat-lbl { color:var(--muted); font-size:.85rem; }
 
-        /* ============================================
-           TELEGRAM ONBOARDING MODAL
-           ============================================ */
-        .tg-modal-overlay{
-            display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);
-            z-index:9999;justify-content:center;align-items:center;padding:20px;
-        }
-        .tg-modal-overlay.active{display:flex}
-        .tg-modal{
-            background:#0d0d14;border:1px solid #00d4ff44;border-radius:20px;
-            padding:40px 36px;max-width:480px;width:100%;text-align:center;
-            position:relative;animation:fade-in-up 0.3s ease;
-        }
-        .tg-modal h3{color:#fff;font-size:1.4rem;font-weight:800;margin-bottom:8px}
-        .tg-modal .tg-sub{color:#999;font-size:0.9rem;margin-bottom:28px}
-        .tg-steps{display:flex;flex-direction:column;gap:16px;text-align:left;margin-bottom:28px}
-        .tg-step{display:flex;align-items:flex-start;gap:14px}
-        .tg-step-num{
-            width:32px;height:32px;border-radius:50%;background:#00d4ff22;
-            border:1px solid #00d4ff;color:#00d4ff;font-weight:700;font-size:0.9rem;
-            display:flex;align-items:center;justify-content:center;flex-shrink:0;
-        }
-        .tg-step-text{color:#ccc;font-size:0.9rem;line-height:1.5;padding-top:5px}
-        .tg-step-text strong{color:#fff}
-        .tg-modal-btn{
-            display:block;background:linear-gradient(135deg,#00d4ff,#0099cc);
-            color:#000;font-weight:800;padding:14px 28px;border-radius:12px;
-            font-size:1rem;text-decoration:none;margin-bottom:12px;
-            transition:transform 0.2s;
-        }
-        .tg-modal-btn:hover{transform:scale(1.03)}
-        .tg-modal-close{
-            position:absolute;top:16px;right:20px;background:none;border:none;
-            color:#666;font-size:1.4rem;cursor:pointer;line-height:1;
-        }
-        .tg-modal-close:hover{color:#fff}
-        .tg-modal-skip{color:#555;font-size:0.8rem;cursor:pointer;text-decoration:underline}
-        .tg-modal-skip:hover{color:#999}
-    </style>
+/* ============================================================
+   PRICING
+   ============================================================ */
+.pricing { padding:90px 24px; background:var(--bg); }
+.price-toggle {
+  display:flex; align-items:center; gap:12px;
+  justify-content:center; margin-bottom:40px;
+}
+.toggle-lbl { color:var(--muted); font-size:.9rem; font-weight:600; }
+.toggle-lbl.active { color:var(--text); }
+.toggle-switch {
+  width:48px; height:26px; border-radius:13px;
+  background:var(--muted-2); position:relative; cursor:pointer;
+  transition:background .25s;
+}
+.toggle-switch::after {
+  content:''; position:absolute; top:3px; left:3px;
+  width:20px; height:20px; border-radius:50%;
+  background:#fff; transition:transform .25s;
+}
+.toggle-switch.on { background:var(--indigo); }
+.toggle-switch.on::after { transform:translateX(22px); }
+.save-badge {
+  background:rgba(16,185,129,.15); color:var(--emerald);
+  border:1px solid rgba(16,185,129,.3); border-radius:20px;
+  font-size:.72rem; font-weight:700; padding:2px 9px; margin-left:6px;
+}
+.price-grid {
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));
+  gap:20px; max-width:960px; margin:0 auto;
+}
+.price-card {
+  background:var(--bg-card); border:1px solid var(--border);
+  border-radius:var(--radius-lg); padding:32px;
+  position:relative; transition:transform .25s, box-shadow .25s;
+}
+.price-card:hover { transform:translateY(-4px); box-shadow:0 16px 48px rgba(0,0,0,.35); }
+.price-card.featured {
+  border-color:var(--indigo); background:linear-gradient(160deg, #0d1220, #111830);
+  box-shadow:0 0 40px rgba(99,102,241,.15);
+}
+.price-card.featured::after {
+  content:attr(data-badge); position:absolute; top:-13px; left:50%; transform:translateX(-50%);
+  background:var(--indigo); color:#fff; padding:3px 14px; border-radius:20px;
+  font-size:.75rem; font-weight:800; letter-spacing:.04em; white-space:nowrap;
+}
+.price-card h3 { font-size:1.25rem; font-weight:900; margin-bottom:16px; }
+.price-amount {
+  font-size:2.4rem; font-weight:900; color:var(--text);
+  margin-bottom:4px; letter-spacing:-.02em;
+}
+.price-amount span { font-size:.9rem; color:var(--muted); font-weight:500; }
+.price-period { color:var(--muted-2); font-size:.82rem; margin-bottom:24px; }
+.price-features { list-style:none; margin:0 0 28px; display:flex; flex-direction:column; gap:10px; }
+.price-features li { display:flex; align-items:flex-start; gap:9px; color:var(--muted); font-size:.9rem; line-height:1.5; }
+.price-features li::before { content:''; width:16px; height:16px; border-radius:50%; background:rgba(16,185,129,.15); border:1px solid rgba(16,185,129,.3); flex-shrink:0; margin-top:1px; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%2310b981' stroke-width='2'%3E%3Cpath d='M2 6l3 3 5-5'/%3E%3C/svg%3E"); background-size:10px; background-position:center; background-repeat:no-repeat; }
+.price-features li.hl { color:var(--text); font-weight:600; }
+.price-btn {
+  display:block; text-align:center; padding:14px;
+  border-radius:10px; font-weight:800; font-size:.95rem;
+  transition:box-shadow .25s, transform .2s; border:none;
+}
+.price-btn:hover { transform:translateY(-2px); }
+.btn-free { background:var(--bg-2); color:var(--text); border:1px solid var(--border); }
+.btn-free:hover { border-color:var(--indigo); }
+.btn-pro  { background:var(--indigo); color:#fff; }
+.btn-pro:hover  { box-shadow:0 0 28px var(--glow-i); }
+.btn-biz  { background:rgba(99,102,241,.12); color:var(--indigo-l); border:1px solid rgba(99,102,241,.3); }
+.btn-biz:hover  { background:var(--indigo); color:#fff; }
+.price-yearly { display:none; }
+.price-old {
+  text-decoration:line-through; color:var(--muted-2);
+  font-size:1rem; font-weight:500; margin-right:6px;
+}
+
+/* ============================================================
+   FOUNDER
+   ============================================================ */
+.founder {
+  padding:72px 24px;
+  background:var(--bg-2);
+  border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+}
+.founder-inner {
+  max-width:720px; margin:0 auto;
+  display:flex; gap:32px; align-items:center; flex-wrap:wrap;
+}
+.founder-avatar {
+  width:88px; height:88px; border-radius:50%; flex-shrink:0;
+  background:linear-gradient(135deg, rgba(99,102,241,.2), rgba(34,211,238,.2));
+  border:2px solid var(--indigo);
+  display:flex; align-items:center; justify-content:center; font-size:2.5rem;
+}
+.founder-info { flex:1; min-width:240px; }
+.founder-name { color:var(--indigo-l); font-weight:700; font-size:1.05rem; margin-bottom:6px; }
+.founder-bio { color:var(--muted); font-size:.92rem; line-height:1.7; margin-bottom:14px; }
+.founder-tags { display:flex; gap:8px; flex-wrap:wrap; }
+.founder-tag {
+  background:var(--bg-card); color:var(--indigo-l);
+  padding:3px 12px; border-radius:20px; font-size:.78rem; font-weight:600;
+  border:1px solid var(--border);
+}
+.founder-legal { text-align:center; margin-top:32px; color:var(--muted-2); font-size:.82rem; }
+
+/* ============================================================
+   FAQ
+   ============================================================ */
+.faq { padding:90px 24px; background:var(--bg); }
+.faq-list { max-width:720px; margin:48px auto 0; display:flex; flex-direction:column; gap:8px; }
+.faq-item {
+  background:var(--bg-card); border:1px solid var(--border);
+  border-radius:var(--radius); overflow:hidden; transition:border-color .2s;
+}
+.faq-item.open { border-color:rgba(99,102,241,.35); }
+.faq-question {
+  width:100%; display:flex; align-items:center; justify-content:space-between;
+  padding:18px 22px; background:none; border:none; color:var(--text);
+  font-size:.95rem; font-weight:600; text-align:left; gap:12px;
+}
+.faq-arrow {
+  color:var(--muted); font-size:.85rem; flex-shrink:0;
+  transition:transform .25s;
+}
+.faq-item.open .faq-arrow { transform:rotate(180deg); color:var(--indigo-l); }
+.faq-answer { display:none; padding:0 22px 18px; }
+.faq-item.open .faq-answer { display:block; }
+.faq-answer p { color:var(--muted); font-size:.9rem; line-height:1.75; }
+
+/* ============================================================
+   FINAL CTA
+   ============================================================ */
+.final-cta {
+  padding:90px 24px; text-align:center;
+  background:linear-gradient(160deg, var(--bg-2) 0%, var(--bg) 100%);
+  border-top:1px solid var(--border);
+}
+.final-cta h2 { font-size:2rem; font-weight:900; margin-bottom:14px; letter-spacing:-.02em; }
+.final-cta p { color:var(--muted); margin-bottom:36px; font-size:1rem; }
+@media(min-width:768px) { .final-cta h2 { font-size:2.6rem; } }
+.final-trust {
+  margin-top:20px; display:flex; align-items:center;
+  justify-content:center; gap:8px; color:var(--muted); font-size:.88rem;
+}
+
+/* ============================================================
+   AI NOTICE + FOOTER
+   ============================================================ */
+.ai-notice {
+  text-align:center; padding:16px 24px;
+  background:var(--bg-2); color:var(--muted-2); font-size:.78rem;
+  border-top:1px solid var(--border);
+}
+footer {
+  background:var(--bg); border-top:1px solid var(--border);
+  padding:40px 24px;
+}
+.footer-trust {
+  display:flex; flex-wrap:wrap; gap:20px;
+  justify-content:center; margin-bottom:28px;
+}
+.ftrust-item {
+  display:flex; align-items:center; gap:7px;
+  color:var(--muted); font-size:.82rem; font-weight:500;
+}
+.ftrust-item svg { width:14px; height:14px; stroke:var(--indigo-l); }
+.footer-links {
+  display:flex; flex-wrap:wrap; gap:24px;
+  justify-content:center; margin-bottom:20px;
+}
+.footer-links a { color:var(--muted-2); font-size:.85rem; transition:color .2s; }
+.footer-links a:hover { color:var(--text); }
+.footer-legal { text-align:center; color:var(--muted-2); font-size:.78rem; }
+
+/* ============================================================
+   UTILITY
+   ============================================================ */
+.text-center { text-align:center; }
+.sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
+</style>
 </head>
 <body>
 
-<!-- ===================== TELEGRAM MODAL ===================== -->
-<div class="tg-modal-overlay" id="tgModal" onclick="closeTgModal(event)">
-    <div class="tg-modal">
-        <button class="tg-modal-close" onclick="document.getElementById('tgModal').classList.remove('active')">&times;</button>
-        <div style="font-size:2.5rem;margin-bottom:12px">&#x1F4AC;</div>
-        <h3 id="tg-modal-title">So startest du in 2 Minuten</h3>
-        <p class="tg-sub" id="tg-modal-sub">KyberGuard laeuft ueber Telegram &mdash; die kostenlose Messenger-App.</p>
-        <div class="tg-steps">
-            <div class="tg-step">
-                <div class="tg-step-num">1</div>
-                <div class="tg-step-text" id="tg-step1"><strong>Telegram installieren</strong> (falls noch nicht vorhanden) &mdash; kostenlos fuer iOS, Android & Desktop.</div>
-            </div>
-            <div class="tg-step">
-                <div class="tg-step-num">2</div>
-                <div class="tg-step-text" id="tg-step2"><strong>Bot oeffnen</strong> &mdash; klicke unten auf den Button. Telegram oeffnet sich automatisch mit KyberGuard.</div>
-            </div>
-            <div class="tg-step">
-                <div class="tg-step-num">3</div>
-                <div class="tg-step-text" id="tg-step3"><strong>&ldquo;Start&rdquo; druecken</strong> im Chat &mdash; fertig. Du kannst sofort Fragen stellen oder Links pruefen.</div>
-            </div>
-        </div>
-        <a href="https://t.me/KyberGuardBot" class="tg-modal-btn" id="tg-modal-cta" target="_blank">&#x1F4F1; KyberGuard in Telegram oeffnen</a>
-        <div class="tg-modal-skip" id="tg-modal-skip" onclick="document.getElementById('tgModal').classList.remove('active')">Schliessen</div>
+<!-- ========== TG MODAL ========== -->
+<div class="tg-overlay" id="tgModal" role="dialog" aria-modal="true" aria-labelledby="tg-modal-title">
+  <div class="tg-modal">
+    <button class="tg-close" id="tgClose" aria-label="Schliessen">&times;</button>
+    <h3 id="tg-modal-title" data-i18n="tg_title">So startest du in 2 Minuten</h3>
+    <p class="tg-sub" data-i18n="tg_sub">KyberGuard l&auml;uft &uuml;ber Telegram &mdash; die kostenlose Messenger-App.</p>
+    <div class="tg-steps">
+      <div class="tg-step">
+        <div class="tg-step-num">1</div>
+        <div class="tg-step-text" data-i18n="tg_step1"><strong>Telegram installieren</strong> (falls noch nicht vorhanden) &mdash; kostenlos f&uuml;r iOS, Android &amp; Desktop.</div>
+      </div>
+      <div class="tg-step">
+        <div class="tg-step-num">2</div>
+        <div class="tg-step-text" data-i18n="tg_step2"><strong>Bot &ouml;ffnen</strong> &mdash; klicke unten auf den Button. Telegram &ouml;ffnet sich automatisch mit KyberGuard.</div>
+      </div>
+      <div class="tg-step">
+        <div class="tg-step-num">3</div>
+        <div class="tg-step-text" data-i18n="tg_step3"><strong>&bdquo;Start&ldquo; dr&uuml;cken</strong> im Chat &mdash; fertig. Du kannst sofort Fragen stellen oder Links pr&uuml;fen.</div>
+      </div>
     </div>
+    <a href="https://t.me/KyberGuardBot" class="tg-modal-btn" id="tgModalBtn" target="_blank" rel="noopener">
+      &#128241; KyberGuard in Telegram &ouml;ffnen
+    </a>
+    <div class="tg-modal-skip" id="tgSkip" data-i18n="tg_skip">Schlie&szlig;en</div>
+  </div>
 </div>
 
-<!-- ===================== NAV BAR ===================== -->
+<!-- ========== NAVBAR ========== -->
 <nav class="navbar">
-    <div class="container">
-        <a href="#" class="nav-logo">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            Secure<span>Bot AI</span>
-        </a>
-        <nav class="nav-links">
-            <a href="#features" class="nav-link" data-i18n="nav_features">Features</a>
-            <a href="#pricing" class="nav-link" data-i18n="nav_pricing">Preise</a>
-            <a href="#faq" class="nav-link" data-i18n="nav_faq">FAQ</a>
-        </nav>
-        <div class="nav-right">
-            <div class="lang-toggle" aria-label="Language switcher">
-                <button class="lang-btn active" data-lang="de" onclick="setLang('de')">DE</button>
-                <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
-            </div>
-            <a href="#" onclick="openTgModal();return false;" class="nav-cta" data-i18n="nav_cta">Jetzt testen</a>
-            <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
-                <span></span><span></span><span></span>
-            </button>
-        </div>
+  <div class="container">
+    <a href="#" class="nav-logo" data-action="open-tg-modal">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+      <span class="logo-ky">Kyber</span><span class="logo-ber">Guard</span>
+    </a>
+    <nav class="nav-links" aria-label="Hauptnavigation">
+      <a href="#features" class="nav-link" data-i18n="nav_features">Features</a>
+      <a href="#pricing" class="nav-link" data-i18n="nav_pricing">Preise</a>
+      <a href="#faq" class="nav-link" data-i18n="nav_faq">FAQ</a>
+    </nav>
+    <div class="nav-right">
+      <div class="lang-toggle" role="group" aria-label="Sprache">
+        <button class="lang-btn active" data-lang="de">DE</button>
+        <button class="lang-btn" data-lang="en">EN</button>
+      </div>
+      <button class="nav-cta" data-action="open-tg-modal" data-i18n="nav_cta">Jetzt testen</button>
+      <button class="hamburger" id="hamburgerBtn" aria-label="Men&uuml; &ouml;ffnen" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
     </div>
+  </div>
 </nav>
 <div class="mobile-menu" id="mobileMenu">
-    <a href="#features" onclick="closeMobileMenu()" data-i18n="nav_features">Features</a>
-    <a href="#pricing" onclick="closeMobileMenu()" data-i18n="nav_pricing">Preise</a>
-    <a href="#faq" onclick="closeMobileMenu()" data-i18n="nav_faq">FAQ</a>
-    <a href="#" onclick="closeMobileMenu();openTgModal();return false;" class="mob-cta" data-i18n="nav_cta">Jetzt testen</a>
+  <a href="#features" data-i18n="nav_features">Features</a>
+  <a href="#pricing" data-i18n="nav_pricing">Preise</a>
+  <a href="#faq" data-i18n="nav_faq">FAQ</a>
+  <button class="mob-cta" data-action="open-tg-modal" data-i18n="nav_cta">Jetzt testen</button>
 </div>
 
-<!-- ===================== HERO ===================== -->
+<!-- ========== HERO ========== -->
 <section class="hero" id="hero">
-    <div class="hero-bg"></div>
-    <div class="hero-grid"></div>
-    <div class="hero-content">
-        <div class="hero-stat reveal">
-            <div class="hero-stat-number" id="attack-counter">0</div>
-            <div class="hero-stat-label" data-i18n="hero_stat">Cyberangriffe seit du diese Seite geoeffnet hast</div>
-        </div>
-        <h1 class="reveal" data-i18n="hero_h1"><span class="accent">Phishing erkannt.</span><br>In 3 Sekunden. 24/7.</h1>
-        <p class="hero-sub reveal" data-i18n="hero_sub">Phishing-Mail erhalten? Unsicher ob der Link echt ist?<br><strong>Frag KyberGuard - in 3 Sekunden weisst du Bescheid.</strong></p>
-        <a href="#" onclick="openTgModal();return false;" class="cta-primary reveal" data-i18n="hero_cta">Jetzt kostenlos testen</a>
-        <div class="hero-trust reveal">
-            <span class="hero-trust-icon">&#x1F4AC;</span>
-            <span data-i18n="hero_trust">Laeuft ueber Telegram (kostenlose App fuer <a href="https://apps.apple.com/app/telegram-messenger/id686449807" style="color:#00d4ff">iOS</a>, <a href="https://play.google.com/store/apps/details?id=org.telegram.messenger" style="color:#00d4ff">Android</a> & <a href="https://desktop.telegram.org/" style="color:#00d4ff">Desktop</a>). Kein extra Login noetig.</span>
-        </div>
-        <div class="hero-trust reveal" style="margin-top:8px">
-            <span class="hero-trust-icon">&#x2705;</span>
-            <span style="color:#00d4ff;font-weight:600">Live seit 2026 &mdash; Server Frankfurt, Deutschland.</span>
-        </div>
-        <div class="hero-trust reveal" style="margin-top:8px">
-            <span class="hero-trust-icon">&#x1F512;</span>
-            <span style="color:#00c896;font-weight:600" data-i18n="hero_quantum">Quantum-Safe Infrastruktur &mdash; NIST FIPS 203 zertifiziert. Schuetzt deine Daten auch gegen kuenftige Quantencomputer.</span>
-        </div>
+  <div class="hero-bg"></div>
+  <div class="hero-grid" aria-hidden="true"></div>
+  <div class="hero-content">
+
+    <!-- Audience Switcher -->
+    <div class="audience-switcher reveal" role="group" aria-label="Zielgruppe w&auml;hlen">
+      <button class="aud-btn active" data-audience="privat" data-i18n="aud_privat">Privatperson</button>
+      <button class="aud-btn" data-audience="business" data-i18n="aud_business">Unternehmen</button>
+      <button class="aud-btn" data-audience="itpro" data-i18n="aud_itpro">IT-Profi</button>
     </div>
+
+    <!-- Attack Counter -->
+    <div class="hero-counter reveal">
+      <div class="counter-num" id="attackCounter">0</div>
+      <div class="counter-label" data-i18n="hero_stat">Cyberangriffe seit du diese Seite ge&ouml;ffnet hast</div>
+    </div>
+
+    <h1 class="reveal" id="heroH1">
+      <span class="accent-i">Phishing erkannt.</span><br>In 3 Sekunden. 24/7.
+    </h1>
+    <p class="hero-sub reveal" id="heroSub">
+      Phishing-Mail erhalten? Unsicher ob der Link echt ist?<br>
+      <strong>Frag KyberGuard &ndash; in 3 Sekunden wei&szlig;t du Bescheid.</strong>
+    </p>
+
+    <button class="cta-primary reveal" data-action="open-tg-modal" data-i18n="hero_cta">
+      Jetzt kostenlos testen &rarr;
+    </button>
+
+    <div class="hero-tags reveal">
+      <span class="hero-tag"><span class="dot"></span> DSGVO-konform</span>
+      <span class="hero-tag"><span class="dot dot-c"></span> Server Frankfurt</span>
+      <span class="hero-tag"><span class="dot dot-i"></span> Quantum-Safe</span>
+      <span class="hero-tag"><span class="dot"></span> Kein Login n&ouml;tig</span>
+    </div>
+
+  </div>
 </section>
 
-<!-- ===================== LIVE DEMO ===================== -->
-<section class="demo" id="demo">
-    <div class="container">
-        <h2 class="reveal" data-i18n="demo_h2">Sieh selbst, wie es funktioniert</h2>
-        <p class="demo-sub reveal" data-i18n="demo_sub">Echte KI-Analyse. In Echtzeit.</p>
-        <div class="reveal" style="display:flex;justify-content:center;gap:8px;margin-bottom:24px">
-            <button id="tab-phishing" onclick="switchTab('phishing')" style="padding:8px 20px;border-radius:20px;border:1px solid #00d4ff;background:#00d4ff;color:#000;font-weight:700;font-size:0.85rem;cursor:pointer;transition:all 0.2s">&#x1F6E1; Phishing-Check</button>
-            <button id="tab-viper" onclick="switchTab('viper')" style="padding:8px 20px;border-radius:20px;border:1px solid #333;background:transparent;color:#888;font-weight:700;font-size:0.85rem;cursor:pointer;transition:all 0.2s">&#x1F4E1; VIPER Anruf-Check</button>
-        </div>
-        <div class="chat-window reveal">
-            <div class="chat-header">
-                <div class="chat-avatar">&#x1F6E1;</div>
-                <div class="chat-header-info">
-                    <h4>KyberGuard</h4>
-                    <span>online</span>
-                </div>
-            </div>
-            <div class="chat-body" id="chat-body">
-                <div class="typing-indicator" id="typing">
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
-                </div>
-            </div>
-        </div>
+<!-- ========== TRUST BAR ========== -->
+<div class="trust-bar reveal">
+  <div class="container">
+    <div class="trust-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span data-i18n="trust_1">DSGVO-konform</span>
     </div>
-</section>
-
-<!-- ===================== PROBLEM / PAIN ===================== -->
-<section class="pain" id="problem">
-    <div class="container">
-        <h2 class="reveal" data-i18n="pain_h2">Kennst du das?</h2>
-        <div class="pain-grid">
-            <div class="pain-card reveal">
-                <div class="pain-icon">&#x1F4E7;</div>
-                <p data-i18n="pain_1">Du erhaeltst eine E-Mail von &ldquo;deiner Bank&rdquo; - aber ist sie echt? Ein falscher Klick und dein Konto ist kompromittiert.</p>
-            </div>
-            <div class="pain-card reveal">
-                <div class="pain-icon">&#x1F465;</div>
-                <p data-i18n="pain_2">Dein Mitarbeiter klickt auf einen Link - war das Phishing? 91% aller Cyberangriffe starten mit einer E-Mail.</p>
-            </div>
-            <div class="pain-card reveal">
-                <div class="pain-icon">&#x1F6A8;</div>
-                <p data-i18n="pain_3">Du wirst gehackt - was jetzt? Wen rufst du um 3 Uhr nachts an? Jede Minute zaehlt.</p>
-            </div>
-            <div class="pain-card reveal">
-                <div class="pain-icon">&#x260E;&#xFE0F;</div>
-                <p data-i18n="pain_4">Eine unbekannte Nummer ruft an. Deine Bank? Polizei? Microsoft-Support? Oder doch Betrug? 2 Milliarden Spam-Anrufe passieren jeden Monat.</p>
-            </div>
-            <div class="pain-card reveal">
-                <div class="pain-icon">&#x1F576;&#xFE0F;</div>
-                <p data-i18n="pain_5">Irgendwo da draussen liegt deine E-Mail-Adresse offen im Darknet &mdash; gestohlen bei einem Hackerangriff auf einen Online-Shop, eine App oder ein Forum. 12 Milliarden Accounts betroffen. Weisst du ob deine dabei ist?</p>
-            </div>
-        </div>
-        <p class="pain-answer reveal" data-i18n="pain_answer">KyberGuard ist dein Security-Experte.<br>Rund um die Uhr. Fuer einen Bruchteil der Kosten.</p>
+    <span class="trust-sep">&bull;</span>
+    <div class="trust-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <span data-i18n="trust_2">Server Frankfurt, DE</span>
     </div>
-</section>
-
-<!-- ===================== FEATURES / TOOLS ===================== -->
-<section class="tools" id="features">
-    <div class="container">
-        <h2 class="reveal" data-i18n="tools_h2">Das kann KyberGuard</h2>
-        <p class="tools-sub reveal" data-i18n="tools_sub">Echte Werkzeuge - nicht nur Fragen beantworten.</p>
-        <div class="tool-grid">
-            <div class="tool-card free-highlight reveal">
-                <div class="tool-icon">&#x1F6E1;</div>
-                <h3 data-i18n="tool1_h3">Phishing-Checker</h3>
-                <span class="tool-badge badge-free" data-i18n="badge_free">KOSTENLOS</span>
-                <p data-i18n="tool1_p">Verdaechtigen Link senden - sofort Risiko-Score 1-10. Typosquatting, gefaelschte Domains, Social Engineering erkennen. Ohne Limit.</p>
-            </div>
-            <div class="tool-card reveal">
-                <div class="tool-icon">&#x1F4CB;</div>
-                <h3 data-i18n="tool2_h3">Security Audit</h3>
-                <span class="tool-badge badge-pro">PRO & BUSINESS</span>
-                <p data-i18n="tool2_p">10 Fragen, 5 Minuten - deine persoenliche Security-Note A-F. Mit KI-Empfehlungen fuer deine Schwachstellen.</p>
-            </div>
-            <div class="tool-card reveal">
-                <div class="tool-icon">&#x1F6A8;</div>
-                <h3 data-i18n="tool3_h3">Incident Response</h3>
-                <span class="tool-badge badge-pro">PRO & BUSINESS</span>
-                <p data-i18n="tool3_p">Account gehackt? Malware entdeckt? Gefuehrter Notfall-Prozess nach NIST-Framework. Schritt fuer Schritt.</p>
-            </div>
-            <div class="tool-card reveal">
-                <div class="tool-icon">&#x1F4E1;</div>
-                <h3 data-i18n="tool4_h3">VIPER Anruf-Schutz</h3>
-                <span class="tool-badge badge-free" data-i18n="badge_free">KOSTENLOS</span>
-                <p data-i18n="tool4_p">Unbekannte Nummer angerufen? Einfach Nummer eintippen - sofortiger Spam-Score aus Deutschlands groesster Telefon-Datenbank. Schuetzt vor Betrug, Fake-Banken und Support-Scams.</p>
-            </div>
-            <div class="tool-card reveal">
-                <div class="tool-icon">&#x1F576;&#xFE0F;</div>
-                <h3 data-i18n="tool5_h3">Dark Web Monitor</h3>
-                <span class="tool-badge badge-pro">PRO & BUSINESS</span>
-                <p data-i18n="tool5_p">Stell dir vor jemand bricht in einen Online-Shop ein und stiehlt Millionen Passwoerter &mdash; die landen dann im Darknet. KyberGuard prueft taeglich ob deine E-Mail-Adresse dabei ist und warnt dich sofort per Telegram. Damit du als Erster weisst, bevor jemand dein Konto uebernimmt.</p>
-            </div>
-        </div>
+    <span class="trust-sep">&bull;</span>
+    <div class="trust-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      <span data-i18n="trust_3">EU AI Act konform</span>
     </div>
-</section>
-
-<!-- ===================== STATS BAR ===================== -->
-<section class="stats reveal">
-    <div class="container">
-        <div class="stats-grid">
-            <div class="stat-item">
-                <div class="stat-value" data-i18n="stat1_val">~3 Sek.</div>
-                <div class="stat-label" data-i18n="stat1_label">Antwortzeit</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value">24/7</div>
-                <div class="stat-label" data-i18n="stat2_label">Verfuegbar</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value" data-i18n="stat3_val">DSGVO</div>
-                <div class="stat-label" data-i18n="stat3_label">Konform</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value">Frankfurt</div>
-                <div class="stat-label" data-i18n="stat4_label">Server-Standort</div>
-            </div>
-        </div>
+    <span class="trust-sep">&bull;</span>
+    <div class="trust-item quantum-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      <span data-i18n="trust_4">Quantum-Safe</span>
+      <div class="qt-tip" data-i18n="trust_qt_tip">
+        Nutzt ML-KEM-768 (NIST FIPS 203) &mdash; unknackbar auch f&uuml;r Quantencomputer. Erste Security-Suite dieser Art in Deutschland.
+      </div>
     </div>
-</section>
-
-<!-- ===================== PRICING ===================== -->
-<section class="pricing" id="pricing">
-    <div class="container">
-        <h2 class="reveal" data-i18n="pricing_h2">Einfache Preise</h2>
-        <p class="reveal" style="text-align:center;color:#999;margin-bottom:32px;font-size:0.95rem" data-i18n="pricing_anchor">Ein Security-Berater kostet 150+ EUR/Stunde. KyberGuard: ab 0 EUR.</p>
-        <div class="price-toggle reveal">
-            <span class="toggle-label active" id="label-monthly" data-i18n="toggle_monthly">Monatlich</span>
-            <div class="toggle-switch" id="price-toggle" onclick="togglePricing()"></div>
-            <span class="toggle-label" id="label-yearly"><span data-i18n="toggle_yearly">Jaehrlich</span><span class="price-save" data-i18n="toggle_save">Spare bis 17%</span></span>
-        </div>
-        <div class="price-grid">
-            <!-- Free -->
-            <div class="price-card reveal">
-                <h3>Free</h3>
-                <div class="price-amount">0 EUR <span>/</span><span data-i18n="per_month">Monat</span></div>
-                <ul class="price-features">
-                    <li class="hl" data-i18n="free_f1">Phishing-Checker inklusive</li>
-                    <li class="hl" data-i18n="free_f4">VIPER Anruf-Schutz (Spam-Score)</li>
-                    <li data-i18n="free_f2">5 Fragen pro Tag</li>
-                    <li data-i18n="free_f3">Kompakte Antworten</li>
-                </ul>
-                <a href="#" onclick="openTgModal();return false;" class="price-btn btn-free" data-i18n="free_btn">Kostenlos starten</a>
-            </div>
-            <!-- Pro -->
-            <div class="price-card featured reveal" data-badge-de="BELIEBT" data-badge-en="POPULAR" data-badge="BELIEBT">
-                <h3>Pro</h3>
-                <div class="price-amount price-monthly">9,99 EUR <span>/</span><span data-i18n="per_month">Monat</span></div>
-                <div class="price-amount price-yearly" style="display:none"><span style="text-decoration:line-through;color:#555;font-size:1.4rem">119,88 EUR</span> 99,90 EUR <span>/</span><span data-i18n="per_year">Jahr</span></div>
-                <ul class="price-features">
-                    <li class="hl" data-i18n="pro_f1">Security Audit mit KI-Empfehlungen</li>
-                    <li class="hl" data-i18n="pro_f2">Phishing KI-Tiefenanalyse</li>
-                    <li class="hl" data-i18n="pro_f6">VIPER Vollanalyse + Kampagnen-Intel</li>
-                    <li class="hl" data-i18n="pro_f7">Dark Web Monitor (3 E-Mails, taeglich)</li>
-                    <li data-i18n="pro_f3">20 Fragen pro Tag</li>
-                    <li data-i18n="pro_f4">Ausfuehrlichere Antworten</li>
-                    <li data-i18n="pro_f5">Staerkeres KI-Modell</li>
-                </ul>
-                <a href="https://buy.stripe.com/cNi9AUekadJogJu5DggnK01" class="price-btn btn-pro price-monthly" data-i18n="pro_btn">Pro waehlen</a>
-                <a href="https://buy.stripe.com/4gMeVe6RI48Obpa4zcgnK03" class="price-btn btn-pro price-yearly" style="display:none" data-i18n="pro_btn">Pro waehlen</a>
-            </div>
-            <!-- Business -->
-            <div class="price-card reveal">
-                <h3>Business</h3>
-                <div class="price-amount price-monthly">29,99 EUR <span>/</span><span data-i18n="per_month">Monat</span></div>
-                <div class="price-amount price-yearly" style="display:none"><span style="text-decoration:line-through;color:#555;font-size:1.4rem">359,88 EUR</span> 299,90 EUR <span>/</span><span data-i18n="per_year">Jahr</span></div>
-                <ul class="price-features">
-                    <li class="hl" data-i18n="biz_f5">Team-Zugang (bis 5 User)</li>
-                    <li class="hl" data-i18n="biz_f2">Incident Response Guide</li>
-                    <li class="hl" data-i18n="biz_f1">Alles aus Pro inklusive</li>
-                    <li class="hl" data-i18n="biz_f6">Dark Web Monitor (10 E-Mails, taeglich)</li>
-                    <li data-i18n="biz_f3">30 Fragen pro Tag</li>
-                    <li data-i18n="biz_f4">Code-Beispiele & Anleitungen</li>
-                </ul>
-                <a href="https://buy.stripe.com/eVq8wQ0tk9t8eBm3v8gnK02" class="price-btn btn-biz price-monthly" data-i18n="biz_btn">Business waehlen</a>
-                <a href="https://buy.stripe.com/fZu6oI3Fw9t8dxi3v8gnK04" class="price-btn btn-biz price-yearly" style="display:none" data-i18n="biz_btn">Business waehlen</a>
-            </div>
-        </div>
+    <span class="trust-sep">&bull;</span>
+    <div class="trust-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <span>Live seit 2026</span>
     </div>
-</section>
-
-<!-- ===================== FAQ ===================== -->
-<section class="faq" id="faq">
-    <div class="container">
-        <h2 class="reveal" data-i18n="faq_h2">Haeufige Fragen</h2>
-        <div class="faq-list">
-            <div class="faq-item reveal">
-                <button class="faq-question" onclick="toggleFaq(this)">
-                    <span data-i18n="faq1_q">Ist KyberGuard kostenlos?</span>
-                    <span class="faq-arrow">&#9662;</span>
-                </button>
-                <div class="faq-answer"><p data-i18n="faq1_a">Ja! Der Free-Plan beinhaltet den Phishing-Checker ohne Limit und 5 Security-Fragen pro Tag. Fuer erweiterte Features wie Security Audit gibt es Pro und Business.</p></div>
-            </div>
-            <div class="faq-item reveal">
-                <button class="faq-question" onclick="toggleFaq(this)">
-                    <span data-i18n="faq2_q">Brauche ich technisches Wissen?</span>
-                    <span class="faq-arrow">&#9662;</span>
-                </button>
-                <div class="faq-answer"><p data-i18n="faq2_a">Nein. Einfach deine Frage tippen oder einen verdaechtigen Link senden. KyberGuard erklaert alles verstaendlich - egal ob Anfaenger oder Profi.</p></div>
-            </div>
-            <div class="faq-item reveal">
-                <button class="faq-question" onclick="toggleFaq(this)">
-                    <span data-i18n="faq3_q">Wo werden meine Daten gespeichert?</span>
-                    <span class="faq-arrow">&#9662;</span>
-                </button>
-                <div class="faq-answer"><p data-i18n="faq3_a">Auf einem Server in Frankfurt, Deutschland. Vollstaendig DSGVO-konform. Du kannst jederzeit deine Daten einsehen (/meinedaten) oder loeschen (/loeschen).</p></div>
-            </div>
-            <div class="faq-item reveal">
-                <button class="faq-question" onclick="toggleFaq(this)">
-                    <span data-i18n="faq4_q">Kann ich KyberGuard im Team nutzen?</span>
-                    <span class="faq-arrow">&#9662;</span>
-                </button>
-                <div class="faq-answer"><p data-i18n="faq4_a">Ja! Mit dem Business-Plan kannst du bis zu 5 Team-Mitglieder hinzufuegen. Alle erhalten Zugang zu allen Pro-Features.</p></div>
-            </div>
-            <div class="faq-item reveal">
-                <button class="faq-question" onclick="toggleFaq(this)">
-                    <span data-i18n="faq5_q">Was ist VIPER und wie nutze ich es?</span>
-                    <span class="faq-arrow">&#9662;</span>
-                </button>
-                <div class="faq-answer"><p data-i18n="faq5_a">VIPER ist unser Anruf-Schutz-System. Einfach die unbekannte Nummer im Bot eintippen (z.B. +49151...) und KyberGuard prueft sie sofort gegen Deutschlands groesste Spam-Datenbank. Kostenlos fuer alle Nutzer. Pro-User erhalten zusaetzlich Kampagnen-Analyse und Taeter-Muster.</p></div>
-            </div>
-            <div class="faq-item reveal">
-                <button class="faq-question" onclick="toggleFaq(this)">
-                    <span data-i18n="faq6_q">Wie melde ich eine Spam-Nummer?</span>
-                    <span class="faq-arrow">&#9662;</span>
-                </button>
-                <div class="faq-answer"><p data-i18n="faq6_a">Im Bot einfach /vreport +49151... eingeben. Die Meldung ist vollstaendig anonym und hilft der Community. Je mehr Meldungen, desto besser wird VIPER fuer alle.</p></div>
-            </div>
-            <div class="faq-item reveal">
-                <button class="faq-question" onclick="toggleFaq(this)">
-                    <span data-i18n="faq7_q">Was ist der Dark Web Monitor und wie funktioniert er?</span>
-                    <span class="faq-arrow">&#9662;</span>
-                </button>
-                <div class="faq-answer"><p data-i18n="faq7_a">Wenn Hacker einen Online-Shop angreifen, landen Millionen E-Mail-Adressen und Passwoerter im Darknet. Der Dark Web Monitor prueft taeglich ob deine E-Mail-Adresse in solchen gestohlenen Datensaetzen auftaucht &mdash; und sendet dir sofort eine Telegram-Benachrichtigung damit du dein Passwort aendern kannst bevor jemand dein Konto uebernimmt. Verfuegbar ab Pro.</p></div>
-            </div>
-            <div class="faq-item reveal">
-                <button class="faq-question" onclick="toggleFaq(this)">
-                    <span data-i18n="faq8_q">Was bedeutet &ldquo;Quantum-Safe&rdquo;?</span>
-                    <span class="faq-arrow">&#9662;</span>
-                </button>
-                <div class="faq-answer"><p data-i18n="faq8_a">In einigen Jahren werden Quantencomputer die heutige Verschluesselung knacken koennen. Geheimdienste sammeln bereits heute verschluesselte Daten um sie dann zu entschluesseln. KyberGuard nutzt eine neue Verschluesselungsmethode (ML-KEM-768, NIST FIPS 203) die selbst Quantencomputer nicht brechen koennen &mdash; deine Daten bleiben also auch in Zukunft sicher.</p></div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ===================== GRUENDER TRUST ===================== -->
-<section style="padding:60px 24px;background:#0d0d14;border-top:1px solid #1a1a2e;border-bottom:1px solid #1a1a2e">
-    <div class="container">
-        <h2 class="reveal" style="text-align:center;font-size:1.6rem;color:#fff;font-weight:800;margin-bottom:40px">Wer steckt dahinter?</h2>
-        <div class="reveal" style="display:flex;gap:32px;align-items:center;flex-wrap:wrap;justify-content:center;max-width:750px;margin:0 auto">
-            <div style="width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#00d4ff22,#00d4ff44);border:2px solid #00d4ff;display:flex;align-items:center;justify-content:center;font-size:2.5rem;flex-shrink:0">&#x1F464;</div>
-            <div style="flex:1;min-width:250px">
-                <div style="color:#00d4ff;font-weight:700;font-size:1.1rem;margin-bottom:6px">Alexander Potzahr &mdash; Gruender</div>
-                <div style="color:#aaa;font-size:0.95rem;line-height:1.7">
-                    IT-Security Manager aus Hamburg mit jahrelanger Erfahrung in Cybersicherheit und Unternehmensschutz.
-                    KyberGuard ist sein Werkzeug &mdash; entwickelt aus echter Praxis, nicht aus dem Lehrbuch.
-                </div>
-                <div style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap">
-                    <span style="background:#1a1a2e;color:#00d4ff;padding:4px 12px;border-radius:20px;font-size:0.8rem">&#x1F6E1; IT-Security</span>
-                    <span style="background:#1a1a2e;color:#00d4ff;padding:4px 12px;border-radius:20px;font-size:0.8rem">&#x1F1E9;&#x1F1EA; Hamburg</span>
-                    <span style="background:#1a1a2e;color:#00d4ff;padding:4px 12px;border-radius:20px;font-size:0.8rem">&#x2705; DSGVO-konform</span>
-                </div>
-            </div>
-        </div>
-        <p class="reveal" style="text-align:center;color:#666;font-size:0.85rem;margin-top:32px">
-            AP Digital Solution &mdash; Kleinunternehmer gem. &sect; 19 UStG &mdash; Hamburg, Deutschland
-        </p>
-    </div>
-</section>
-
-<!-- ===================== FINAL CTA ===================== -->
-<section class="final-cta">
-    <div class="container">
-        <h2 class="reveal" data-i18n="final_h2">Warte nicht bis es zu spaet ist.</h2>
-        <p class="reveal" data-i18n="final_p">Alle 39 Sekunden passiert ein Cyberangriff. Der naechste koennte dich treffen.</p>
-        <a href="#" onclick="openTgModal();return false;" class="cta-primary reveal" data-i18n="hero_cta">Jetzt kostenlos testen</a>
-        <div class="hero-trust reveal" style="margin-top:20px">
-            <span class="hero-trust-icon">&#x2615;</span>
-            <span data-i18n="final_trust">Kostet weniger als ein Kaffee pro Tag. Der Free-Plan ist fuer immer kostenlos.</span>
-        </div>
-    </div>
-</section>
-
-<!-- ===================== AI NOTICE ===================== -->
-<div class="ai-notice" data-i18n="ai_notice">
-    Alle Antworten werden von KI generiert (Claude AI). Keine professionelle Sicherheitsberatung. Nutzung auf eigenes Risiko.
+  </div>
 </div>
 
-<!-- ===================== FOOTER ===================== -->
-<footer class="footer">
+<!-- ========== LIVE DEMO ========== -->
+<section class="demo" id="demo">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label reveal" data-i18n="demo_label">Live Demo</div>
+      <h2 class="section-h2 reveal" data-i18n="demo_h2">Sieh selbst, wie es funktioniert</h2>
+      <p class="section-sub reveal" data-i18n="demo_sub">Echte KI-Analyse. In Echtzeit.</p>
+    </div>
+    <div class="demo-tabs reveal">
+      <button class="demo-tab active" data-tab="phishing" data-i18n="tab_phishing">&#128737; Phishing-Check</button>
+      <button class="demo-tab" data-tab="viper" data-i18n="tab_viper">&#128225; VIPER Anruf-Check</button>
+    </div>
+    <div class="chat-window reveal">
+      <div class="chat-header">
+        <div class="chat-avatar" aria-hidden="true">&#128737;</div>
+        <div class="chat-header-info">
+          <h4>KyberGuard</h4>
+          <span class="chat-online"><span class="chat-status-dot"></span>online</span>
+        </div>
+      </div>
+      <div class="chat-body" id="chatBody" aria-live="polite">
+        <div class="typing-indicator" id="typingIndicator" aria-hidden="true">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== PROBLEM / PAIN ========== -->
+<section class="pain" id="problem">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label reveal" data-i18n="pain_label">Das Problem</div>
+      <h2 class="section-h2 reveal" data-i18n="pain_h2">Kennst du das?</h2>
+    </div>
+    <div class="pain-grid">
+      <div class="pain-card reveal">
+        <div class="pain-icon">&#128231;</div>
+        <p data-i18n="pain_1">Du erh&auml;ltst eine E-Mail von &bdquo;deiner Bank&ldquo; &ndash; aber ist sie echt? Ein falscher Klick und dein Konto ist kompromittiert.</p>
+      </div>
+      <div class="pain-card reveal">
+        <div class="pain-icon">&#128101;</div>
+        <p data-i18n="pain_2">Dein Mitarbeiter klickt auf einen Link &ndash; war das Phishing? 91% aller Cyberangriffe starten mit einer E-Mail.</p>
+      </div>
+      <div class="pain-card reveal">
+        <div class="pain-icon">&#128680;</div>
+        <p data-i18n="pain_3">Du wirst gehackt &ndash; was jetzt? Wen rufst du um 3 Uhr nachts an? Jede Minute z&auml;hlt.</p>
+      </div>
+      <div class="pain-card reveal">
+        <div class="pain-icon">&#9742;&#65039;</div>
+        <p data-i18n="pain_4">Eine unbekannte Nummer ruft an. Deine Bank? Polizei? Microsoft-Support? Oder doch Betrug? 2 Milliarden Spam-Anrufe passieren jeden Monat.</p>
+      </div>
+      <div class="pain-card reveal">
+        <div class="pain-icon">&#128374;&#65039;</div>
+        <p data-i18n="pain_5">Irgendwo da drau&szlig;en liegt deine E-Mail-Adresse offen im Darknet &mdash; gestohlen bei einem Hackerangriff. 12 Milliarden Accounts betroffen. Wei&szlig;t du ob deine dabei ist?</p>
+      </div>
+    </div>
+    <p class="pain-answer reveal" data-i18n="pain_answer">
+      KyberGuard ist dein Security-Experte.<br>
+      <span>Rund um die Uhr. F&uuml;r einen Bruchteil der Kosten.</span>
+    </p>
+  </div>
+</section>
+
+<!-- ========== FEATURES ========== -->
+<section class="tools" id="features">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label reveal" data-i18n="tools_label">Features</div>
+      <h2 class="section-h2 reveal" data-i18n="tools_h2">Das kann KyberGuard</h2>
+      <p class="section-sub reveal" data-i18n="tools_sub">Echte Werkzeuge &ndash; nicht nur Fragen beantworten.</p>
+    </div>
+    <div class="tool-grid">
+      <div class="tool-card featured-tool reveal">
+        <div class="tool-icon">&#128737;</div>
+        <h3 data-i18n="tool1_h3">Phishing-Checker</h3>
+        <span class="tool-badge badge-free" data-i18n="badge_free">KOSTENLOS</span>
+        <p data-i18n="tool1_p">Verd&auml;chtigen Link senden &ndash; sofort Risiko-Score 1-10. Typosquatting, gef&auml;lschte Domains, Social Engineering erkennen. Ohne Limit.</p>
+      </div>
+      <div class="tool-card reveal">
+        <div class="tool-icon">&#128203;</div>
+        <h3 data-i18n="tool2_h3">Security Audit</h3>
+        <span class="tool-badge badge-pro">PRO &amp; BUSINESS</span>
+        <p data-i18n="tool2_p">10 Fragen, 5 Minuten &ndash; deine pers&ouml;nliche Security-Note A&ndash;F. Mit KI-Empfehlungen f&uuml;r deine Schwachstellen.</p>
+      </div>
+      <div class="tool-card reveal">
+        <div class="tool-icon">&#128680;</div>
+        <h3 data-i18n="tool3_h3">Incident Response</h3>
+        <span class="tool-badge badge-pro">PRO &amp; BUSINESS</span>
+        <p data-i18n="tool3_p">Account gehackt? Malware entdeckt? Gef&uuml;hrter Notfall-Prozess nach NIST-Framework. Schritt f&uuml;r Schritt.</p>
+      </div>
+      <div class="tool-card featured-tool reveal">
+        <div class="tool-icon">&#128225;</div>
+        <h3 data-i18n="tool4_h3">VIPER Anruf-Schutz</h3>
+        <span class="tool-badge badge-free" data-i18n="badge_free">KOSTENLOS</span>
+        <p data-i18n="tool4_p">Unbekannte Nummer angerufen? Einfach Nummer eintippen &ndash; sofortiger Spam-Score aus Deutschlands gr&ouml;&szlig;ter Telefon-Datenbank.</p>
+      </div>
+      <div class="tool-card reveal">
+        <div class="tool-icon">&#128374;&#65039;</div>
+        <h3 data-i18n="tool5_h3">Dark Web Monitor</h3>
+        <span class="tool-badge badge-pro">PRO &amp; BUSINESS</span>
+        <p data-i18n="tool5_p">KyberGuard pr&uuml;ft t&auml;glich ob deine E-Mail-Adresse in gestohlenen Datens&auml;tzen im Darknet auftaucht &mdash; und warnt dich sofort per Telegram.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== STATS ========== -->
+<div class="stats-bar">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="reveal">
+        <div class="stat-val" data-i18n="stat1_val">~3 Sek.</div>
+        <div class="stat-lbl" data-i18n="stat1_lbl">Antwortzeit</div>
+      </div>
+      <div class="reveal">
+        <div class="stat-val">24/7</div>
+        <div class="stat-lbl" data-i18n="stat2_lbl">Verf&uuml;gbar</div>
+      </div>
+      <div class="reveal">
+        <div class="stat-val" data-i18n="stat3_val">DSGVO</div>
+        <div class="stat-lbl" data-i18n="stat3_lbl">Konform</div>
+      </div>
+      <div class="reveal">
+        <div class="stat-val">Frankfurt</div>
+        <div class="stat-lbl" data-i18n="stat4_lbl">Server-Standort</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PRICING ========== -->
+<section class="pricing" id="pricing">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label reveal" data-i18n="pricing_label">Preise</div>
+      <h2 class="section-h2 reveal" data-i18n="pricing_h2">Einfache Preise</h2>
+      <p class="section-sub reveal" data-i18n="pricing_anchor">Ein Security-Berater kostet 150+ EUR/Stunde. KyberGuard: ab 0 EUR.</p>
+    </div>
+    <div class="price-toggle reveal" role="group" aria-label="Abrechnungszeitraum">
+      <span class="toggle-lbl active" id="lbl-monthly" data-i18n="toggle_monthly">Monatlich</span>
+      <div class="toggle-switch" id="priceToggle" role="switch" aria-checked="false" tabindex="0"></div>
+      <span class="toggle-lbl" id="lbl-yearly">
+        <span data-i18n="toggle_yearly">J&auml;hrlich</span>
+        <span class="save-badge" data-i18n="toggle_save">Spare 17%</span>
+      </span>
+    </div>
+    <div class="price-grid">
+      <!-- Free -->
+      <div class="price-card reveal">
+        <h3>Free</h3>
+        <div class="price-amount">0 EUR <span>/ <span data-i18n="per_month">Monat</span></span></div>
+        <p class="price-period" data-i18n="price_free_period">F&uuml;r immer kostenlos</p>
+        <ul class="price-features">
+          <li class="hl" data-i18n="free_f1">Phishing-Checker inklusive</li>
+          <li class="hl" data-i18n="free_f4">VIPER Anruf-Schutz (Spam-Score)</li>
+          <li data-i18n="free_f2">5 Fragen pro Tag</li>
+          <li data-i18n="free_f3">Kompakte Antworten</li>
+        </ul>
+        <button class="price-btn btn-free" data-action="open-tg-modal" data-i18n="free_btn">Kostenlos starten</button>
+      </div>
+      <!-- Pro -->
+      <div class="price-card featured reveal" data-badge-de="BELIEBT" data-badge-en="POPULAR" data-badge="BELIEBT">
+        <h3>Pro</h3>
+        <div class="price-amount price-monthly">9,99 EUR <span>/ <span data-i18n="per_month">Monat</span></span></div>
+        <div class="price-amount price-yearly" style="display:none"><span class="price-old">119,88</span>99,90 EUR <span>/ <span data-i18n="per_year">Jahr</span></span></div>
+        <p class="price-period price-monthly" data-i18n="price_pro_period">Jederzeit k&uuml;ndbar</p>
+        <p class="price-period price-yearly" style="display:none" data-i18n="price_pro_year_period">12 Monate, einmalig</p>
+        <ul class="price-features">
+          <li class="hl" data-i18n="pro_f1">Security Audit mit KI-Empfehlungen</li>
+          <li class="hl" data-i18n="pro_f2">Phishing KI-Tiefenanalyse</li>
+          <li class="hl" data-i18n="pro_f6">VIPER Vollanalyse + Kampagnen-Intel</li>
+          <li class="hl" data-i18n="pro_f7">Dark Web Monitor (3 E-Mails, t&auml;glich)</li>
+          <li data-i18n="pro_f3">20 Fragen pro Tag</li>
+          <li data-i18n="pro_f4">Ausf&uuml;hrlichere Antworten</li>
+          <li data-i18n="pro_f5">St&auml;rkeres KI-Modell</li>
+        </ul>
+        <a href="https://buy.stripe.com/cNi9AUekadJogJu5DggnK01" class="price-btn btn-pro price-monthly" data-i18n="pro_btn">Pro w&auml;hlen</a>
+        <a href="https://buy.stripe.com/4gMeVe6RI48Obpa4zcgnK03" class="price-btn btn-pro price-yearly" style="display:none" data-i18n="pro_btn">Pro w&auml;hlen</a>
+      </div>
+      <!-- Business -->
+      <div class="price-card reveal">
+        <h3>Business</h3>
+        <div class="price-amount price-monthly">29,99 EUR <span>/ <span data-i18n="per_month">Monat</span></span></div>
+        <div class="price-amount price-yearly" style="display:none"><span class="price-old">359,88</span>299,90 EUR <span>/ <span data-i18n="per_year">Jahr</span></span></div>
+        <p class="price-period price-monthly" data-i18n="price_biz_period">Jederzeit k&uuml;ndbar</p>
+        <p class="price-period price-yearly" style="display:none" data-i18n="price_biz_year_period">12 Monate, einmalig</p>
+        <ul class="price-features">
+          <li class="hl" data-i18n="biz_f5">Team-Zugang (bis 5 User)</li>
+          <li class="hl" data-i18n="biz_f6">Dark Web Monitor (10 E-Mails, t&auml;glich)</li>
+          <li class="hl" data-i18n="biz_f2">Incident Response Guide</li>
+          <li class="hl" data-i18n="biz_f1">Alles aus Pro inklusive</li>
+          <li data-i18n="biz_f3">30 Fragen pro Tag</li>
+          <li data-i18n="biz_f4">Code-Beispiele &amp; Anleitungen</li>
+        </ul>
+        <a href="https://buy.stripe.com/eVq8wQ0tk9t8eBm3v8gnK02" class="price-btn btn-biz price-monthly" data-i18n="biz_btn">Business w&auml;hlen</a>
+        <a href="https://buy.stripe.com/fZu6oI3Fw9t8dxi3v8gnK04" class="price-btn btn-biz price-yearly" style="display:none" data-i18n="biz_btn">Business w&auml;hlen</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== FOUNDER ========== -->
+<section class="founder reveal">
+  <div class="container">
+    <div class="founder-inner">
+      <div class="founder-avatar" aria-hidden="true">&#128100;</div>
+      <div class="founder-info">
+        <div class="founder-name" data-i18n="founder_name">Alexander Potzahr &mdash; Gr&uuml;nder</div>
+        <div class="founder-bio" data-i18n="founder_bio">
+          IT-Security Manager aus Hamburg mit jahrelanger Erfahrung in Cybersicherheit und Unternehmensschutz.
+          KyberGuard ist sein Werkzeug &mdash; entwickelt aus echter Praxis, nicht aus dem Lehrbuch.
+        </div>
+        <div class="founder-tags">
+          <span class="founder-tag">&#128737; IT-Security</span>
+          <span class="founder-tag">&#127465;&#127466; Hamburg</span>
+          <span class="founder-tag">&#9989; DSGVO-konform</span>
+          <span class="founder-tag">&#128274; Quantum-Safe</span>
+        </div>
+      </div>
+    </div>
+    <p class="founder-legal">AP Digital Solution &mdash; Kleinunternehmer gem. &sect; 19 UStG &mdash; Hamburg, Deutschland</p>
+  </div>
+</section>
+
+<!-- ========== FAQ ========== -->
+<section class="faq" id="faq">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label reveal" data-i18n="faq_label">FAQ</div>
+      <h2 class="section-h2 reveal" data-i18n="faq_h2">H&auml;ufige Fragen</h2>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item reveal">
+        <button class="faq-question">
+          <span data-i18n="faq1_q">Ist KyberGuard kostenlos?</span>
+          <span class="faq-arrow" aria-hidden="true">&#9662;</span>
+        </button>
+        <div class="faq-answer"><p data-i18n="faq1_a">Ja! Der Free-Plan beinhaltet den Phishing-Checker ohne Limit und 5 Security-Fragen pro Tag. F&uuml;r erweiterte Features wie Security Audit und Dark Web Monitor gibt es Pro und Business.</p></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-question">
+          <span data-i18n="faq2_q">Brauche ich technisches Wissen?</span>
+          <span class="faq-arrow" aria-hidden="true">&#9662;</span>
+        </button>
+        <div class="faq-answer"><p data-i18n="faq2_a">Nein. Einfach deine Frage tippen oder einen verd&auml;chtigen Link senden. KyberGuard erkl&auml;rt alles verst&auml;ndlich &ndash; egal ob Anf&auml;nger oder Profi.</p></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-question">
+          <span data-i18n="faq3_q">Wo werden meine Daten gespeichert?</span>
+          <span class="faq-arrow" aria-hidden="true">&#9662;</span>
+        </button>
+        <div class="faq-answer"><p data-i18n="faq3_a">Auf einem Server in Frankfurt, Deutschland. Vollst&auml;ndig DSGVO-konform. Du kannst jederzeit deine Daten einsehen (/meinedaten) oder l&ouml;schen (/loeschen).</p></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-question">
+          <span data-i18n="faq4_q">Kann ich KyberGuard im Team nutzen?</span>
+          <span class="faq-arrow" aria-hidden="true">&#9662;</span>
+        </button>
+        <div class="faq-answer"><p data-i18n="faq4_a">Ja! Mit dem Business-Plan kannst du bis zu 5 Team-Mitglieder hinzuf&uuml;gen. Alle erhalten Zugang zu allen Pro-Features.</p></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-question">
+          <span data-i18n="faq5_q">Was ist VIPER und wie nutze ich es?</span>
+          <span class="faq-arrow" aria-hidden="true">&#9662;</span>
+        </button>
+        <div class="faq-answer"><p data-i18n="faq5_a">VIPER ist unser Anruf-Schutz-System. Einfach die unbekannte Nummer im Bot eintippen (z.B. +49151...) und KyberGuard pr&uuml;ft sie sofort gegen Deutschlands gr&ouml;&szlig;te Spam-Datenbank. Kostenlos f&uuml;r alle Nutzer.</p></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-question">
+          <span data-i18n="faq6_q">Wie melde ich eine Spam-Nummer?</span>
+          <span class="faq-arrow" aria-hidden="true">&#9662;</span>
+        </button>
+        <div class="faq-answer"><p data-i18n="faq6_a">Im Bot einfach /vreport +49151... eingeben. Die Meldung ist vollst&auml;ndig anonym und hilft der Community.</p></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-question">
+          <span data-i18n="faq7_q">Was ist der Dark Web Monitor?</span>
+          <span class="faq-arrow" aria-hidden="true">&#9662;</span>
+        </button>
+        <div class="faq-answer"><p data-i18n="faq7_a">Wenn Hacker einen Online-Shop angreifen, landen Millionen E-Mail-Adressen im Darknet. Der Dark Web Monitor pr&uuml;ft t&auml;glich ob deine E-Mail dabei ist &mdash; und sendet dir sofort eine Telegram-Benachrichtigung. Verf&uuml;gbar ab Pro.</p></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-question">
+          <span data-i18n="faq8_q">Was bedeutet &bdquo;Quantum-Safe&ldquo;?</span>
+          <span class="faq-arrow" aria-hidden="true">&#9662;</span>
+        </button>
+        <div class="faq-answer"><p data-i18n="faq8_a">In einigen Jahren werden Quantencomputer die heutige Verschl&uuml;sselung knacken k&ouml;nnen. KyberGuard nutzt ML-KEM-768 (NIST FIPS 203) &mdash; eine neue Verschl&uuml;sselungsmethode die selbst Quantencomputer nicht brechen k&ouml;nnen.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== FINAL CTA ========== -->
+<section class="final-cta">
+  <div class="container">
+    <h2 class="reveal" data-i18n="final_h2">Warte nicht bis es zu sp&auml;t ist.</h2>
+    <p class="reveal" data-i18n="final_p">Alle 39 Sekunden passiert ein Cyberangriff. Der n&auml;chste k&ouml;nnte dich treffen.</p>
+    <button class="cta-primary reveal" data-action="open-tg-modal" data-i18n="hero_cta">
+      Jetzt kostenlos testen &rarr;
+    </button>
+    <div class="final-trust reveal">
+      <span>&#9749;</span>
+      <span data-i18n="final_trust">Kostet weniger als ein Kaffee pro Tag. Der Free-Plan ist f&uuml;r immer kostenlos.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ========== AI NOTICE ========== -->
+<div class="ai-notice" data-i18n="ai_notice">
+  Alle Antworten werden von KI generiert. Keine professionelle Sicherheitsberatung. Nutzung auf eigenes Risiko.
+</div>
+
+<!-- ========== FOOTER ========== -->
+<footer>
+  <div class="container">
     <div class="footer-trust">
-        <div class="trust-badge">
-            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            <span data-i18n="trust_1">DSGVO-konform</span>
-        </div>
-        <div class="trust-badge">
-            <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            <span data-i18n="trust_2">Server in Frankfurt</span>
-        </div>
-        <div class="trust-badge">
-            <svg viewBox="0 0 24 24"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M9 12l2 2 4-4" fill="none" stroke="#000" stroke-width="2"/></svg>
-            <span data-i18n="trust_3">EU AI Act konform</span>
-        </div>
-        <div class="trust-badge">
-            <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-            <span data-i18n="trust_4">Quantum-Safe Design</span>
-        </div>
+      <div class="ftrust-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span data-i18n="trust_1">DSGVO-konform</span>
+      </div>
+      <div class="ftrust-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span data-i18n="trust_2">Server Frankfurt, DE</span>
+      </div>
+      <div class="ftrust-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <span data-i18n="trust_3">EU AI Act konform</span>
+      </div>
+      <div class="ftrust-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        <span data-i18n="trust_4">Quantum-Safe</span>
+      </div>
     </div>
     <div class="footer-links">
-        <a href="https://t.me/KyberGuardBot">Telegram Bot</a>
-        <a href="mailto:securebot.ai.contact@gmail.com" data-i18n="footer_contact">Kontakt</a>
-        <a href="agb.html" data-i18n="footer_agb">AGB</a>
-        <a href="datenschutz.html" data-i18n="footer_datenschutz">Datenschutz</a>
+      <a href="https://t.me/KyberGuardBot" rel="noopener">Telegram Bot</a>
+      <a href="mailto:securebot.ai.contact@gmail.com" data-i18n="footer_contact">Kontakt</a>
+      <a href="agb.html" data-i18n="footer_agb">AGB</a>
+      <a href="datenschutz.html" data-i18n="footer_datenschutz">Datenschutz</a>
     </div>
     <p class="footer-legal">
-        AP Digital Solution - Alexander Potzahr, Hamburg | <span data-i18n="footer_legal">Kleinunternehmer gem. &sect; 19 UStG</span>
+      AP Digital Solution &mdash; Alexander Potzahr, Hamburg &nbsp;|&nbsp;
+      <span data-i18n="footer_legal">Kleinunternehmer gem. &sect; 19 UStG</span>
     </p>
+  </div>
 </footer>
 
 <script>
-/* ============================================
-   TRANSLATIONS (DE/EN)
-   ============================================ */
+/* ============================================================
+   TRANSLATIONS
+   ============================================================ */
 const T = {
 de: {
-    nav_cta: "Jetzt testen",
-    nav_features: "Features",
-    nav_pricing: "Preise",
-    nav_faq: "FAQ",
-    faq5_q: "Was ist VIPER und wie nutze ich es?",
-    faq5_a: "VIPER ist unser Anruf-Schutz-System. Einfach die unbekannte Nummer im Bot eintippen (z.B. +49151...) und KyberGuard pr\u00fcft sie sofort gegen Deutschlands gr\u00f6\u00dfte Spam-Datenbank. Kostenlos f\u00fcr alle Nutzer. Pro-User erhalten zus\u00e4tzlich Kampagnen-Analyse und T\u00e4ter-Muster.",
-    faq6_q: "Wie melde ich eine Spam-Nummer?",
-    faq6_a: "Im Bot einfach /vreport +49151... eingeben. Die Meldung ist vollst\u00e4ndig anonym und hilft der Community. Je mehr Meldungen, desto besser wird VIPER f\u00fcr alle.",
-    hero_stat: "Cyberangriffe seit du diese Seite ge\u00f6ffnet hast",
-    hero_h1: '<span class="accent">Phishing erkannt.</span><br>In 3 Sekunden. 24/7.',
-    hero_sub: 'Phishing-Mail erhalten? Unsicher ob der Link echt ist?<br><strong>Frag KyberGuard \u2013 in 3 Sekunden wei\u00dft du Bescheid.</strong>',
-    hero_cta: "Jetzt kostenlos testen",
-    hero_trust: 'L\u00e4uft \u00fcber Telegram (kostenlose App f\u00fcr <a href="https://apps.apple.com/app/telegram-messenger/id686449807" style="color:#00d4ff">iOS</a>, <a href="https://play.google.com/store/apps/details?id=org.telegram.messenger" style="color:#00d4ff">Android</a> & <a href="https://desktop.telegram.org/" style="color:#00d4ff">Desktop</a>). Kein extra Login n\u00f6tig.',
-    demo_h2: "Sieh selbst, wie es funktioniert",
-    demo_sub: "Echte Phishing-Erkennung. In Echtzeit.",
-    pain_h2: "Kennst du das?",
-    pain_1: 'Du erh\u00e4ltst eine E-Mail von \u201edeiner Bank\u201c \u2013 aber ist sie echt? Ein falscher Klick und dein Konto ist kompromittiert.',
-    pain_2: 'Dein Mitarbeiter klickt auf einen Link \u2013 war das Phishing? 91% aller Cyberangriffe starten mit einer E-Mail.',
-    pain_3: 'Du wirst gehackt \u2013 was jetzt? Wen rufst du um 3 Uhr nachts an? Jede Minute z\u00e4hlt.',
-    pain_answer: 'KyberGuard ist dein Security-Experte.<br>Rund um die Uhr. F\u00fcr einen Bruchteil der Kosten.',
-    tools_h2: "Das kann KyberGuard",
-    tools_sub: "Echte Werkzeuge \u2013 nicht nur Fragen beantworten.",
-    tool1_h3: "Phishing-Checker",
-    badge_free: "KOSTENLOS",
-    tool1_p: "Verd\u00e4chtigen Link senden \u2013 sofort Risiko-Score 1-10. Typosquatting, gef\u00e4lschte Domains, Social Engineering erkennen. Ohne Limit.",
-    tool2_h3: "Security Audit",
-    tool2_p: "10 Fragen, 5 Minuten \u2013 deine pers\u00f6nliche Security-Note A-F. Mit KI-Empfehlungen f\u00fcr deine Schwachstellen.",
-    tool3_h3: "Incident Response",
-    tool3_p: "Account gehackt? Malware entdeckt? Gef\u00fchrter Notfall-Prozess nach NIST-Framework. Schritt f\u00fcr Schritt.",
-    tool4_h3: "VIPER Anruf-Schutz",
-    tool4_p: "Unbekannte Nummer angerufen? Einfach Nummer eintippen \u2013 sofortiger Spam-Score aus Deutschlands gr\u00f6\u00dfter Telefon-Datenbank. Sch\u00fctzt vor Betrug, Fake-Banken und Support-Scams.",
-    pain_4: "Eine unbekannte Nummer ruft an. Deine Bank? Polizei? Microsoft-Support? Oder doch Betrug? 2 Milliarden Spam-Anrufe passieren jeden Monat.",
-    stat1_val: "~3 Sek.",
-    stat1_label: "Antwortzeit",
-    stat2_label: "Verf\u00fcgbar",
-    stat3_val: "DSGVO",
-    stat3_label: "Konform",
-    stat4_label: "Server-Standort",
-    pricing_h2: "Einfache Preise",
-    toggle_monthly: "Monatlich",
-    toggle_yearly: "J\u00e4hrlich",
-    toggle_save: "Spare bis 17%",
-    per_month: "Monat",
-    per_year: "Jahr",
-    free_f1: "Phishing-Checker inklusive",
-    free_f4: "VIPER Anruf-Schutz (Spam-Score)",
-    free_f2: "5 Fragen pro Tag",
-    free_f3: "Kompakte Antworten",
-    free_btn: "Kostenlos starten",
-    pro_f1: "Security Audit mit KI-Empfehlungen",
-    pro_f2: "Phishing KI-Tiefenanalyse",
-    pro_f6: "VIPER Vollanalyse + Kampagnen-Intel",
-    pro_f7: "Dark Web Monitor (3 E-Mails, t\u00e4glich)",
-    pro_f3: "20 Fragen pro Tag",
-    pro_f4: "Ausf\u00fchrlichere Antworten",
-    pro_f5: "St\u00e4rkeres KI-Modell",
-    pro_btn: "Pro w\u00e4hlen",
-    biz_f1: "Alles aus Pro inklusive",
-    biz_f2: "Incident Response Guide",
-    biz_f3: "30 Fragen pro Tag",
-    biz_f4: "Code-Beispiele & Anleitungen",
-    biz_f5: "Team-Zugang (bis 5 User)",
-    biz_f6: "Dark Web Monitor (10 E-Mails, t\u00e4glich)",
-    biz_btn: "Business w\u00e4hlen",
-    tool5_h3: "Dark Web Monitor",
-    tool5_p: "Stell dir vor jemand bricht in einen Online-Shop ein und stiehlt Millionen Passw\u00f6rter \u2014 die landen dann im Darknet. KyberGuard pr\u00fcft t\u00e4glich ob deine E-Mail-Adresse dabei ist und warnt dich sofort per Telegram. Damit du als Erster wei\u00dft, bevor jemand dein Konto \u00fcbernimmt.",
-    pain_5: "Irgendwo da drau\u00dfen liegt deine E-Mail-Adresse offen im Darknet \u2014 gestohlen bei einem Hackerangriff auf einen Online-Shop, eine App oder ein Forum. 12 Milliarden Accounts betroffen. Wei\u00dft du ob deine dabei ist?",
-    hero_quantum: "Quantum-Safe Infrastruktur \u2014 NIST FIPS 203 zertifiziert. Sch\u00fctzt deine Daten auch gegen k\u00fcnftige Quantencomputer.",
-    faq_h2: "H\u00e4ufige Fragen",
-    faq1_q: "Ist KyberGuard kostenlos?",
-    faq1_a: "Ja! Der Free-Plan beinhaltet den Phishing-Checker ohne Limit und 5 Security-Fragen pro Tag. F\u00fcr erweiterte Features wie Security Audit und Dark Web Monitor gibt es Pro und Business.",
-    faq2_q: "Brauche ich technisches Wissen?",
-    faq2_a: "Nein. Einfach deine Frage tippen oder einen verd\u00e4chtigen Link senden. KyberGuard erkl\u00e4rt alles verst\u00e4ndlich \u2013 egal ob Anf\u00e4nger oder Profi.",
-    faq3_q: "Wo werden meine Daten gespeichert?",
-    faq3_a: "Auf einem Server in Frankfurt, Deutschland. Vollst\u00e4ndig DSGVO-konform. Du kannst jederzeit deine Daten einsehen (/meinedaten) oder l\u00f6schen (/loeschen).",
-    faq4_q: "Kann ich KyberGuard im Team nutzen?",
-    faq4_a: "Ja! Mit dem Business-Plan kannst du bis zu 5 Team-Mitglieder hinzuf\u00fcgen. Alle erhalten Zugang zu allen Pro-Features.",
-    faq7_q: "Was ist der Dark Web Monitor und wie funktioniert er?",
-    faq7_a: "Wenn Hacker einen Online-Shop angreifen, landen Millionen E-Mail-Adressen und Passw\u00f6rter im Darknet. Der Dark Web Monitor pr\u00fcft t\u00e4glich ob deine E-Mail-Adresse in solchen gestohlenen Datens\u00e4tzen auftaucht \u2014 und sendet dir sofort eine Telegram-Benachrichtigung damit du dein Passwort \u00e4ndern kannst bevor jemand dein Konto \u00fcbernimmt. Verf\u00fcgbar ab Pro.",
-    faq8_q: "Was bedeutet \u201eQuantum-Safe\u201c?",
-    faq8_a: "In einigen Jahren werden Quantencomputer die heutige Verschl\u00fcsselung knacken k\u00f6nnen. Geheimdienste sammeln bereits heute verschl\u00fcsselte Daten um sie dann zu entschl\u00fcsseln. KyberGuard nutzt eine neue Verschl\u00fcsselungsmethode (ML-KEM-768, NIST FIPS 203) die selbst Quantencomputer nicht brechen k\u00f6nnen \u2014 deine Daten bleiben also auch in Zukunft sicher.",
-    final_h2: "Warte nicht bis es zu sp\u00e4t ist.",
-    final_p: "Alle 39 Sekunden passiert ein Cyberangriff. Der n\u00e4chste k\u00f6nnte dich treffen.",
-    final_trust: "Kostet weniger als ein Kaffee pro Tag. Der Free-Plan ist f\u00fcr immer kostenlos.",
-    ai_notice: "Alle Antworten werden von KI generiert (Claude AI). Keine professionelle Sicherheitsberatung. Nutzung auf eigenes Risiko.",
-    trust_1: "DSGVO-konform",
-    trust_2: "Server in Frankfurt",
-    trust_3: "EU AI Act konform",
-    footer_contact: "Kontakt",
-    footer_legal: "Kleinunternehmer gem. \u00a7 19 UStG",
-    hero_early: "Early Access \u2013 Sei einer der Ersten.",
-    pricing_anchor: "Ein Security-Berater kostet 150+ EUR/Stunde. KyberGuard: ab 0 EUR.",
-    trust_4: "Quantum-Safe Design",
-    footer_agb: "AGB",
-    footer_datenschutz: "Datenschutz"
+  nav_cta:"Jetzt testen", nav_features:"Features", nav_pricing:"Preise", nav_faq:"FAQ",
+  aud_privat:"Privatperson", aud_business:"Unternehmen", aud_itpro:"IT-Profi",
+  hero_stat:"Cyberangriffe seit du diese Seite ge\u00f6ffnet hast",
+  hero_cta:"Jetzt kostenlos testen",
+  demo_label:"Live Demo", demo_h2:"Sieh selbst, wie es funktioniert", demo_sub:"Echte KI-Analyse. In Echtzeit.",
+  tab_phishing:"\uD83D\uDEE1\uFE0F Phishing-Check", tab_viper:"\uD83D\uDCE1 VIPER Anruf-Check",
+  pain_label:"Das Problem", pain_h2:"Kennst du das?",
+  pain_1:"Du erh\u00e4ltst eine E-Mail von \u201edeiner Bank\u201c \u2013 aber ist sie echt? Ein falscher Klick und dein Konto ist kompromittiert.",
+  pain_2:"Dein Mitarbeiter klickt auf einen Link \u2013 war das Phishing? 91% aller Cyberangriffe starten mit einer E-Mail.",
+  pain_3:"Du wirst gehackt \u2013 was jetzt? Wen rufst du um 3 Uhr nachts an? Jede Minute z\u00e4hlt.",
+  pain_4:"Eine unbekannte Nummer ruft an. Deine Bank? Polizei? Microsoft-Support? Oder doch Betrug? 2 Milliarden Spam-Anrufe passieren jeden Monat.",
+  pain_5:"Irgendwo da drau\u00dfen liegt deine E-Mail-Adresse offen im Darknet \u2014 gestohlen bei einem Hackerangriff. 12 Milliarden Accounts betroffen. Wei\u00dft du ob deine dabei ist?",
+  pain_answer:"KyberGuard ist dein Security-Experte.<br><span>Rund um die Uhr. F\u00fcr einen Bruchteil der Kosten.</span>",
+  tools_label:"Features", tools_h2:"Das kann KyberGuard", tools_sub:"Echte Werkzeuge \u2013 nicht nur Fragen beantworten.",
+  tool1_h3:"Phishing-Checker", badge_free:"KOSTENLOS",
+  tool1_p:"Verd\u00e4chtigen Link senden \u2013 sofort Risiko-Score 1-10. Typosquatting, gef\u00e4lschte Domains, Social Engineering erkennen. Ohne Limit.",
+  tool2_h3:"Security Audit", tool2_p:"10 Fragen, 5 Minuten \u2013 deine pers\u00f6nliche Security-Note A\u2013F. Mit KI-Empfehlungen f\u00fcr deine Schwachstellen.",
+  tool3_h3:"Incident Response", tool3_p:"Account gehackt? Malware entdeckt? Gef\u00fchrter Notfall-Prozess nach NIST-Framework. Schritt f\u00fcr Schritt.",
+  tool4_h3:"VIPER Anruf-Schutz", tool4_p:"Unbekannte Nummer angerufen? Einfach Nummer eintippen \u2013 sofortiger Spam-Score aus Deutschlands gr\u00f6\u00dfter Telefon-Datenbank.",
+  tool5_h3:"Dark Web Monitor", tool5_p:"KyberGuard pr\u00fcft t\u00e4glich ob deine E-Mail-Adresse in gestohlenen Datens\u00e4tzen im Darknet auftaucht \u2014 und warnt dich sofort per Telegram.",
+  stat1_val:"~3 Sek.", stat1_lbl:"Antwortzeit", stat2_lbl:"Verf\u00fcgbar", stat3_val:"DSGVO", stat3_lbl:"Konform", stat4_lbl:"Server-Standort",
+  pricing_label:"Preise", pricing_h2:"Einfache Preise", pricing_anchor:"Ein Security-Berater kostet 150+ EUR/Stunde. KyberGuard: ab 0 EUR.",
+  toggle_monthly:"Monatlich", toggle_yearly:"J\u00e4hrlich", toggle_save:"Spare 17%",
+  per_month:"Monat", per_year:"Jahr",
+  price_free_period:"F\u00fcr immer kostenlos",
+  price_pro_period:"Jederzeit k\u00fcndbar", price_pro_year_period:"12 Monate, einmalig",
+  price_biz_period:"Jederzeit k\u00fcndbar", price_biz_year_period:"12 Monate, einmalig",
+  free_f1:"Phishing-Checker inklusive", free_f4:"VIPER Anruf-Schutz (Spam-Score)",
+  free_f2:"5 Fragen pro Tag", free_f3:"Kompakte Antworten", free_btn:"Kostenlos starten",
+  pro_f1:"Security Audit mit KI-Empfehlungen", pro_f2:"Phishing KI-Tiefenanalyse",
+  pro_f6:"VIPER Vollanalyse + Kampagnen-Intel", pro_f7:"Dark Web Monitor (3 E-Mails, t\u00e4glich)",
+  pro_f3:"20 Fragen pro Tag", pro_f4:"Ausf\u00fchrlichere Antworten", pro_f5:"St\u00e4rkeres KI-Modell", pro_btn:"Pro w\u00e4hlen",
+  biz_f5:"Team-Zugang (bis 5 User)", biz_f6:"Dark Web Monitor (10 E-Mails, t\u00e4glich)",
+  biz_f2:"Incident Response Guide", biz_f1:"Alles aus Pro inklusive",
+  biz_f3:"30 Fragen pro Tag", biz_f4:"Code-Beispiele & Anleitungen", biz_btn:"Business w\u00e4hlen",
+  founder_name:"Alexander Potzahr \u2014 Gr\u00fcnder",
+  founder_bio:"IT-Security Manager aus Hamburg mit jahrelanger Erfahrung in Cybersicherheit und Unternehmensschutz. KyberGuard ist sein Werkzeug \u2014 entwickelt aus echter Praxis, nicht aus dem Lehrbuch.",
+  faq_label:"FAQ", faq_h2:"H\u00e4ufige Fragen",
+  faq1_q:"Ist KyberGuard kostenlos?", faq1_a:"Ja! Der Free-Plan beinhaltet den Phishing-Checker ohne Limit und 5 Security-Fragen pro Tag. F\u00fcr erweiterte Features wie Security Audit und Dark Web Monitor gibt es Pro und Business.",
+  faq2_q:"Brauche ich technisches Wissen?", faq2_a:"Nein. Einfach deine Frage tippen oder einen verd\u00e4chtigen Link senden. KyberGuard erkl\u00e4rt alles verst\u00e4ndlich \u2013 egal ob Anf\u00e4nger oder Profi.",
+  faq3_q:"Wo werden meine Daten gespeichert?", faq3_a:"Auf einem Server in Frankfurt, Deutschland. Vollst\u00e4ndig DSGVO-konform. Du kannst jederzeit deine Daten einsehen (/meinedaten) oder l\u00f6schen (/loeschen).",
+  faq4_q:"Kann ich KyberGuard im Team nutzen?", faq4_a:"Ja! Mit dem Business-Plan kannst du bis zu 5 Team-Mitglieder hinzuf\u00fcgen. Alle erhalten Zugang zu allen Pro-Features.",
+  faq5_q:"Was ist VIPER und wie nutze ich es?", faq5_a:"VIPER ist unser Anruf-Schutz-System. Einfach die unbekannte Nummer im Bot eintippen (z.B. +49151...) und KyberGuard pr\u00fcft sie sofort gegen Deutschlands gr\u00f6\u00dfte Spam-Datenbank. Kostenlos f\u00fcr alle Nutzer.",
+  faq6_q:"Wie melde ich eine Spam-Nummer?", faq6_a:"Im Bot einfach /vreport +49151... eingeben. Die Meldung ist vollst\u00e4ndig anonym und hilft der Community.",
+  faq7_q:"Was ist der Dark Web Monitor?", faq7_a:"Wenn Hacker einen Online-Shop angreifen, landen Millionen E-Mail-Adressen im Darknet. Der Dark Web Monitor pr\u00fcft t\u00e4glich ob deine E-Mail dabei ist \u2014 und sendet dir sofort eine Telegram-Benachrichtigung. Verf\u00fcgbar ab Pro.",
+  faq8_q:"Was bedeutet \u201eQuantum-Safe\u201c?", faq8_a:"In einigen Jahren werden Quantencomputer die heutige Verschl\u00fcsselung knacken k\u00f6nnen. KyberGuard nutzt ML-KEM-768 (NIST FIPS 203) \u2014 eine neue Verschl\u00fcsselungsmethode die selbst Quantencomputer nicht brechen k\u00f6nnen.",
+  final_h2:"Warte nicht bis es zu sp\u00e4t ist.", final_p:"Alle 39 Sekunden passiert ein Cyberangriff. Der n\u00e4chste k\u00f6nnte dich treffen.",
+  final_trust:"Kostet weniger als ein Kaffee pro Tag. Der Free-Plan ist f\u00fcr immer kostenlos.",
+  ai_notice:"Alle Antworten werden von KI generiert. Keine professionelle Sicherheitsberatung. Nutzung auf eigenes Risiko.",
+  trust_1:"DSGVO-konform", trust_2:"Server Frankfurt, DE", trust_3:"EU AI Act konform", trust_4:"Quantum-Safe",
+  trust_qt_tip:"Nutzt ML-KEM-768 (NIST FIPS 203) \u2014 unknackbar auch f\u00fcr Quantencomputer. Erste Security-Suite dieser Art in Deutschland.",
+  footer_contact:"Kontakt", footer_legal:"Kleinunternehmer gem. \u00a7 19 UStG", footer_agb:"AGB", footer_datenschutz:"Datenschutz",
+  tg_title:"So startest du in 2 Minuten", tg_sub:"KyberGuard l\u00e4uft \u00fcber Telegram \u2014 die kostenlose Messenger-App.",
+  tg_step1:"<strong>Telegram installieren</strong> (falls noch nicht vorhanden) \u2014 kostenlos f\u00fcr iOS, Android & Desktop.",
+  tg_step2:"<strong>Bot \u00f6ffnen</strong> \u2014 klicke unten auf den Button. Telegram \u00f6ffnet sich automatisch mit KyberGuard.",
+  tg_step3:"<strong>\u201eStart\u201c dr\u00fccken</strong> im Chat \u2014 fertig. Du kannst sofort Fragen stellen oder Links pr\u00fcfen.",
+  tg_skip:"Schlie\u00dfen"
 },
 en: {
-    nav_cta: "Try now",
-    nav_features: "Features",
-    nav_pricing: "Pricing",
-    nav_faq: "FAQ",
-    faq5_q: "What is VIPER and how do I use it?",
-    faq5_a: "VIPER is our call protection system. Simply type the unknown number in the bot (e.g. +49151...) and KyberGuard checks it instantly against Germany\u2019s largest spam database. Free for all users. Pro users also get campaign analysis and fraud pattern recognition.",
-    faq6_q: "How do I report a spam number?",
-    faq6_a: "In the bot, simply type /vreport +49151... The report is completely anonymous and helps the community. The more reports, the better VIPER gets for everyone.",
-    hero_stat: "Cyberattacks since you opened this page",
-    hero_h1: '<span class="accent">Phishing detected.</span><br>In 3 seconds. 24/7.',
-    hero_sub: 'Received a phishing email? Unsure if a link is legit?<br><strong>Ask KyberGuard \u2013 know in 3 seconds.</strong>',
-    hero_cta: "Try for free now",
-    hero_trust: 'Runs on Telegram (free app for <a href="https://apps.apple.com/app/telegram-messenger/id686449807" style="color:#00d4ff">iOS</a>, <a href="https://play.google.com/store/apps/details?id=org.telegram.messenger" style="color:#00d4ff">Android</a> & <a href="https://desktop.telegram.org/" style="color:#00d4ff">Desktop</a>). No extra login needed.',
-    demo_h2: "See how it works",
-    demo_sub: "Real phishing detection. In real time.",
-    pain_h2: "Sound familiar?",
-    pain_1: 'You receive an email from \u201cyour bank\u201d \u2013 but is it real? One wrong click and your account is compromised.',
-    pain_2: 'Your employee clicks a link \u2013 was it phishing? 91% of all cyberattacks start with an email.',
-    pain_3: "You've been hacked \u2013 what now? Who do you call at 3 AM? Every minute counts.",
-    pain_answer: "KyberGuard is your security expert.<br>Around the clock. At a fraction of the cost.",
-    tools_h2: "What KyberGuard can do",
-    tools_sub: "Real tools \u2013 not just answering questions.",
-    tool1_h3: "Phishing Checker",
-    badge_free: "FREE",
-    tool1_p: "Send a suspicious link \u2013 get an instant risk score 1-10. Detect typosquatting, fake domains, social engineering. No limits.",
-    tool2_h3: "Security Audit",
-    tool2_p: "10 questions, 5 minutes \u2013 your personal security grade A-F. With AI recommendations for your vulnerabilities.",
-    tool3_h3: "Incident Response",
-    tool3_p: "Account hacked? Malware found? Guided emergency process based on NIST framework. Step by step.",
-    tool4_h3: "VIPER Call Protection",
-    tool4_p: "Unknown number called you? Just type the number \u2013 instant spam score from Germany\u2019s largest phone database. Protects against fraud, fake banks and support scams.",
-    pain_4: "An unknown number calls. Your bank? Police? Microsoft support? Or a scammer? 2 billion spam calls happen every month.",
-    stat1_val: "~3 sec",
-    stat1_label: "Response time",
-    stat2_label: "Available",
-    stat3_val: "GDPR",
-    stat3_label: "Compliant",
-    stat4_label: "Server location",
-    pricing_h2: "Simple pricing",
-    toggle_monthly: "Monthly",
-    toggle_yearly: "Yearly",
-    toggle_save: "Save up to 17%",
-    per_month: "month",
-    per_year: "year",
-    free_f1: "Phishing Checker included",
-    free_f4: "VIPER Call Protection (spam score)",
-    free_f2: "5 questions per day",
-    free_f3: "Compact answers",
-    free_btn: "Start for free",
-    pro_f1: "Security Audit with AI recommendations",
-    pro_f2: "Phishing AI deep analysis",
-    pro_f6: "VIPER full analysis + campaign intel",
-    pro_f7: "Dark Web Monitor (3 emails, daily)",
-    pro_f3: "20 questions per day",
-    pro_f4: "More detailed answers",
-    pro_f5: "Stronger AI model",
-    pro_btn: "Choose Pro",
-    biz_f1: "Everything in Pro included",
-    biz_f2: "Incident Response Guide",
-    biz_f3: "30 questions per day",
-    biz_f4: "Code examples & guides",
-    biz_f5: "Team access (up to 5 users)",
-    biz_f6: "Dark Web Monitor (10 emails, daily)",
-    biz_btn: "Choose Business",
-    tool5_h3: "Dark Web Monitor",
-    tool5_p: "Imagine someone breaks into an online shop and steals millions of passwords \u2014 those end up on the dark web. KyberGuard checks daily whether your email address is among them and alerts you instantly via Telegram. So you\u2019re the first to know, before anyone takes over your account.",
-    pain_5: "Somewhere out there your email address is exposed on the dark web \u2014 stolen in a hack of an online shop, app or forum. 12 billion accounts affected. Do you know if yours is one of them?",
-    hero_quantum: "Quantum-Safe Infrastructure \u2014 NIST FIPS 203 certified. Protects your data even against future quantum computers.",
-    faq_h2: "Frequently asked questions",
-    faq1_q: "Is KyberGuard free?",
-    faq1_a: "Yes! The Free plan includes the Phishing Checker with no limits and 5 security questions per day. For advanced features like Security Audit and Dark Web Monitor, there's Pro and Business.",
-    faq2_q: "Do I need technical knowledge?",
-    faq2_a: "No. Just type your question or send a suspicious link. KyberGuard explains everything clearly \u2013 whether you're a beginner or a pro.",
-    faq3_q: "Where is my data stored?",
-    faq3_a: "On a server in Frankfurt, Germany. Fully GDPR compliant. You can view your data (/meinedaten) or delete it (/loeschen) anytime.",
-    faq4_q: "Can I use KyberGuard with my team?",
-    faq4_a: "Yes! With the Business plan, you can add up to 5 team members. Everyone gets access to all Pro features.",
-    faq7_q: "What is the Dark Web Monitor and how does it work?",
-    faq7_a: "When hackers attack an online shop, millions of email addresses and passwords end up on the dark web. The Dark Web Monitor checks daily whether your email appears in such stolen datasets \u2014 and sends you an instant Telegram notification so you can change your password before anyone takes over your account. Available from Pro.",
-    faq8_q: "What does \u201cQuantum-Safe\u201d mean?",
-    faq8_a: "In a few years, quantum computers will be able to break today\u2019s encryption. Intelligence agencies are already collecting encrypted data today to decrypt it later. KyberGuard uses a new encryption method (ML-KEM-768, NIST FIPS 203) that even quantum computers cannot break \u2014 so your data stays secure in the future too.",
-    final_h2: "Don\u2019t wait until it\u2019s too late.",
-    final_p: "A cyberattack happens every 39 seconds. The next one could hit you.",
-    final_trust: "Costs less than a coffee per day. The Free plan is free forever.",
-    ai_notice: "All responses are AI-generated (Claude AI). Not professional security advice. Use at your own risk.",
-    trust_1: "GDPR compliant",
-    trust_2: "Server in Frankfurt",
-    trust_3: "EU AI Act compliant",
-    footer_contact: "Contact",
-    footer_legal: "Small business acc. to \u00a7 19 UStG",
-    hero_early: "Early Access \u2013 Be one of the first.",
-    pricing_anchor: "A security consultant costs 150+ EUR/hour. KyberGuard: from 0 EUR.",
-    trust_4: "Quantum-Safe Design",
-    footer_agb: "Terms",
-    footer_datenschutz: "Privacy"
+  nav_cta:"Try now", nav_features:"Features", nav_pricing:"Pricing", nav_faq:"FAQ",
+  aud_privat:"Personal", aud_business:"Business", aud_itpro:"IT Pro",
+  hero_stat:"Cyberattacks since you opened this page",
+  hero_cta:"Try for free now",
+  demo_label:"Live Demo", demo_h2:"See how it works", demo_sub:"Real AI analysis. In real time.",
+  tab_phishing:"\uD83D\uDEE1\uFE0F Phishing Check", tab_viper:"\uD83D\uDCE1 VIPER Call Check",
+  pain_label:"The Problem", pain_h2:"Sound familiar?",
+  pain_1:"You receive an email from \u201cyour bank\u201d \u2013 but is it real? One wrong click and your account is compromised.",
+  pain_2:"Your employee clicks a link \u2013 was it phishing? 91% of all cyberattacks start with an email.",
+  pain_3:"You\u2019ve been hacked \u2013 what now? Who do you call at 3 AM? Every minute counts.",
+  pain_4:"An unknown number calls. Your bank? Police? Microsoft support? Or a scammer? 2 billion spam calls happen every month.",
+  pain_5:"Somewhere out there your email address is exposed on the dark web \u2014 stolen in a hack. 12 billion accounts affected. Do you know if yours is one of them?",
+  pain_answer:"KyberGuard is your security expert.<br><span>Around the clock. At a fraction of the cost.</span>",
+  tools_label:"Features", tools_h2:"What KyberGuard can do", tools_sub:"Real tools \u2013 not just answering questions.",
+  tool1_h3:"Phishing Checker", badge_free:"FREE",
+  tool1_p:"Send a suspicious link \u2013 instant risk score 1-10. Detect typosquatting, fake domains, social engineering. No limits.",
+  tool2_h3:"Security Audit", tool2_p:"10 questions, 5 minutes \u2013 your personal security grade A\u2013F. With AI recommendations for your vulnerabilities.",
+  tool3_h3:"Incident Response", tool3_p:"Account hacked? Malware found? Guided emergency process based on NIST framework. Step by step.",
+  tool4_h3:"VIPER Call Protection", tool4_p:"Unknown number called you? Just type the number \u2013 instant spam score from Germany\u2019s largest phone database.",
+  tool5_h3:"Dark Web Monitor", tool5_p:"KyberGuard checks daily whether your email address appears in stolen datasets on the dark web \u2014 and alerts you instantly via Telegram.",
+  stat1_val:"~3 sec", stat1_lbl:"Response time", stat2_lbl:"Available", stat3_val:"GDPR", stat3_lbl:"Compliant", stat4_lbl:"Server location",
+  pricing_label:"Pricing", pricing_h2:"Simple pricing", pricing_anchor:"A security consultant costs 150+ EUR/hour. KyberGuard: from 0 EUR.",
+  toggle_monthly:"Monthly", toggle_yearly:"Yearly", toggle_save:"Save 17%",
+  per_month:"month", per_year:"year",
+  price_free_period:"Free forever",
+  price_pro_period:"Cancel anytime", price_pro_year_period:"12 months, one-time",
+  price_biz_period:"Cancel anytime", price_biz_year_period:"12 months, one-time",
+  free_f1:"Phishing Checker included", free_f4:"VIPER Call Protection (spam score)",
+  free_f2:"5 questions per day", free_f3:"Compact answers", free_btn:"Start for free",
+  pro_f1:"Security Audit with AI recommendations", pro_f2:"Phishing AI deep analysis",
+  pro_f6:"VIPER full analysis + campaign intel", pro_f7:"Dark Web Monitor (3 emails, daily)",
+  pro_f3:"20 questions per day", pro_f4:"More detailed answers", pro_f5:"Stronger AI model", pro_btn:"Choose Pro",
+  biz_f5:"Team access (up to 5 users)", biz_f6:"Dark Web Monitor (10 emails, daily)",
+  biz_f2:"Incident Response Guide", biz_f1:"Everything in Pro included",
+  biz_f3:"30 questions per day", biz_f4:"Code examples & guides", biz_btn:"Choose Business",
+  founder_name:"Alexander Potzahr \u2014 Founder",
+  founder_bio:"IT Security Manager from Hamburg with years of experience in cybersecurity and business protection. KyberGuard is his tool \u2014 built from real-world practice, not textbooks.",
+  faq_label:"FAQ", faq_h2:"Frequently asked questions",
+  faq1_q:"Is KyberGuard free?", faq1_a:"Yes! The Free plan includes the Phishing Checker with no limits and 5 security questions per day. For advanced features like Security Audit and Dark Web Monitor, there\u2019s Pro and Business.",
+  faq2_q:"Do I need technical knowledge?", faq2_a:"No. Just type your question or send a suspicious link. KyberGuard explains everything clearly \u2013 whether you\u2019re a beginner or a pro.",
+  faq3_q:"Where is my data stored?", faq3_a:"On a server in Frankfurt, Germany. Fully GDPR compliant. You can view your data (/meinedaten) or delete it (/loeschen) anytime.",
+  faq4_q:"Can I use KyberGuard with my team?", faq4_a:"Yes! With the Business plan, you can add up to 5 team members. Everyone gets access to all Pro features.",
+  faq5_q:"What is VIPER and how do I use it?", faq5_a:"VIPER is our call protection system. Simply type the unknown number in the bot (e.g. +49151...) and KyberGuard checks it instantly against Germany\u2019s largest spam database. Free for all users.",
+  faq6_q:"How do I report a spam number?", faq6_a:"In the bot, simply type /vreport +49151... The report is completely anonymous and helps the community.",
+  faq7_q:"What is the Dark Web Monitor?", faq7_a:"When hackers attack an online shop, millions of email addresses end up on the dark web. The Dark Web Monitor checks daily whether your email appears in such stolen datasets \u2014 and sends you an instant Telegram notification. Available from Pro.",
+  faq8_q:"What does \u201cQuantum-Safe\u201d mean?", faq8_a:"In a few years, quantum computers will be able to break today\u2019s encryption. KyberGuard uses ML-KEM-768 (NIST FIPS 203) \u2014 a new encryption method that even quantum computers cannot break.",
+  final_h2:"Don\u2019t wait until it\u2019s too late.", final_p:"A cyberattack happens every 39 seconds. The next one could hit you.",
+  final_trust:"Costs less than a coffee per day. The Free plan is free forever.",
+  ai_notice:"All responses are AI-generated. Not professional security advice. Use at your own risk.",
+  trust_1:"GDPR compliant", trust_2:"Server Frankfurt, DE", trust_3:"EU AI Act compliant", trust_4:"Quantum-Safe",
+  trust_qt_tip:"Uses ML-KEM-768 (NIST FIPS 203) \u2014 unbreakable even by quantum computers. First security suite of this kind in Germany.",
+  footer_contact:"Contact", footer_legal:"Small business acc. to \u00a7 19 UStG", footer_agb:"Terms", footer_datenschutz:"Privacy",
+  tg_title:"Get started in 2 minutes", tg_sub:"KyberGuard runs on Telegram \u2014 the free messenger app.",
+  tg_step1:"<strong>Install Telegram</strong> (if not already) \u2014 free for iOS, Android & Desktop.",
+  tg_step2:"<strong>Open the bot</strong> \u2014 click the button below. Telegram opens automatically with KyberGuard.",
+  tg_step3:"<strong>Press \u201cStart\u201d</strong> in the chat \u2014 done. You can ask questions or check links immediately.",
+  tg_skip:"Close"
 }
 };
 
-/* Chat demo messages */
-const chatDE = [
-    {type:'user', text:'Ist dieser Link sicher? https://paypa1.com/login'},
-    {type:'bot', html:'<span class="warn-badge">WARNUNG</span><br><span class="risk-score">Risiko: 9/10</span> \u2013 Typosquatting erkannt.<br><strong>paypa1.com</strong> imitiert <strong>paypal.com</strong> (Ziffer \u201e1\u201c statt Buchstabe \u201el\u201c). Klassische Phishing-Domain.'},
-    {type:'user', text:'Was soll ich tun?'},
-    {type:'bot', html:'<span class="safe-action">\u2713 Empfehlung:</span><br>1. Link <strong>NICHT</strong> klicken<br>2. Absender blockieren<br>3. Falls bereits geklickt: Passwort sofort \u00e4ndern + 2FA aktivieren'}
-];
-const chatEN = [
-    {type:'user', text:'Is this link safe? https://paypa1.com/login'},
-    {type:'bot', html:'<span class="warn-badge">WARNING</span><br><span class="risk-score">Risk: 9/10</span> \u2013 Typosquatting detected.<br><strong>paypa1.com</strong> impersonates <strong>paypal.com</strong> (digit \u201c1\u201d instead of letter \u201cl\u201d). Classic phishing domain.'},
-    {type:'user', text:'What should I do?'},
-    {type:'bot', html:'<span class="safe-action">\u2713 Recommendation:</span><br>1. Do <strong>NOT</strong> click the link<br>2. Block the sender<br>3. If already clicked: Change password immediately + enable 2FA'}
-];
+/* Audience-specific hero text */
+const AUDIENCE = {
+de: {
+  privat:  { h1:'<span class="accent-i">Phishing erkannt.</span><br>In 3 Sekunden. 24/7.', sub:'Phishing-Mail erhalten? Unsicher ob der Link echt ist?<br><strong>Frag KyberGuard \u2013 in 3 Sekunden wei\u00dft du Bescheid.</strong>' },
+  business:{ h1:'<span class="accent-i">91% der Angriffe</span><br>starten per E-Mail.', sub:'Sch\u00fctze dein Unternehmen. Security Audit, Incident Response und Dark Web Monitor \u2013 ohne teuren IT-Berater.<br><strong>KyberGuard ist dein digitaler Security-Officer.</strong>' },
+  itpro:   { h1:'<span class="accent-c">Quantum-Safe.</span><br>NIST FIPS 203. Jetzt.', sub:'ML-KEM-768, NIST-Framework, DSGVO-konform. KyberGuard f\u00fcr technische Teams, die keine Kompromisse machen.<br><strong>Security auf Enterprise-Niveau. Zum SMB-Preis.</strong>' }
+},
+en: {
+  privat:  { h1:'<span class="accent-i">Phishing detected.</span><br>In 3 seconds. 24/7.', sub:'Received a phishing email? Unsure if a link is legit?<br><strong>Ask KyberGuard \u2013 know in 3 seconds.</strong>' },
+  business:{ h1:'<span class="accent-i">91% of attacks</span><br>start with an email.', sub:'Protect your business. Security Audit, Incident Response and Dark Web Monitor \u2013 without an expensive IT consultant.<br><strong>KyberGuard is your digital security officer.</strong>' },
+  itpro:   { h1:'<span class="accent-c">Quantum-Safe.</span><br>NIST FIPS 203. Now.', sub:'ML-KEM-768, NIST framework, GDPR compliant. KyberGuard for technical teams that make no compromises.<br><strong>Enterprise-grade security. At SMB prices.</strong>' }
+}
+};
 
-let currentLang = localStorage.getItem('sb-lang') || 'de';
+/* Chat demo data */
+const CHAT = {
+phishingDE: [
+  {type:'user', text:'Ist dieser Link sicher? https://paypa1.com/login'},
+  {type:'bot',  html:'<span class="warn-badge">WARNUNG</span><br><span class="risk-score">Risiko: 9/10</span> \u2013 Typosquatting erkannt.<br><strong>paypa1.com</strong> imitiert <strong>paypal.com</strong> (Ziffer \u201e1\u201c statt \u201el\u201c). Klassische Phishing-Domain.'},
+  {type:'user', text:'Was soll ich tun?'},
+  {type:'bot',  html:'<span class="safe-action">\u2713 Empfehlung:</span><br>1. Link <strong>NICHT</strong> klicken<br>2. Absender blockieren<br>3. Falls bereits geklickt: Passwort sofort \u00e4ndern + 2FA aktivieren'}
+],
+phishingEN: [
+  {type:'user', text:'Is this link safe? https://paypa1.com/login'},
+  {type:'bot',  html:'<span class="warn-badge">WARNING</span><br><span class="risk-score">Risk: 9/10</span> \u2013 Typosquatting detected.<br><strong>paypa1.com</strong> impersonates <strong>paypal.com</strong> (digit \u201c1\u201d instead of \u201cl\u201d). Classic phishing domain.'},
+  {type:'user', text:'What should I do?'},
+  {type:'bot',  html:'<span class="safe-action">\u2713 Recommendation:</span><br>1. Do <strong>NOT</strong> click the link<br>2. Block the sender<br>3. If already clicked: Change password + enable 2FA'}
+],
+viperDE: [
+  {type:'user', text:'+49151 23456789 hat mich angerufen. Spam?'},
+  {type:'bot',  html:'\uD83D\uDCE1 <strong>VIPER Analyse l\u00e4uft...</strong>'},
+  {type:'bot',  html:'<span class="warn-badge">SPAM ERKANNT</span><br><span class="risk-score">Score: 82/100</span> \u2013 Hohes Risiko<br><strong>Carrier:</strong> VoIP \u2022 <strong>Tellows:</strong> 8/9 \u2022 47 Meldungen<br><strong>Kampagne:</strong> Fake-Bankberater NRW'},
+  {type:'user', text:'Was tue ich?'},
+  {type:'bot',  html:'<span class="safe-action">\u2713 Empfehlung:</span><br>1. Nummer <strong>blockieren</strong><br>2. <strong>Nicht zur\u00fcckriufen</strong><br>3. Melden: /vreport +4915123456789 bank'}
+],
+viperEN: [
+  {type:'user', text:'+49151 23456789 called me. Spam?'},
+  {type:'bot',  html:'\uD83D\uDCE1 <strong>VIPER analysis running...</strong>'},
+  {type:'bot',  html:'<span class="warn-badge">SPAM DETECTED</span><br><span class="risk-score">Score: 82/100</span> \u2013 High risk<br><strong>Carrier:</strong> VoIP \u2022 <strong>Tellows:</strong> 8/9 \u2022 47 reports<br><strong>Campaign:</strong> Fake bank advisor NRW'},
+  {type:'user', text:'What should I do?'},
+  {type:'bot',  html:'<span class="safe-action">\u2713 Recommendation:</span><br>1. <strong>Block</strong> the number<br>2. Do <strong>NOT call back</strong><br>3. Report: /vreport +4915123456789 bank'}
+]
+};
+
+/* ============================================================
+   STATE
+   ============================================================ */
+let lang        = localStorage.getItem('kg-lang') || 'de';
+let activeTab   = 'phishing';
+let activeAud   = 'privat';
 let chatRunning = false;
-let chatTimeout = null;
+let chatTimer   = null;
 
-/* ============================================
-   LANGUAGE SWITCHER
-   ============================================ */
-function setLang(lang) {
-    currentLang = lang;
-    localStorage.setItem('sb-lang', lang);
-    document.documentElement.setAttribute('data-lang', lang);
-
-    // Update active button
-    document.querySelectorAll('.lang-btn').forEach(b => {
-        b.classList.toggle('active', b.dataset.lang === lang);
-    });
-
-    // Update all translatable elements
-    const t = T[lang];
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.dataset.i18n;
-        if (t[key] !== undefined) {
-            if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-                el.placeholder = t[key];
-            } else {
-                el.innerHTML = t[key];
-            }
-        }
-    });
-
-    // Update featured badge
-    document.querySelectorAll('.price-card.featured').forEach(card => {
-        card.setAttribute('data-badge', lang === 'en' ? card.dataset.badgeEn : card.dataset.badgeDe);
-    });
-
-    // Restart chat demo
-    restartChat();
+/* ============================================================
+   TRANSLATIONS APPLY
+   ============================================================ */
+function applyLang(l) {
+  lang = l;
+  localStorage.setItem('kg-lang', l);
+  document.documentElement.setAttribute('data-lang', l);
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === l));
+  const t = T[l];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.dataset.i18n;
+    if (t[k] === undefined) return;
+    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') { el.placeholder = t[k]; }
+    else { el.innerHTML = t[k]; }
+  });
+  document.querySelectorAll('.price-card.featured').forEach(c => {
+    c.setAttribute('data-badge', l === 'en' ? c.dataset.badgeEn : c.dataset.badgeDe);
+  });
+  applyAudience(activeAud);
+  restartChat();
 }
 
-/* ============================================
+/* ============================================================
+   AUDIENCE SWITCHER
+   ============================================================ */
+function applyAudience(aud) {
+  activeAud = aud;
+  document.querySelectorAll('.aud-btn').forEach(b => b.classList.toggle('active', b.dataset.audience === aud));
+  const d = AUDIENCE[lang][aud];
+  document.getElementById('heroH1').innerHTML = d.h1;
+  document.getElementById('heroSub').innerHTML = d.sub;
+}
+
+/* ============================================================
    ATTACK COUNTER
-   ============================================ */
-let counterStart = null;
-const counterEl = document.getElementById('attack-counter');
-function updateCounter(timestamp) {
-    if (!counterStart) counterStart = timestamp;
-    // IBM X-Force: ~1.5M cyber incidents/day globally = ~17/sec
-    // Visual: ~2/sec for dramatic but believable pacing
-    const elapsed = (timestamp - counterStart) / 1000;
-    const displayed = Math.floor(elapsed * 2);
-    counterEl.textContent = displayed.toLocaleString();
-    requestAnimationFrame(updateCounter);
-}
-requestAnimationFrame(updateCounter);
+   ============================================================ */
+(function() {
+  const el = document.getElementById('attackCounter');
+  let start = null;
+  function tick(ts) {
+    if (!start) start = ts;
+    el.textContent = Math.floor((ts - start) / 1000 * 2).toLocaleString();
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
 
-/* ============================================
-   CHAT DEMO ANIMATION
-   ============================================ */
+/* ============================================================
+   CHAT DEMO
+   ============================================================ */
+function getChatMsgs() {
+  const key = activeTab + (lang === 'en' ? 'EN' : 'DE');
+  return CHAT[key] || CHAT.phishingDE;
+}
+
 function restartChat() {
-    if (chatTimeout) clearTimeout(chatTimeout);
-    const body = document.getElementById('chat-body');
-    const typing = document.getElementById('typing');
-    body.querySelectorAll('.chat-msg').forEach(m => m.remove());
-    typing.classList.remove('visible');
-    chatRunning = true;
-    let msgs;
-    if (activeTab === 'viper') {
-        msgs = currentLang === 'en' ? viperEN : viperDE;
-    } else {
-        msgs = currentLang === 'en' ? chatEN : chatDE;
-    }
-    runChat(msgs, 0, body, typing);
+  if (chatTimer) clearTimeout(chatTimer);
+  const body   = document.getElementById('chatBody');
+  const typing = document.getElementById('typingIndicator');
+  body.querySelectorAll('.chat-msg').forEach(m => m.remove());
+  typing.classList.remove('vis');
+  chatRunning = false;
+  startChat();
 }
 
-function runChat(msgs, idx, body, typing) {
-    if (idx >= msgs.length) {
-        // Pause then restart
-        chatTimeout = setTimeout(() => {
-            body.querySelectorAll('.chat-msg').forEach(m => m.remove());
-            runChat(msgs, 0, body, typing);
-        }, 5000);
-        return;
-    }
-    const msg = msgs[idx];
-    if (msg.type === 'bot') {
-        typing.classList.add('visible');
-        chatTimeout = setTimeout(() => {
-            typing.classList.remove('visible');
-            const div = document.createElement('div');
-            div.className = 'chat-msg bot' + (msg.html.includes('warn-badge') ? ' warning' : '');
-            div.innerHTML = msg.html;
-            body.insertBefore(div, typing);
-            requestAnimationFrame(() => div.classList.add('visible'));
-            chatTimeout = setTimeout(() => runChat(msgs, idx + 1, body, typing), 1800);
-        }, 1500);
-    } else {
-        const div = document.createElement('div');
-        div.className = 'chat-msg user';
-        div.textContent = msg.text;
-        body.insertBefore(div, typing);
-        requestAnimationFrame(() => div.classList.add('visible'));
-        chatTimeout = setTimeout(() => runChat(msgs, idx + 1, body, typing), 1200);
-    }
+function startChat() {
+  if (chatRunning) return;
+  chatRunning = true;
+  runChat(getChatMsgs(), 0);
 }
 
-/* ============================================
+function runChat(msgs, idx) {
+  const body   = document.getElementById('chatBody');
+  const typing = document.getElementById('typingIndicator');
+  if (idx >= msgs.length) {
+    chatTimer = setTimeout(() => {
+      body.querySelectorAll('.chat-msg').forEach(m => m.remove());
+      runChat(msgs, 0);
+    }, 5000);
+    return;
+  }
+  const msg = msgs[idx];
+  if (msg.type === 'bot') {
+    typing.classList.add('vis');
+    chatTimer = setTimeout(() => {
+      typing.classList.remove('vis');
+      const div = document.createElement('div');
+      div.className = 'chat-msg bot' + (msg.html && msg.html.includes('warn-badge') ? ' warn' : '');
+      div.innerHTML = msg.html;
+      body.insertBefore(div, typing);
+      requestAnimationFrame(() => div.classList.add('vis'));
+      chatTimer = setTimeout(() => runChat(msgs, idx + 1), 1800);
+    }, 1400);
+  } else {
+    const div = document.createElement('div');
+    div.className = 'chat-msg user';
+    div.textContent = msg.text;
+    body.insertBefore(div, typing);
+    requestAnimationFrame(() => div.classList.add('vis'));
+    chatTimer = setTimeout(() => runChat(msgs, idx + 1), 1200);
+  }
+}
+
+/* ============================================================
    PRICING TOGGLE
-   ============================================ */
+   ============================================================ */
 function togglePricing() {
-    const toggle = document.getElementById('price-toggle');
-    const monthly = document.querySelectorAll('.price-monthly');
-    const yearly = document.querySelectorAll('.price-yearly');
-    const labelM = document.getElementById('label-monthly');
-    const labelY = document.getElementById('label-yearly');
-    const isYearly = toggle.classList.toggle('yearly');
-    monthly.forEach(el => el.style.display = isYearly ? 'none' : '');
-    yearly.forEach(el => el.style.display = isYearly ? '' : 'none');
-    labelM.classList.toggle('active', !isYearly);
-    labelY.classList.toggle('active', isYearly);
+  const sw  = document.getElementById('priceToggle');
+  const on  = sw.classList.toggle('on');
+  sw.setAttribute('aria-checked', String(on));
+  document.querySelectorAll('.price-monthly').forEach(el => el.style.display = on ? 'none' : '');
+  document.querySelectorAll('.price-yearly').forEach(el  => el.style.display = on ? '' : 'none');
+  document.getElementById('lbl-monthly').classList.toggle('active', !on);
+  document.getElementById('lbl-yearly').classList.toggle('active',  on);
 }
 
-/* ============================================
+/* ============================================================
    FAQ ACCORDION
-   ============================================ */
-function toggleFaq(btn) {
-    const item = btn.parentElement;
-    const wasOpen = item.classList.contains('open');
-    // Close all
-    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
-    if (!wasOpen) item.classList.add('open');
+   ============================================================ */
+function initFaq() {
+  document.querySelectorAll('.faq-question').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item    = btn.parentElement;
+      const wasOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if (!wasOpen) item.classList.add('open');
+    });
+  });
 }
 
-/* ============================================
-   SCROLL REVEAL (IntersectionObserver)
-   ============================================ */
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-        }
-    });
-}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+/* ============================================================
+   TG MODAL
+   ============================================================ */
+function openModal()  { document.getElementById('tgModal').classList.add('active'); }
+function closeModal() { document.getElementById('tgModal').classList.remove('active'); }
 
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+/* ============================================================
+   SCROLL REVEAL
+   ============================================================ */
+function initReveal() {
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+}
 
-/* ============================================
-   INIT
-   ============================================ */
-setLang(currentLang);
-
-// Start chat demo when demo section is visible
-const demoObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting && !chatRunning) {
-            restartChat();
-            demoObserver.disconnect();
-        }
-    });
-}, { threshold: 0.3 });
-demoObserver.observe(document.getElementById('demo'));
-</script>
-
-<script>
-/* ============================================
+/* ============================================================
    MOBILE MENU
-   ============================================ */
-function toggleMobileMenu() {
-    document.getElementById('mobileMenu').classList.toggle('open');
-}
-function closeMobileMenu() {
-    document.getElementById('mobileMenu').classList.remove('open');
-}
-
-/* ============================================
-   DEMO TABS (Phishing / VIPER)
-   ============================================ */
-const viperDE = [
-    {type:'user', text:'+49151 23456789 hat mich angerufen. Spam?'},
-    {type:'bot', html:'&#x1F4E1; <strong>VIPER Analyse l\u00e4uft...</strong>'},
-    {type:'bot', html:'<span class="warn-badge">SPAM ERKANNT</span><br><span class="risk-score">Score: 82/100</span> \u2013 Hohes Risiko<br><strong>Carrier:</strong> VoIP (nicht Telekom/Vodafone)<br><strong>Tellows:</strong> 8/9 &bull; 47 gemeldete Anrufe<br><strong>Kampagne:</strong> Fake-Bankberater NRW'},
-    {type:'user', text:'Was tue ich?'},
-    {type:'bot', html:'<span class="safe-action">\u2713 Empfehlung:</span><br>1. Nummer <strong>blockieren</strong><br>2. <strong>Nicht zur\u00fcckrufen</strong> (kostenpflichtige Hotline)<br>3. Melden: /vreport +4915123456789 bank'}
-];
-const viperEN = [
-    {type:'user', text:'+49151 23456789 called me. Spam?'},
-    {type:'bot', html:'&#x1F4E1; <strong>VIPER analysis running...</strong>'},
-    {type:'bot', html:'<span class="warn-badge">SPAM DETECTED</span><br><span class="risk-score">Score: 82/100</span> \u2013 High risk<br><strong>Carrier:</strong> VoIP (not Telekom/Vodafone)<br><strong>Tellows:</strong> 8/9 &bull; 47 reported calls<br><strong>Campaign:</strong> Fake bank advisor NRW'},
-    {type:'user', text:'What should I do?'},
-    {type:'bot', html:'<span class="safe-action">\u2713 Recommendation:</span><br>1. <strong>Block</strong> the number<br>2. Do <strong>NOT call back</strong> (premium rate trap)<br>3. Report: /vreport +4915123456789 bank'}
-];
-
-let activeTab = 'phishing';
-function switchTab(tab) {
-    activeTab = tab;
-    const btnP = document.getElementById('tab-phishing');
-    const btnV = document.getElementById('tab-viper');
-    if (tab === 'phishing') {
-        btnP.style.cssText = 'padding:8px 20px;border-radius:20px;border:1px solid #00d4ff;background:#00d4ff;color:#000;font-weight:700;font-size:0.85rem;cursor:pointer;transition:all 0.2s';
-        btnV.style.cssText = 'padding:8px 20px;border-radius:20px;border:1px solid #333;background:transparent;color:#888;font-weight:700;font-size:0.85rem;cursor:pointer;transition:all 0.2s';
-    } else {
-        btnV.style.cssText = 'padding:8px 20px;border-radius:20px;border:1px solid #00d4ff;background:#00d4ff;color:#000;font-weight:700;font-size:0.85rem;cursor:pointer;transition:all 0.2s';
-        btnP.style.cssText = 'padding:8px 20px;border-radius:20px;border:1px solid #333;background:transparent;color:#888;font-weight:700;font-size:0.85rem;cursor:pointer;transition:all 0.2s';
-    }
-    restartChat();
+   ============================================================ */
+function initMobileMenu() {
+  const btn  = document.getElementById('hamburgerBtn');
+  const menu = document.getElementById('mobileMenu');
+  btn.addEventListener('click', () => {
+    const open = menu.classList.toggle('open');
+    btn.setAttribute('aria-expanded', String(open));
+  });
+  menu.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      menu.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    });
+  });
 }
 
-const _origRunChat = restartChat;
-
-/* ============================================
-   TELEGRAM ONBOARDING MODAL
-   ============================================ */
-const tgModalTexts = {
-    de: {
-        title: "So startest du in 2 Minuten",
-        sub:   "KyberGuard l\u00e4uft \u00fcber Telegram \u2014 die kostenlose Messenger-App.",
-        s1: "<strong>Telegram installieren</strong> (falls noch nicht vorhanden) \u2014 kostenlos f\u00fcr iOS, Android & Desktop.",
-        s2: "<strong>Bot \u00f6ffnen</strong> \u2014 klicke unten auf den Button. Telegram \u00f6ffnet sich automatisch.",
-        s3: "<strong>\u201eStart\u201c dr\u00fccken</strong> im Chat \u2014 fertig. Du kannst sofort Fragen stellen oder Links pr\u00fcfen.",
-        cta: "&#x1F4F1; KyberGuard in Telegram \u00f6ffnen",
-        skip: "Schlie\u00dfen"
-    },
-    en: {
-        title: "Get started in 2 minutes",
-        sub:   "KyberGuard runs on Telegram \u2014 the free messenger app.",
-        s1: "<strong>Install Telegram</strong> (if not already) \u2014 free for iOS, Android & Desktop.",
-        s2: "<strong>Open the bot</strong> \u2014 click the button below. Telegram opens automatically.",
-        s3: "<strong>Press \u201cStart\u201d</strong> in the chat \u2014 done. You can immediately ask questions or check links.",
-        cta: "&#x1F4F1; Open KyberGuard in Telegram",
-        skip: "Close"
-    }
-};
-
-function openTgModal() {
-    const lang = currentLang || 'de';
-    const t = tgModalTexts[lang] || tgModalTexts.de;
-    document.getElementById('tg-modal-title').textContent = t.title;
-    document.getElementById('tg-modal-sub').textContent   = t.sub;
-    document.getElementById('tg-step1').innerHTML  = t.s1;
-    document.getElementById('tg-step2').innerHTML  = t.s2;
-    document.getElementById('tg-step3').innerHTML  = t.s3;
-    document.getElementById('tg-modal-cta').innerHTML = t.cta;
-    document.getElementById('tg-modal-skip').textContent = t.skip;
-    document.getElementById('tgModal').classList.add('active');
-    document.body.style.overflow = 'hidden';
+/* ============================================================
+   EVENT DELEGATION — all data-action buttons
+   ============================================================ */
+function initActions() {
+  document.addEventListener('click', e => {
+    const el = e.target.closest('[data-action]');
+    if (!el) return;
+    const action = el.dataset.action;
+    if (action === 'open-tg-modal') { e.preventDefault(); openModal(); }
+  });
+  document.getElementById('tgClose').addEventListener('click', closeModal);
+  document.getElementById('tgSkip').addEventListener('click',  closeModal);
+  document.getElementById('tgModal').addEventListener('click', e => {
+    if (e.target === document.getElementById('tgModal')) closeModal();
+  });
 }
 
-function closeTgModal(e) {
-    if (e.target === document.getElementById('tgModal')) {
-        document.getElementById('tgModal').classList.remove('active');
-        document.body.style.overflow = '';
-    }
+/* ============================================================
+   LANG BUTTONS
+   ============================================================ */
+function initLang() {
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => applyLang(btn.dataset.lang));
+  });
 }
 
-document.getElementById('tgModal').addEventListener('transitionend', function() {
-    if (!this.classList.contains('active')) document.body.style.overflow = '';
+/* ============================================================
+   PRICING TOGGLE EVENT
+   ============================================================ */
+function initPricing() {
+  const sw = document.getElementById('priceToggle');
+  sw.addEventListener('click', togglePricing);
+  sw.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); togglePricing(); } });
+}
+
+/* ============================================================
+   AUDIENCE BUTTONS
+   ============================================================ */
+function initAudience() {
+  document.querySelectorAll('.aud-btn').forEach(btn => {
+    btn.addEventListener('click', () => applyAudience(btn.dataset.audience));
+  });
+}
+
+/* ============================================================
+   DEMO TABS
+   ============================================================ */
+function initDemoTabs() {
+  document.querySelectorAll('.demo-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeTab = btn.dataset.tab;
+      document.querySelectorAll('.demo-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === activeTab));
+      restartChat();
+    });
+  });
+}
+
+/* ============================================================
+   INIT — start demo when visible
+   ============================================================ */
+function initDemoObserver() {
+  const demoObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting && !chatRunning) { startChat(); demoObs.disconnect(); }
+    });
+  }, { threshold: 0.3 });
+  demoObs.observe(document.getElementById('demo'));
+}
+
+/* ============================================================
+   BOOTSTRAP
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', () => {
+  initActions();
+  initLang();
+  initPricing();
+  initAudience();
+  initDemoTabs();
+  initDemoObserver();
+  initFaq();
+  initMobileMenu();
+  initReveal();
+  applyLang(lang);
 });
 </script>
-
 </body>
 </html>
