@@ -623,7 +623,11 @@ async def ask_groq(question: str, subscription: str = 'free') -> str:
             ) as resp:
                 if resp.status == 200:
                     data = await resp.json()
-                    return data['choices'][0]['message']['content']
+                    text = (data.get('choices') or [{}])[0].get('message', {}).get('content', '')
+                    if text and text.strip():
+                        return text.strip()
+                    logger.warning("Groq leere Antwort — Fallback zu Claude")
+                    return await ask_claude(question, subscription)
                 elif resp.status == 429:
                     logger.warning("Groq Rate-Limit erreicht — Fallback zu Claude")
                     return await ask_claude(question, subscription)
