@@ -58,7 +58,7 @@ automate this?
 - Answers to: network security, DSGVO/GDPR, cloud security, code review basics
 
 **Free to try:**
-https://t.me/Lees_Securebot (just /start and ask or /check followed by a link)
+https://t.me/KyberGuard_AI (just /start and ask or /check followed by a link)
 
 **Questions I'm curious about:**
 1. Would you actually use something like this in your organization?
@@ -79,7 +79,7 @@ plans for more in-depth analysis, but the phishing checker stays free forever. I
 
 **CTA (Call to Action):**
 ```
-Try it: https://t.me/Lees_Securebot (no login, 2 min setup)
+Try it: https://t.me/KyberGuard_AI (no login, 2 min setup)
 Link to Landing Page in first comment with /trial code
 ```
 
@@ -152,7 +152,7 @@ Questions for r/netsec:
 
 **CTA:**
 ```
-Try the bot and analyze your own threats: https://t.me/Lees_Securebot
+Try the bot and analyze your own threats: https://t.me/KyberGuard_AI
 Get a /trial for 7 days Pro (includes incident response guide)
 ```
 
@@ -255,12 +255,12 @@ Would love feedback:
 - What features would make you upgrade?
 - Any indie hackers here who bootstrapped from $0?
 
-**Try it:** https://t.me/Lees_Securebot
+**Try it:** https://t.me/KyberGuard_AI
 ```
 
 **CTA:**
 ```
-Try it now: https://t.me/Lees_Securebot
+Try it now: https://t.me/KyberGuard_AI
 /trial gives 7 days Pro free
 ```
 
@@ -334,7 +334,7 @@ I built SecureBot for option 2. Free for everyone. Pro plans for teams that want
 
 ---
 
-**Try it:** https://t.me/Lees_Securebot (7-day trial available)
+**Try it:** https://t.me/KyberGuard_AI (7-day trial available)
 
 What phishing attacks are hitting your organization right now?
 Comment below—I'm researching 2026 threat patterns.
@@ -344,7 +344,7 @@ Comment below—I'm researching 2026 threat patterns.
 
 **CTA:**
 ```
-Try it: https://t.me/Lees_Securebot
+Try it: https://t.me/KyberGuard_AI
 Comment your biggest security challenge → I'll share insights
 ```
 
@@ -412,7 +412,7 @@ Not because it's trendy. Because it actually works.
 
 ---
 
-**Try it:** https://t.me/Lees_Securebot (Incident Response guide for Business users)
+**Try it:** https://t.me/KyberGuard_AI (Incident Response guide for Business users)
 
 What threats are you seeing in your logs right now? Drop a comment.
 Let's build better threat intelligence together.
@@ -422,7 +422,7 @@ Let's build better threat intelligence together.
 
 **CTA:**
 ```
-Try Incident Response guide: https://t.me/Lees_Securebot /trial (7 days Business access)
+Try Incident Response guide: https://t.me/KyberGuard_AI /trial (7 days Business access)
 Share your threat patterns in comments
 ```
 
@@ -506,7 +506,7 @@ there's a better way.
 
 ---
 
-**Try it:** https://t.me/Lees_Securebot (Business plan includes incident response + team access)
+**Try it:** https://t.me/KyberGuard_AI (Business plan includes incident response + team access)
 
 How much are you spending on security tools? What actually gets used?
 Drop a comment—let's talk about this.
@@ -516,7 +516,7 @@ Drop a comment—let's talk about this.
 
 **CTA:**
 ```
-Try Business plan: https://t.me/Lees_Securebot (€29,99/mo or €299,90/year)
+Try Business plan: https://t.me/KyberGuard_AI (€29,99/mo or €299,90/year)
 Share your security tool costs in comments
 ```
 
@@ -624,7 +624,7 @@ I'm an IT Security Manager and I built SecureBot AI (Telegram bot) to help teams
 threat patterns without needing to run their own honeypot. Free to try.
 (not shilling, just... relevant)
 
-https://t.me/Lees_Securebot
+https://t.me/KyberGuard_AI
 
 **Questions for r/InternetIsBeautiful:**
 - How many of you ran honeypots?
@@ -634,7 +634,7 @@ https://t.me/Lees_Securebot
 
 **CTA:**
 ```
-Try the bot to understand your own security posture: https://t.me/Lees_Securebot
+Try the bot to understand your own security posture: https://t.me/KyberGuard_AI
 /trial for 7 days Pro
 ```
 
@@ -704,7 +704,7 @@ TWEET 6:
 Why I'm sharing this: built SecureBot AI (free Telegram bot) to help teams understand
 threats like these. Not to scare—to educate.
 
-https://t.me/Lees_Securebot
+https://t.me/KyberGuard_AI
 
 Try it. /trial for 7 days Pro.
 ```
@@ -780,7 +780,7 @@ The more you practice, the better your intuition gets.
 ---
 
 **Try SecureBot AI for instant scoring:**
-https://t.me/Lees_Securebot
+https://t.me/KyberGuard_AI
 /check followed by any URL = instant risk analysis
 
 Drop your score in the comments.
@@ -797,7 +797,7 @@ I built a tool that can analyze URLs for phishing patterns.
 Here are 10 real examples from my honeypot. Try to rank them 1-10 (risk level).
 
 Then use the tool to check your answers:
-https://t.me/Lees_Securebot /check [URL]
+https://t.me/KyberGuard_AI /check [URL]
 
 ---
 
@@ -831,7 +831,7 @@ Drop your score in replies!
 
 TWEET 4:
 Struggling? Try SecureBot AI's phishing checker (free):
-https://t.me/Lees_Securebot
+https://t.me/KyberGuard_AI
 /check [any URL]
 
 It analyzes:
@@ -933,7 +933,7 @@ I built a full Security Audit tool in SecureBot AI:
 - Specific recommendations (not generic)
 - Takes 5 minutes
 
-Try it: https://t.me/Lees_Securebot
+Try it: https://t.me/KyberGuard_AI
 /audit (or /trial for 7 days Pro access)
 
 **Drop your score in the comments.**
@@ -983,7 +983,7 @@ Blind spots are the real vulnerability.
 
 TWEET 5:
 Want a deeper diagnosis?
-https://t.me/Lees_Securebot /audit
+https://t.me/KyberGuard_AI /audit
 AI-powered security assessment. Takes 5 min.
 
 /trial = 7 days full access
@@ -1005,7 +1005,7 @@ I built a tool that grades security posture. Tried it on 50 people.
 Discussion: What surprised you most about how you scored?
 What gaps are you worried about most?
 
-Try the full AI audit: https://t.me/Lees_Securebot /audit
+Try the full AI audit: https://t.me/KyberGuard_AI /audit
 ```
 
 **CTA:**
@@ -1133,7 +1133,7 @@ Post the same content at different times on the same platform:
 ```
 Reddit/LinkedIn/Twitter
         ↓
-Clicks to t.me/Lees_Securebot
+Clicks to t.me/KyberGuard_AI
         ↓
 /start command
         ↓

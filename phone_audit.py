@@ -268,7 +268,7 @@ def format_report(result: dict) -> str:
             "Quantum-Score Analyse und persönlichen Maßnahmen.\n👉 /upgrade"
         )
 
-    lines.append("\n_KyberGuard Phone Audit — @KyberGuardBot_")
+    lines.append("\n_KyberGuard Phone Audit — @KyberGuard_AI_")
     return "\n".join(lines)
 
 

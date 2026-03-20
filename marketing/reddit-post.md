@@ -26,7 +26,7 @@ I kept answering the same security questions for colleagues and clients. Instead
 - Docker for deployment
 - Stripe for paid plans
 
-**Free to try:** https://t.me/Lees_Securebot
+**Free to try:** https://t.me/KyberGuard_AI
 Just open in Telegram, type /start, ask a question.
 
 I'd love feedback from the community:

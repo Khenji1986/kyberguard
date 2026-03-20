@@ -33,7 +33,7 @@ Was meint ihr - nützlich oder überflüssig?
 
 ## Erster Kommentar (sofort posten):
 
-Hier der Link zum Bot: https://t.me/Lees_Securebot
+Hier der Link zum Bot: https://t.me/KyberGuard_AI
 
 7 Tage Pro kostenlos testen mit /trial
 
