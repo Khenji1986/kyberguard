@@ -1,0 +1,160 @@
+{
+  "name": "KyberGuard CT-Log Monitor",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "ct-001-cron",
+      "name": "Cron 1h",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://10.8.0.1:8000/internal/asm/targets",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 10000,
+          "response": { "response": { "responseFormat": "json" } }
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "User-Agent", "value": "kyberguard-ct-monitor/1.1" },
+            { "name": "Accept", "value": "application/json" }
+          ]
+        }
+      },
+      "id": "ct-002-asm-targets",
+      "name": "ASM-Targets aus DB",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [420, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE-WITH-ASM-INTERNAL-CRED-ID",
+          "name": "ASM Internal Bearer"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Mappt /internal/asm/targets Response auf einen Eintrag pro Domain.\n// Erwartet: { targets: [{user_id, domain, email, plan}], count: N }\n// Output: ein item pro verifizierter Domain.\n\nconst items = $input.all();\nconst out = [];\n\nfor (const item of items) {\n  const body = item.json || {};\n  const targets = Array.isArray(body.targets) ? body.targets : [];\n  for (const t of targets) {\n    const d = (t && typeof t.domain === 'string') ? t.domain.trim().toLowerCase() : '';\n    if (!d || d.length > 253) continue;\n    if (!/^[a-z0-9.\\-]+$/.test(d)) continue;  // strikte Domain-Whitelist\n    out.push({ json: { domain: d, user_id: t.user_id || null } });\n  }\n}\n\nif (out.length === 0) {\n  // Fail-safe: kein Output stoppt den Cron-Lauf — Diff-Node bekäme leere Liste.\n  // Wir loggen das implizit indem wir trotzdem ein Sentinel-Item liefern, aber\n  // ohne domain wird der nächste Schritt es per Validierung verwerfen.\n  return [];\n}\nreturn out;"
+      },
+      "id": "ct-003-extract",
+      "name": "Domain-Extract",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [640, 300]
+    },
+    {
+      "parameters": {
+        "url": "=https://crt.sh/?q=%25.{{ $json.domain }}&output=json",
+        "options": {
+          "timeout": 25000,
+          "response": { "response": { "responseFormat": "json" } }
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "User-Agent", "value": "kyberguard-ct-monitor/1.1" },
+            { "name": "Accept", "value": "application/json" }
+          ]
+        }
+      },
+      "id": "ct-004-http",
+      "name": "crt.sh Query",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [860, 300],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Diff-Logik: vergleicht aktuelle crt.sh-Ergebnisse mit Stand vom letzten Lauf.\n// Speichert Stand in workflowStaticData (n8n-eigene Persistenz pro Workflow).\n\nconst items = $input.all();\nconst staticData = $getWorkflowStaticData('global');\nstaticData.knownSubdomains = staticData.knownSubdomains || {};\n\nconst out = [];\n\nfor (const item of items) {\n  const domain = item.json.domain || '';\n  let raw = item.json;\n  // crt.sh returnt Array — bei Fehler dict mit error\n  let entries = Array.isArray(raw) ? raw : (Array.isArray(raw.body) ? raw.body : []);\n  if (!Array.isArray(entries)) entries = [];\n\n  const found = new Set();\n  for (const entry of entries) {\n    if (!entry || typeof entry !== 'object') continue;\n    const nv = (entry.name_value || '').toString();\n    for (const cand of nv.split('\\n')) {\n      let c = cand.trim().toLowerCase().replace(/^\\*\\.?/, '').replace(/\\.+$/, '');\n      if (!c || c.length > 253) continue;\n      if (c !== domain && !c.endsWith('.' + domain)) continue;\n      if (c.includes('*') || c.includes('..')) continue;\n      if (!/^[a-z0-9.\\-]+$/.test(c)) continue;\n      found.add(c);\n    }\n  }\n\n  const known = new Set(staticData.knownSubdomains[domain] || []);\n  const novel = [...found].filter(s => !known.has(s));\n\n  // Update static state (alle aktuellen) — neue beim naechsten Lauf nicht mehr 'novel'\n  staticData.knownSubdomains[domain] = [...found].sort();\n  staticData.lastRunAt = new Date().toISOString();\n\n  out.push({\n    json: {\n      domain,\n      total_known: found.size,\n      novel_count: novel.length,\n      novel_subdomains: novel.slice(0, 20),\n      checked_at: new Date().toISOString()\n    }\n  });\n}\n\nreturn out;"
+      },
+      "id": "ct-005-diff",
+      "name": "Diff vs Last Run",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1080, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "novel-gt-zero",
+              "leftValue": "={{ $json.novel_count }}",
+              "rightValue": 0,
+              "operator": { "type": "number", "operation": "gt" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "ct-006-if",
+      "name": "Neue Subdomains?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1300, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "alert@kyberguard.de",
+        "toEmail": "ceuleeneo@gmail.com",
+        "subject": "=KyberGuard CT-Monitor: {{ $json.novel_count }} neue Subdomain(s) fuer {{ $json.domain }}",
+        "emailFormat": "text",
+        "text": "=Neue Subdomains aus Certificate-Transparency-Logs erkannt:\n\nDomain: {{ $json.domain }}\nNeue Subdomains: {{ $json.novel_count }}\nGesamt-Bekannt: {{ $json.total_known }}\nZeit: {{ $json.checked_at }}\n\nNeue Eintraege:\n{{ $json.novel_subdomains.join('\\n') }}\n\n— KyberGuard CT-Monitor (n8n auf frieguen-hub)\nWenn das eine erwartete neue Subdomain ist (z.B. neuer Service), keine Aktion noetig.\nWenn unerwartet: KyberGuard-Dashboard pruefen, evtl. Phishing/Schatten-IT.",
+        "options": {}
+      },
+      "id": "ct-007-email",
+      "name": "E-Mail an Lee",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1540, 200],
+      "credentials": {
+        "smtp": {
+          "id": "REPLACE-WITH-MAILBOXORG-SMTP-CRED-ID",
+          "name": "mailbox.org SMTP"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Cron 1h": { "main": [[{ "node": "ASM-Targets aus DB", "type": "main", "index": 0 }]] },
+    "ASM-Targets aus DB": { "main": [[{ "node": "Domain-Extract", "type": "main", "index": 0 }]] },
+    "Domain-Extract": { "main": [[{ "node": "crt.sh Query", "type": "main", "index": 0 }]] },
+    "crt.sh Query": { "main": [[{ "node": "Diff vs Last Run", "type": "main", "index": 0 }]] },
+    "Diff vs Last Run": { "main": [[{ "node": "Neue Subdomains?", "type": "main", "index": 0 }]] },
+    "Neue Subdomains?": { "main": [[{ "node": "E-Mail an Lee", "type": "main", "index": 0 }], []] }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveExecutionProgress": true,
+    "saveDataSuccessExecution": "all",
+    "saveDataErrorExecution": "all",
+    "errorWorkflow": ""
+  },
+  "tags": [
+    { "name": "kyberguard" },
+    { "name": "ct-monitor" }
+  ]
+}
