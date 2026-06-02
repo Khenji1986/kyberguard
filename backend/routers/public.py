@@ -26,6 +26,7 @@ import re
 import socket
 import ssl
 import time
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -886,6 +887,126 @@ async def _check_phishing_lookalikes(domain: str) -> dict:
 
 
 # ---------------------------------------------------------------------------
+# EvilGinx / Reverse-Proxy Phishing — Certificate-Transparency-Erkennung
+# ---------------------------------------------------------------------------
+# Passiver Check via crt.sh: sucht kuerzlich ausgestellte Let's-Encrypt-Zertifikate
+# auf Lookalike-Domains (letzte 60 Tage).
+#
+# Sicherheitshinweise:
+# - Kein HTTP-Probing auf Lookalike-Domains → kein SSRF-Risiko
+# - Nur crt.sh API (externe CT-Log-Aggregation, keine eigene DNS-Aufloesung)
+# - EvilGinx-Reverse-Proxy nutzt fast immer Let's Encrypt fuer schnelle SSL-Bereitstellung
+# - Neuausstellungen auf Lookalike-Domains = starker Indikator fuer aktive Phishing-Infra
+# ---------------------------------------------------------------------------
+
+async def _check_reverse_proxy_threat(
+    domain: str, client: httpx.AsyncClient
+) -> dict:
+    """
+    Erkennt potenzielle EvilGinx-Reverse-Proxy-Phishing-Infrastruktur passiv
+    ueber Certificate-Transparency-Logs (crt.sh).
+    Gibt Risikostufe und konkrete Zertifikat-Nachweise zurueck.
+    """
+    result: dict = {
+        "recent_lookalike_certs": [],
+        "evilginx_risk": "low",
+        "checked": False,
+        "checked_days": 60,
+    }
+
+    extracted = tldextract.extract(domain)
+    if not extracted.domain or not extracted.suffix:
+        return result
+
+    label = extracted.domain
+    suffix = extracted.suffix
+
+    try:
+        resp = await client.get(
+            f"https://crt.sh/?q=%25{label}%25.{suffix}&output=json",
+            timeout=httpx.Timeout(connect=5.0, read=10.0, write=5.0, pool=5.0),
+            follow_redirects=True,
+        )
+        if resp.status_code != 200:
+            return result
+
+        try:
+            certs = resp.json()
+        except Exception:
+            return result
+
+        result["checked"] = True
+
+        from datetime import timedelta
+        cutoff = datetime.now(timezone.utc) - timedelta(days=60)
+
+        seen: set[str] = set()
+        suspicious: list[dict] = []
+
+        for cert in certs:
+            issuer = cert.get("issuer_name", "") or ""
+            name_value = cert.get("name_value", "") or ""
+            not_before = cert.get("not_before", "") or ""
+
+            # Nur Let's Encrypt (LE nutzt R3, E1, E5, R10, R11 als Issuer-CNs)
+            if not any(
+                kw in issuer
+                for kw in ("Let's Encrypt", "R3", "E1", "E5", "R10", "R11")
+            ):
+                continue
+
+            # Zeitfilter: letzte 60 Tage
+            if not_before:
+                try:
+                    issued_dt = datetime.fromisoformat(
+                        not_before.replace(" ", "T").replace("Z", "+00:00")
+                    )
+                    if issued_dt.tzinfo is None:
+                        issued_dt = issued_dt.replace(tzinfo=timezone.utc)
+                    if issued_dt < cutoff:
+                        continue
+                except Exception:
+                    pass
+
+            # Namen aufsplitten (crt.sh liefert manchmal mehrzeilig)
+            names = [
+                n.strip()
+                for n in name_value.replace("\\n", "\n").split("\n")
+                if n.strip()
+            ]
+            for name in names:
+                clean = name.lstrip("*.")
+                # Eigene Domain ausschliessen
+                if clean == domain or clean.endswith(f".{domain}"):
+                    continue
+                # Muss den Domain-Label enthalten (Lookalike-Bedingung)
+                if label not in clean:
+                    continue
+                if clean in seen:
+                    continue
+                seen.add(clean)
+                suspicious.append({
+                    "domain": clean,
+                    "issuer": "Let's Encrypt",
+                    "issued": not_before[:10] if not_before else "unknown",
+                })
+
+        # Kapp auf 10 Ergebnisse
+        result["recent_lookalike_certs"] = suspicious[:10]
+
+        count = len(suspicious)
+        if count >= 3:
+            result["evilginx_risk"] = "high"
+        elif count >= 1:
+            result["evilginx_risk"] = "medium"
+
+    except Exception as e:
+        logger.debug("CT-Log-EvilGinx-Check fehlgeschlagen: %s", e)
+
+    return result
+
+
+# ---------------------------------------------------------------------------
 # Cloud-Bucket-Exposure (passive HEAD-Probes)
 # ---------------------------------------------------------------------------
 # Prueft Standard-Bucket-Namen fuer den Brand auf Public-Read.
@@ -1087,18 +1208,19 @@ async def get_stats(request: Request) -> JSONResponse:
     if cache_key in _stats_cache:
         return JSONResponse(content=_stats_cache[cache_key])
 
-    # Statistiken — in Produktion aus DB oder CrowdSec befuellen
-    # Aktuell: realistische Basis-Werte die taeglich variieren
-    # (Nero-Note: echte Werte spaeter aus kyberguard.db befuellen)
+    # Externe Quellen (CrowdSec, CISA KEV, URLhaus, Feodo) werden spaeter integriert.
+    # Bis dahin: "unavailable" signalisiert dem Frontend, dass keine Echtdaten vorliegen
+    # (zeigt "—" statt falscher Zahlen).
     now = datetime.now(timezone.utc)
-    # Pseudo-Dynamik basierend auf aktuellem Tag/Stunde (kein RNG-Missbrauch)
-    day_seed = now.day * now.month
-    hour_offset = now.hour * 47
 
     stats = {
-        "cve_critical_today": 823 + (day_seed % 50) + (hour_offset % 24),
-        "threats_blocked_today": 12400 + (day_seed % 800) + (hour_offset % 300),
-        "ransomware_victims_30d": 2280 + (day_seed % 120),
+        "metrics": {
+            "crowdsec_blocked": {"value": None, "status": "unavailable"},
+            "cisa_kev":         {"value": None, "status": "unavailable"},
+            "urlhaus_24h":      {"value": None, "status": "unavailable"},
+            "ransomware_30d":   {"value": None, "status": "unavailable"},
+            "feodo_active_botnets": {"value": None, "status": "unavailable"},
+        },
         "cached_at": now.isoformat(),
         "cache_ttl_seconds": 60,
     }
@@ -1107,6 +1229,70 @@ async def get_stats(request: Request) -> JSONResponse:
     logger.info(f"Stats-Cache aktualisiert (IP-Hash: {_hash_ip(get_remote_address(request))})")
 
     return JSONResponse(content=stats)
+
+
+# ---------------------------------------------------------------------------
+# Holehe — E-Mail-Exposition-Check (Domain-Scanner v3)
+# ---------------------------------------------------------------------------
+
+_holehe_executor = ThreadPoolExecutor(max_workers=2, thread_name_prefix="holehe")
+
+
+def _run_holehe_sync(email: str) -> list:
+    """Fuehrt holehe in eigenem Thread aus (trio ist blockierend)."""
+    try:
+        import trio
+        from holehe.core import import_submodules, get_functions
+        modules = import_submodules("holehe.modules")
+        functions = get_functions(modules)
+        results: list = []
+
+        async def _check():
+            async with trio.open_nursery() as nursery:
+                for func in functions:
+                    nursery.start_soon(func, email, results, {})
+
+        trio.run(_check)
+        return [r for r in results if r.get("exists")]
+    except ImportError:
+        return []
+    except Exception:
+        return []
+
+
+async def _check_email_exposure(domain: str) -> dict:
+    """Prueft ob Standard-E-Mails der Domain auf bekannten Diensten registriert sind."""
+    try:
+        import holehe  # noqa: F401
+    except ImportError:
+        return {"available": False, "checked": False, "emails_checked": [],
+                "exposed_accounts": {}, "total_service_hits": 0}
+
+    emails = [f"info@{domain}", f"admin@{domain}"]
+    loop = asyncio.get_event_loop()
+    found: dict[str, list[str]] = {}
+    total = 0
+
+    for email in emails:
+        try:
+            hits = await asyncio.wait_for(
+                loop.run_in_executor(_holehe_executor, _run_holehe_sync, email),
+                timeout=25,
+            )
+            if hits:
+                names = [r.get("name", r.get("website", "unbekannt")) for r in hits]
+                found[email] = names
+                total += len(names)
+        except (asyncio.TimeoutError, Exception):
+            pass
+
+    return {
+        "available": True,
+        "checked": True,
+        "emails_checked": emails,
+        "exposed_accounts": found,
+        "total_service_hits": total,
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -1191,6 +1377,7 @@ async def quick_scan(
             ssl_result, dns_result, sec_txt_result, headers_result,
             dns_security_result, asn_result, tech_result,
             mail_adv_result, lookalike_result, bucket_result,
+            rp_threat_result, holehe_result,
         ) = await asyncio.gather(
             _check_ssl(clean_domain),
             _check_dns_records(clean_domain),
@@ -1202,6 +1389,8 @@ async def quick_scan(
             _check_mail_security_advanced(clean_domain, client),
             _check_phishing_lookalikes(clean_domain),
             _check_cloud_buckets(clean_domain, client),
+            _check_reverse_proxy_threat(clean_domain, client),
+            _check_email_exposure(clean_domain),
             return_exceptions=True,
         )
 
@@ -1230,6 +1419,11 @@ async def quick_scan(
         lookalike_result = {"variants_checked": 0, "live_count": 0, "live_lookalikes": []}
     if isinstance(bucket_result, Exception):
         bucket_result = {"checked": 0, "exposed": [], "potential": []}
+    if isinstance(rp_threat_result, Exception):
+        rp_threat_result = {"recent_lookalike_certs": [], "evilginx_risk": "low", "checked": False}
+    if isinstance(holehe_result, Exception):
+        holehe_result = {"available": False, "checked": False, "emails_checked": [],
+                         "exposed_accounts": {}, "total_service_hits": 0}
 
     scan_duration_ms = round((time.monotonic() - scan_start) * 1000)
 
@@ -1264,7 +1458,7 @@ async def quick_scan(
     if mail_adv_result.get("tls_rpt", {}).get("exists"):
         score += 1
 
-    # Risiko-Indikatoren ziehen Punkte ab (max. -3)
+    # Risiko-Indikatoren ziehen Punkte ab (max. -5)
     risk_penalty = 0
     if lookalike_result.get("live_count", 0) >= 1:
         # Aktive Lookalikes = potenzielle Phishing-Vorbereitung
@@ -1272,7 +1466,19 @@ async def quick_scan(
     if bucket_result.get("exposed"):
         # Public-Read Cloud-Bucket = sofortige Datenexfil-Gefahr
         risk_penalty += min(len(bucket_result["exposed"]) * 2, 3)
-    score = max(0, score - min(risk_penalty, 3))
+    # EvilGinx Reverse-Proxy: kuerzlich ausgestellte LE-Certs auf Lookalike-Domains
+    evilginx_risk = rp_threat_result.get("evilginx_risk", "low")
+    if evilginx_risk == "high":
+        risk_penalty += 2
+    elif evilginx_risk == "medium":
+        risk_penalty += 1
+    # E-Mail-Exposition via holehe: viele registrierte Dienste = groessere Angriffsfläche
+    holehe_hits = holehe_result.get("total_service_hits", 0) if holehe_result.get("checked") else 0
+    if holehe_hits >= 10:
+        risk_penalty += 2
+    elif holehe_hits >= 5:
+        risk_penalty += 1
+    score = max(0, score - min(risk_penalty, 5))
 
     # Grade-Schwellen passend auf 15-Punkte-Maximum (13 bonus + 2 mail-adv)
     if score >= 13:
@@ -1334,11 +1540,20 @@ async def quick_scan(
             "variants_checked": lookalike_result.get("variants_checked", 0),
             "live_count": lookalike_result.get("live_count", 0),
             "live_lookalikes": lookalike_result.get("live_lookalikes", []),
+            "evilginx_risk": rp_threat_result.get("evilginx_risk", "low"),
+            "recent_lookalike_certs": rp_threat_result.get("recent_lookalike_certs", []),
+            "ct_log_checked": rp_threat_result.get("checked", False),
         },
         "cloud_exposure": {
             "checked": bucket_result.get("checked", 0),
             "exposed": bucket_result.get("exposed", []),
             "potential": bucket_result.get("potential", []),
+        },
+        "email_exposure": {
+            "checked": holehe_result.get("checked", False),
+            "emails_checked": holehe_result.get("emails_checked", []),
+            "exposed_accounts": holehe_result.get("exposed_accounts", {}),
+            "total_service_hits": holehe_result.get("total_service_hits", 0),
         },
         "security_txt": sec_txt_result.get("exists", False),
         "headers": {
@@ -1357,7 +1572,7 @@ async def quick_scan(
     }
 
     logger.info(
-        f"Quick-Scan abgeschlossen: {clean_domain} | Score: {score}/10 | "
+        f"Quick-Scan abgeschlossen: {clean_domain} | Score: {score}/15 | "
         f"Grade: {grade} | {scan_duration_ms}ms (IP-Hash: {ip_hash})"
     )
 

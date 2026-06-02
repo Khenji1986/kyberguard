@@ -430,6 +430,8 @@ img { max-width:100%; }
 /* ============================================================
    PAIN SECTION
    ============================================================ */
+.video-section { padding:90px 24px; background:var(--bg); }
+.video-wrapper { margin-top:32px; }
 .pain { padding:90px 24px; background:var(--bg-2); }
 .pain-grid {
   display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));
@@ -854,6 +856,28 @@ footer {
   </div>
 </section>
 
+<!-- ========== ERKLÄRVIDEO ========== -->
+<section class="video-section" id="video">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label reveal">Erklärvideo</div>
+      <h2 class="section-h2 reveal">Wie Quantum-Safe Security funktioniert</h2>
+      <p class="section-sub reveal">In 90 Sekunden erklärt — warum klassische Verschlüsselung bald nicht mehr reicht.</p>
+    </div>
+    <div class="video-wrapper reveal">
+      <video
+        controls
+        preload="none"
+        poster=""
+        style="width:100%;max-width:860px;border-radius:12px;border:1px solid rgba(0,212,255,0.2);display:block;margin:0 auto;"
+        aria-label="KyberGuard Erklärvideo — Quantum-Safe Security">
+        <source src="KyberGuard_Erklaervideo_v2_voiced.mp4" type="video/mp4">
+        Dein Browser unterstützt kein HTML5-Video.
+      </video>
+    </div>
+  </div>
+</section>
+
 <!-- ========== PROBLEM / PAIN ========== -->
 <section class="pain" id="problem">
   <div class="container">
@@ -1162,7 +1186,7 @@ footer {
     </div>
     <div class="footer-links">
       <a href="https://t.me/KyberGuard_AI" rel="noopener">Telegram Bot</a>
-      <a href="mailto:securebot.ai.contact@gmail.com" data-i18n="footer_contact">Kontakt</a>
+      <a href="mailto:info@kyberguard.de" data-i18n="footer_contact">Kontakt</a>
       <a href="agb.html" data-i18n="footer_agb">AGB</a>
       <a href="datenschutz.html" data-i18n="footer_datenschutz">Datenschutz</a>
     </div>

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api.kyberguard.de; font-src 'self'; object-src 'none'; base-uri 'self';">
+<title>Dark Web E-Mail-Check — Kostenlos | KyberGuard</title>
+<meta name="description" content="Prüfen Sie jetzt kostenlos, ob Ihre E-Mail-Adresse in einem Datenleck aufgetaucht ist. Sofort. Ohne Anmeldung. DSGVO-konform.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://kyberguard.de/free-check">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x1F6E1;</text></svg>">
+<style>
+:root{
+    --bg:#000308;--surface:#020c1a;--card:#040e1d;
+    --cyan:#00F0FF;--cyan-dim:rgba(0,240,255,0.08);--cyan-glow:rgba(0,240,255,0.18);
+    --violet:#A020FF;--violet-dim:rgba(160,32,255,0.08);
+    --green:#00FF88;--green-dim:rgba(0,255,136,0.08);
+    --red:#FF0050;--red-dim:rgba(255,0,80,0.08);
+    --amber:#FFB300;
+    --text:#DCE8F5;--text-muted:#5A7A9A;--text-dim:#2A4060;
+    --border:rgba(0,240,255,0.06);--radius:12px;--radius-lg:20px;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden;min-height:100vh;}
+a{text-decoration:none;color:inherit;}
+button{cursor:pointer;border:none;background:none;font-family:inherit;}
+input{font-family:inherit;}
+.container{max-width:720px;margin:0 auto;padding:0 24px;}
+
+/* SCANLINE */
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,240,255,.004) 3px,rgba(0,240,255,.004) 4px);pointer-events:none;z-index:1;}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes pulseRed{0%,100%{box-shadow:0 0 22px rgba(255,0,80,.32)}50%{box-shadow:0 0 55px rgba(255,0,80,.75),0 0 110px rgba(255,0,80,.18)}}
+@keyframes pulseGreen{0%,100%{box-shadow:0 0 22px rgba(0,255,136,.32)}50%{box-shadow:0 0 55px rgba(0,255,136,.65),0 0 110px rgba(0,255,136,.15)}}
+@keyframes shimmerMove{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@keyframes countUp{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
+@keyframes scanBeam{0%{top:0%}100%{top:102%}}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:16px 0;background:rgba(0,3,8,.92);backdrop-filter:blur(28px);border-bottom:1px solid var(--border);}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;max-width:720px;margin:0 auto;padding:0 24px;}
+.nav-logo{font-size:1.05rem;font-weight:800;display:flex;align-items:center;gap:7px;letter-spacing:-.02em;}
+.nav-logo-icon{color:var(--cyan);font-size:1.2rem;}
+.nav-back{font-size:.83rem;color:var(--text-muted);display:flex;align-items:center;gap:5px;transition:color .2s;}
+.nav-back:hover{color:var(--cyan);}
+
+/* HERO STRIP */
+.hero-strip{padding:108px 0 40px;text-align:center;animation:fadeUp .7s ease both;}
+.hero-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(255,0,80,.06);border:1px solid rgba(255,0,80,.22);border-radius:100px;padding:5px 16px;font-size:.72rem;color:var(--red);letter-spacing:.09em;text-transform:uppercase;margin-bottom:20px;font-family:'Courier New',monospace;font-weight:700;}
+.hero-badge-dot{width:6px;height:6px;background:var(--red);border-radius:50%;box-shadow:0 0 8px var(--red);animation:blink 1.2s infinite;}
+.hero-title{font-size:clamp(1.8rem,4.5vw,3rem);font-weight:900;line-height:1.15;letter-spacing:-.03em;margin-bottom:14px;}
+.hero-title em{font-style:normal;color:var(--red);text-shadow:0 0 40px rgba(255,0,80,.5);}
+.hero-sub{font-size:1rem;color:#8AACC8;max-width:520px;margin:0 auto 8px;line-height:1.8;}
+.hero-note{font-size:.78rem;color:var(--text-muted);margin-bottom:0;}
+
+/* MAIN CARD */
+.check-card{background:rgba(4,14,29,.97);backdrop-filter:blur(28px);border:1px solid rgba(0,240,255,.16);border-radius:var(--radius-lg);padding:40px 36px;position:relative;overflow:hidden;box-shadow:0 36px 90px rgba(0,0,0,.58),0 0 60px rgba(0,240,255,.04);margin-bottom:32px;animation:fadeUp .7s .15s ease both;}
+.check-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);animation:shimmerMove 3.5s linear infinite;background-size:200% 100%;}
+.check-card.scanning::after{content:'';position:absolute;left:0;right:0;height:2px;top:0;background:linear-gradient(90deg,transparent,rgba(0,240,255,.85),transparent);animation:scanBeam 1.5s linear infinite;z-index:3;pointer-events:none;}
+
+/* INPUT ROW */
+.input-label{font-size:.8rem;color:var(--text-muted);margin-bottom:8px;font-family:'Courier New',monospace;text-transform:uppercase;letter-spacing:.08em;}
+.input-row{display:flex;gap:10px;margin-bottom:8px;}
+#email-input{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(0,240,255,.18);border-radius:100px;padding:14px 22px;color:var(--text);font-size:.95rem;outline:none;transition:border-color .2s,box-shadow .2s;}
+#email-input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,240,255,.10);}
+#email-input::placeholder{color:var(--text-muted);}
+#email-input.error-state{border-color:var(--red);box-shadow:0 0 0 3px rgba(255,0,80,.10);}
+#check-btn{background:var(--red);color:#fff;font-weight:800;padding:14px 28px;border-radius:100px;font-size:.93rem;transition:all .22s;display:flex;align-items:center;gap:8px;white-space:nowrap;box-shadow:0 0 24px rgba(255,0,80,.25);}
+#check-btn:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(255,0,80,.5);}
+#check-btn:disabled{opacity:.6;transform:none;cursor:not-allowed;}
+#check-spinner{display:none;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;}
+.input-hint{font-size:.73rem;color:var(--text-muted);display:flex;align-items:center;gap:6px;margin-bottom:0;}
+.input-hint-icon{color:var(--green);font-size:.85rem;}
+#input-error{display:none;color:var(--red);font-size:.82rem;margin-top:8px;padding:8px 14px;background:rgba(255,0,80,.07);border-radius:8px;border:1px solid rgba(255,0,80,.2);}
+
+/* OPT-IN */
+.optin-row{display:flex;gap:12px;align-items:flex-start;padding:18px 20px;background:rgba(0,240,255,.03);border:1px solid rgba(0,240,255,.10);border-radius:var(--radius);margin-top:20px;}
+.optin-checkbox{width:18px;height:18px;accent-color:var(--cyan);flex-shrink:0;margin-top:2px;cursor:pointer;}
+.optin-label{font-size:.83rem;color:var(--text-muted);line-height:1.6;}
+.optin-label a{color:var(--cyan);text-decoration:underline;}
+
+/* RESULT AREA */
+#result-area{display:none;margin-top:28px;padding-top:28px;border-top:1px solid var(--border);}
+
+/* BREACH FOUND */
+.result-breach{background:rgba(255,0,80,.05);border:1px solid rgba(255,0,80,.2);border-radius:var(--radius);padding:24px 26px;animation:pulseRed 3s ease-in-out infinite;}
+.result-header{display:flex;align-items:center;gap:16px;margin-bottom:18px;}
+.result-icon{font-size:2.4rem;flex-shrink:0;}
+.result-title{font-size:1.18rem;font-weight:900;color:var(--red);line-height:1.2;margin-bottom:4px;}
+.result-subtitle{font-size:.88rem;color:#9AAEC8;}
+.breach-count-big{font-family:'Courier New',monospace;font-size:3.5rem;font-weight:900;color:var(--red);text-shadow:0 0 30px rgba(255,0,80,.55);line-height:1;display:inline-block;animation:countUp .5s ease both;}
+.breach-count-label{font-size:.8rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em;font-family:'Courier New',monospace;margin-top:4px;}
+.breach-names-title{font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin:18px 0 10px;font-family:'Courier New',monospace;}
+.breach-tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:20px;}
+.breach-tag{background:rgba(255,0,80,.10);border:1px solid rgba(255,0,80,.22);color:var(--red);font-size:.74rem;font-weight:700;padding:4px 12px;border-radius:100px;font-family:'Courier New',monospace;}
+.result-cta-box{background:rgba(0,0,0,.3);border:1px solid rgba(255,0,80,.18);border-radius:var(--radius);padding:20px 22px;text-align:center;}
+.result-cta-box p{font-size:.88rem;color:#9AAEC8;margin-bottom:14px;line-height:1.7;}
+.result-cta-btn{display:inline-flex;align-items:center;gap:8px;background:var(--red);color:#fff;font-weight:800;font-size:.92rem;padding:12px 28px;border-radius:100px;transition:all .22s;box-shadow:0 0 26px rgba(255,0,80,.25);}
+.result-cta-btn:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(255,0,80,.5);}
+
+/* CLEAN RESULT */
+.result-clean{background:rgba(0,255,136,.04);border:1px solid rgba(0,255,136,.18);border-radius:var(--radius);padding:24px 26px;animation:pulseGreen 3s ease-in-out infinite;}
+.result-clean .result-title{color:var(--green);}
+.clean-icon{font-size:3.5rem;display:block;margin-bottom:12px;}
+.clean-cta-box{background:rgba(0,0,0,.3);border:1px solid rgba(0,255,136,.12);border-radius:var(--radius);padding:20px 22px;text-align:center;margin-top:16px;}
+.clean-cta-box p{font-size:.88rem;color:#9AAEC8;margin-bottom:14px;line-height:1.7;}
+.clean-cta-btn{display:inline-flex;align-items:center;gap:8px;background:var(--green);color:#000;font-weight:800;font-size:.92rem;padding:12px 28px;border-radius:100px;transition:all .22s;box-shadow:0 0 22px rgba(0,255,136,.2);}
+.clean-cta-btn:hover{transform:translateY(-1px);box-shadow:0 6px 28px rgba(0,255,136,.4);}
+
+/* OPT-IN CONFIRM */
+.optin-confirm{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--green);margin-top:12px;padding:8px 14px;background:rgba(0,255,136,.05);border-radius:8px;border:1px solid rgba(0,255,136,.15);}
+
+/* INFO BOXES */
+.info-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:32px;animation:fadeUp .7s .3s ease both;}
+@media(max-width:560px){.info-row{grid-template-columns:1fr;}}
+.info-box{background:rgba(4,14,29,.9);border:1px solid var(--border);border-radius:var(--radius);padding:18px 16px;text-align:center;}
+.info-box-icon{font-size:1.5rem;margin-bottom:8px;display:block;}
+.info-box-title{font-size:.82rem;font-weight:700;margin-bottom:4px;color:var(--text);}
+.info-box-sub{font-size:.74rem;color:var(--text-muted);line-height:1.6;}
+
+/* FOOTER */
+footer{padding:28px 0;border-top:1px solid var(--border);margin-top:40px;}
+.footer-inner{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;}
+.footer-logo{font-size:.9rem;font-weight:800;display:flex;align-items:center;gap:6px;color:var(--text-muted);}
+.footer-links{display:flex;gap:20px;}
+.footer-link{font-size:.78rem;color:var(--text-muted);transition:color .2s;}
+.footer-link:hover{color:var(--text);}
+.footer-copy{font-size:.74rem;color:var(--text-dim);}
+
+/* MOBILE */
+@media(max-width:560px){
+    .check-card{padding:28px 20px;}
+    .input-row{flex-direction:column;}
+    #check-btn{width:100%;justify-content:center;}
+    .hero-title{font-size:1.9rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+    <div class="nav-inner">
+        <a href="/" class="nav-logo">
+            <span class="nav-logo-icon">&#x1F6E1;</span>
+            <span>KyberGuard</span>
+        </a>
+        <a href="/" class="nav-back">&#x2190; Zur&uuml;ck zur Startseite</a>
+    </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero-strip">
+    <div class="container">
+        <div class="hero-badge">
+            <span class="hero-badge-dot"></span>
+            Kostenloser Live-Check
+        </div>
+        <h1 class="hero-title">Ist Ihre E-Mail im<br><em>Dark Web</em> aufgetaucht?</h1>
+        <p class="hero-sub">Wir pr&uuml;fen sofort, ob Ihre E-Mail-Adresse in bekannten Datenlecks gefunden wurde &mdash; ohne Anmeldung, ohne Kreditkarte.</p>
+        <p class="hero-note">Powered by Have I Been Pwned &mdash; DSGVO-konform &mdash; Made in Germany</p>
+    </div>
+</div>
+
+<!-- MAIN -->
+<main>
+    <div class="container">
+
+        <!-- CHECK CARD -->
+        <div class="check-card" id="check-card">
+            <div class="input-label">E-Mail-Adresse pr&uuml;fen</div>
+            <div class="input-row">
+                <input
+                    type="email"
+                    id="email-input"
+                    placeholder="ihre@email.de"
+                    maxlength="254"
+                    autocomplete="email"
+                    spellcheck="false"
+                    aria-label="E-Mail-Adresse eingeben"
+                >
+                <button id="check-btn" type="button" aria-label="E-Mail jetzt pr&uuml;fen">
+                    <span id="check-spinner"></span>
+                    <span id="check-btn-text">Jetzt pr&uuml;fen</span>
+                </button>
+            </div>
+            <div class="input-hint">
+                <span class="input-hint-icon">&#x1F512;</span>
+                Ihre E-Mail wird nicht gespeichert &mdash; der Check erfolgt vollst&auml;ndig anonym.
+            </div>
+            <div id="input-error" role="alert"></div>
+
+            <!-- DSGVO OPT-IN -->
+            <div class="optin-row">
+                <input type="checkbox" id="optin-check" class="optin-checkbox" aria-label="E-Mail-Benachrichtigungen aktivieren">
+                <label for="optin-check" class="optin-label">
+                    Ich m&ouml;chte bei neuen Datenlecks automatisch benachrichtigt werden.
+                    Ich stimme der Verarbeitung meiner E-Mail-Adresse zu.
+                    (<a href="/datenschutz" target="_blank" rel="noopener">Datenschutzerkl&auml;rung</a>)
+                </label>
+            </div>
+
+            <!-- RESULT AREA -->
+            <div id="result-area" aria-live="polite">
+
+                <!-- BREACH FOUND -->
+                <div id="result-breach" style="display:none;" class="result-breach">
+                    <div class="result-header">
+                        <span class="result-icon">&#x26A0;&#xFE0F;</span>
+                        <div>
+                            <div class="result-title" id="breach-title">Datenleck gefunden!</div>
+                            <div class="result-subtitle">Ihre E-Mail wurde in Datenlecks gefunden.</div>
+                        </div>
+                    </div>
+                    <div style="text-align:center;padding:8px 0 6px;">
+                        <div class="breach-count-big" id="breach-count">0</div>
+                        <div class="breach-count-label">Datenleck(s) gefunden</div>
+                    </div>
+                    <div id="breach-names-section" style="display:none;">
+                        <div class="breach-names-title">Betroffene Dienste</div>
+                        <div class="breach-tags" id="breach-tags"></div>
+                    </div>
+                    <div class="result-cta-box">
+                        <p>
+                            <strong style="color:var(--text);">Jetzt handeln:</strong> Aktivieren Sie Dark Web Monitoring &mdash; KyberGuard &uuml;berwacht Ihre E-Mail kontinuierlich und warnt Sie bei neuen Lecks.
+                        </p>
+                        <a href="/auth/register?plan=pro&ref=free_check_breach" class="result-cta-btn">
+                            &#x1F6E1; Dark Web Monitoring aktivieren &rarr;
+                        </a>
+                        <p style="margin:10px 0 0;font-size:.74rem;color:var(--text-dim);">Pro Plan ab 34,99&nbsp;&euro;/Monat &mdash; monatlich k&uuml;ndbar</p>
+                    </div>
+                    <div id="optin-confirm-breach" class="optin-confirm" style="display:none;">
+                        &#x2713; Sie werden bei neuen Datenlecks benachrichtigt.
+                    </div>
+                </div>
+
+                <!-- CLEAN -->
+                <div id="result-clean" style="display:none;" class="result-clean">
+                    <span class="clean-icon">&#x2705;</span>
+                    <div class="result-title">Keine Datenlecks gefunden</div>
+                    <p style="font-size:.88rem;color:#9AAEC8;margin-top:6px;line-height:1.75;">
+                        Gute Nachrichten! Ihre E-Mail-Adresse wurde in keinem bekannten Datenleck gefunden.
+                        Das bedeutet nicht, dass Sie vollst&auml;ndig sicher sind &mdash; neue Lecks kommen t&auml;glich hinzu.
+                    </p>
+                    <div class="clean-cta-box">
+                        <p>
+                            Schutz aufrechterhalten: Mit dem kostenlosen Dashboard werden Sie sofort informiert, wenn Ihre E-Mail in einem neuen Leck auftaucht.
+                        </p>
+                        <a href="/auth/register?ref=free_check_clean" class="clean-cta-btn">
+                            Gratis Dashboard erstellen &rarr;
+                        </a>
+                        <p style="margin:10px 0 0;font-size:.74rem;color:var(--text-dim);">Keine Kreditkarte erforderlich</p>
+                    </div>
+                    <div id="optin-confirm-clean" class="optin-confirm" style="display:none;">
+                        &#x2713; Sie werden bei neuen Datenlecks benachrichtigt.
+                    </div>
+                </div>
+
+            </div><!-- /result-area -->
+        </div><!-- /check-card -->
+
+        <!-- INFO ROW -->
+        <div class="info-row">
+            <div class="info-box">
+                <span class="info-box-icon">&#x1F512;</span>
+                <div class="info-box-title">Vollst&auml;ndig anonym</div>
+                <div class="info-box-sub">Ihre E-Mail wird nicht im Klartext gespeichert oder protokolliert.</div>
+            </div>
+            <div class="info-box">
+                <span class="info-box-icon">&#x1F1E9;&#x1F1EA;</span>
+                <div class="info-box-title">DSGVO-konform</div>
+                <div class="info-box-sub">Hetzner Cloud, Frankfurt. Alle Daten bleiben in der EU. BSI-Richtlinien.</div>
+            </div>
+            <div class="info-box">
+                <span class="info-box-icon">&#x26A1;</span>
+                <div class="info-box-title">Echtzeit-Pr&uuml;fung</div>
+                <div class="info-box-sub">Datenbank mit &uuml;ber 10 Milliarden bekannten Datenlecks. T&auml;glich aktualisiert.</div>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<!-- FOOTER -->
+<footer>
+    <div class="container">
+        <div class="footer-inner">
+            <div class="footer-logo">&#x1F6E1; KyberGuard</div>
+            <div class="footer-links">
+                <a href="/agb" class="footer-link">AGB</a>
+                <a href="/datenschutz" class="footer-link">Datenschutz</a>
+                <a href="/impressum" class="footer-link">Impressum</a>
+                <a href="mailto:support@kyberguard.de" class="footer-link">Kontakt</a>
+            </div>
+            <div class="footer-copy">&copy; 2026 KyberGuard &mdash; AP Digital Solution</div>
+        </div>
+    </div>
+</footer>
+
+<script src="/free-check.js?v=20260427a"></script>
+</body>
+</html>
