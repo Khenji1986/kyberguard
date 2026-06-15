@@ -783,8 +783,30 @@ footer{padding:48px 0;}
     -webkit-backdrop-filter:blur(8px);
 }
 
+/* ========= ZERTIFIZIERUNGEN ========= */
+.cert-section{padding:80px 0;background:var(--bg);position:relative;overflow:hidden;}
+.cert-section::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(0,240,255,.03),transparent 60%),radial-gradient(ellipse at 70% 50%,rgba(160,32,255,.025),transparent 60%);pointer-events:none;}
+.cert-header{text-align:center;margin-bottom:48px;}
+.cert-header .section-sub{margin:12px auto 0;text-align:center;max-width:600px;}
+.cert-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:900px;margin:0 auto;}
+.cert-card{background:var(--card);border:1px solid rgba(0,240,255,.10);border-radius:var(--radius-lg);padding:32px;position:relative;overflow:hidden;transition:all .3s;}
+.cert-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(0,240,255,.5),transparent);}
+.cert-card:hover{border-color:rgba(0,240,255,.25);box-shadow:0 20px 55px rgba(0,0,0,.4),0 0 30px rgba(0,240,255,.06);transform:translateY(-3px);}
+.cert-icon{font-size:2rem;margin-bottom:12px;filter:drop-shadow(0 0 8px rgba(0,240,255,.35));}
+.cert-issuer{font-size:.7rem;color:var(--cyan);text-transform:uppercase;letter-spacing:.09em;margin-bottom:8px;font-family:'Courier New',monospace;font-weight:700;line-height:1.5;}
+.cert-title{font-size:1.2rem;font-weight:900;margin-bottom:14px;letter-spacing:-.02em;}
+.cert-meta{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px;font-size:.76rem;color:var(--text-muted);font-family:'Courier New',monospace;}
+.cert-topics{list-style:none;display:flex;flex-direction:column;gap:8px;margin-bottom:18px;}
+.cert-topics li{font-size:.84rem;color:#8AACC8;display:flex;gap:8px;align-items:flex-start;line-height:1.55;}
+.cert-topics li::before{content:'›';color:var(--cyan);font-weight:700;flex-shrink:0;margin-top:1px;}
+.cert-badge{font-size:.71rem;font-weight:800;color:var(--green);background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.2);padding:6px 14px;border-radius:100px;display:inline-block;letter-spacing:.04em;font-family:'Courier New',monospace;}
+.cert-note{text-align:center;font-size:.82rem;color:var(--text-muted);margin-top:32px;}
+.cert-note a{color:var(--cyan);text-decoration:none;border-bottom:1px dashed rgba(0,240,255,.3);transition:color .2s,border-color .2s;}
+.cert-note a:hover{color:#fff;border-color:rgba(0,240,255,.8);}
+
 /* ========= RESPONSIVE ========= */
 @media(max-width:1100px){.hero-shield-hud{display:none;}}
+@media(max-width:700px){.cert-grid{grid-template-columns:1fr;}}
 @media(max-width:900px){
     .nis2-layout,.terminal-layout{grid-template-columns:1fr;gap:40px;}
     .features-grid{grid-template-columns:1fr 1fr;}
@@ -908,8 +930,8 @@ footer{padding:48px 0;}
                 </div>
                 <div class="hero-stats">
                     <div class="hero-stat">
-                        <span class="hero-stat-num" id="hero-cve-count">7.109</span>
-                        <span class="hero-stat-lbl">Known-Exploited CVEs</span>
+                        <span class="hero-stat-num" id="hero-cve-count">30.648</span>
+                        <span class="hero-stat-lbl">Kritische CVEs (NVD)</span>
                     </div>
                     <div class="hero-stat">
                         <span class="hero-stat-num">99,9&nbsp;%</span>
@@ -1126,7 +1148,7 @@ footer{padding:48px 0;}
                 <div class="feature-title">IR-Playbook Generator</div>
                 <div class="feature-tagline">"Im Ernstfall: klarer Kopf, sofortige Maßnahmen."</div>
                 <p class="feature-desc">Schritt-für-Schritt-Leitfaden bei Vorfällen. BSI-Meldungsvorlage automatisch erstellt. 24-h-Meldepflicht ohne Stress erfüllbar.</p>
-                <span class="feature-badge badge-new">Neu</span>
+                <span class="feature-badge badge-pro">Pro &amp; Business</span>
                 <div class="feat-data-line" aria-hidden="true"></div>
             </div>
 
@@ -1161,7 +1183,7 @@ footer{padding:48px 0;}
                 <div class="feature-title">Post-Quantum Assessment</div>
                 <div class="feature-tagline">"HNDL: Ihre Daten werden heute gesammelt."</div>
                 <p class="feature-desc">Harvest-Now-Decrypt-Later Analyse. Krypto-Inventar, PQ-Readiness-Score, BSI TR-02102 Mapping. Zukunftssicher ab heute.</p>
-                <span class="feature-badge badge-new">Neu</span>
+                <span class="feature-badge badge-pro">Pro &amp; Business</span>
                 <div class="feat-data-line" aria-hidden="true"></div>
             </div>
 
@@ -1232,6 +1254,54 @@ footer{padding:48px 0;}
 
 <div class="cyber-divider"></div>
 
+<!-- ZERTIFIZIERUNGEN -->
+<section class="cert-section">
+    <div class="container">
+        <div class="cert-header reveal">
+            <div class="section-label">Zertifizierte Expertise</div>
+            <h2 class="section-title">BSI-gepr&uuml;ft. IHK-zertifiziert.<br><em>Sicherheit aus erster Hand.</em></h2>
+            <p class="section-sub">Das Fundament von KyberGuard: gepr&uuml;ftes Fachwissen nach BSI IT-Grundschutz und IHK-Standard &mdash; keine Marketing-Versprechen, sondern offizielle Qualifikationsnachweise.</p>
+        </div>
+        <div class="cert-grid">
+            <div class="cert-card reveal reveal-delay-1">
+                <div class="cert-icon">&#x1F6E1;&#xFE0F;</div>
+                <div class="cert-issuer">BSI &mdash; Bundesamt f&uuml;r Sicherheit in der Informationstechnik</div>
+                <h3 class="cert-title">IT-Grundschutz Praktiker</h3>
+                <div class="cert-meta">
+                    <span>&#x1F4C5;&nbsp;Juni 2025</span>
+                    <span>&#x23F1;&nbsp;50 Unterrichtseinheiten</span>
+                </div>
+                <ul class="cert-topics">
+                    <li>IT-Grundschutz-Vorgehensweise nach BSI-Kompendium</li>
+                    <li>Risikoanalyse &amp; Schutzbedarfsfeststellung</li>
+                    <li>IT-Grundschutz-Check &amp; Umsetzungsplanung</li>
+                    <li>Auditierung, Zertifizierung, Notfallmanagement</li>
+                </ul>
+                <div class="cert-badge">&#x2713;&nbsp;Gepr&uuml;ft nach BSI-Pr&uuml;fungsbedingungen 1.0</div>
+            </div>
+            <div class="cert-card reveal reveal-delay-2">
+                <div class="cert-icon">&#x1F393;</div>
+                <div class="cert-issuer">IHK Akademie Schwaben &mdash; Wirtschaft. Technik. Zukunft.</div>
+                <h3 class="cert-title">IT-Security Manager IHK</h3>
+                <div class="cert-meta">
+                    <span>&#x1F4C5;&nbsp;November 2025</span>
+                    <span>&#x23F1;&nbsp;130 Unterrichtsstunden</span>
+                </div>
+                <ul class="cert-topics">
+                    <li>ISO/IEC 27000ff. &mdash; Informationssicherheits-Managementsysteme</li>
+                    <li>BSI IT-Grundschutz-Kataloge &amp; Datenschutz (DSGVO)</li>
+                    <li>Aktuelle IT-Sicherheitsthemen &amp; Gesetzgebung (NIS2)</li>
+                    <li>Sichere IT-Systeme, Firewalls, Netzwerk- &amp; Cloudsicherheit</li>
+                </ul>
+                <div class="cert-badge">&#x2713;&nbsp;Profilgruppe 11 &mdash; IT Security Coordinator</div>
+            </div>
+        </div>
+        <p class="cert-note reveal">Zertifikate werden auf Anfrage zur Verf&uuml;gung gestellt &mdash; <a href="mailto:info@kyberguard.de">info@kyberguard.de</a></p>
+    </div>
+</section>
+
+<div class="cyber-divider"></div>
+
 <!-- REVIEWS -->
 <section class="reviews-section reveal" id="bewertungen">
     <div class="container">
@@ -1260,8 +1330,8 @@ footer{padding:48px 0;}
                 <div class="stat-lbl">Threats blockiert</div>
             </div>
             <div class="stat-item">
-                <div class="stat-num" id="stat-cisa-kev" data-count="1592">0</div>
-                <div class="stat-lbl">Known-Exploited CVEs</div>
+                <div class="stat-num" id="stat-cisa-kev" data-count="30000">0</div>
+                <div class="stat-lbl">Kritische CVEs (NVD)</div>
             </div>
             <div class="stat-item">
                 <div class="stat-num" id="stat-urlhaus">—</div>
@@ -1346,6 +1416,8 @@ footer{padding:48px 0;}
                     <li><em class="feat-icon">&#x2713;</em> NIS2-Compliance-Übersicht</li>
                     <li><em class="feat-icon">&#x2713;</em> E-Mail-Alerts</li>
                     <li><em class="feat-icon">&#x2713;</em> 1 Domain</li>
+                    <li><em class="feat-icon">&#x2713;</em> IR-Playbook Generator (5/Monat)</li>
+                    <li><em class="feat-icon">&#x2713;</em> Post-Quantum Assessment (3/Monat)</li>
                     <li class="feat-disabled"><em class="feat-icon">&mdash;</em> KyberAssist KI</li>
                     <li class="feat-disabled"><em class="feat-icon">&mdash;</em> API-Zugang</li>
                 </ul>
@@ -1364,11 +1436,11 @@ footer{padding:48px 0;}
                     <li><em class="feat-icon">&#x2713;</em> Alles aus Pro</li>
                     <li><em class="feat-icon">&#x2713;</em> KyberAssist KI (unbegrenzt)</li>
                     <li><em class="feat-icon">&#x2713;</em> CVE-Radar (vollständig)</li>
-                    <li><em class="feat-icon">&#x2713;</em> IR-Playbook Generator</li>
+                    <li><em class="feat-icon">&#x2713;</em> IR-Playbook Generator (unbegrenzt)</li>
                     <li><em class="feat-icon">&#x2713;</em> NIS2-Auditbericht (PDF)</li>
                     <li><em class="feat-icon">&#x2713;</em> Bis zu 5 Domains</li>
                     <li><em class="feat-icon">&#x2713;</em> Threat Actor Intelligence</li>
-                    <li><em class="feat-icon">&#x2713;</em> Post-Quantum Assessment</li>
+                    <li><em class="feat-icon">&#x2713;</em> Post-Quantum Assessment (unbegrenzt)</li>
                 </ul>
                 <a href="/auth/register?plan=business" class="pricing-btn primary">Business starten</a>
             </div>

@@ -1021,7 +1021,7 @@ function initLiveStats(){
             items.push({tag:'block',tagLabel:'MALWARE',text:fmt(uh.value)+' neue Malware-URLs (24h) — abuse.ch',time:'LIVE'});
         var kev=m.cisa_kev;
         if(kev&&kev.status==='ok'&&kev.value!==null)
-            items.push({tag:'cve',tagLabel:'CISA-RADAR',text:fmt(kev.value)+' Known-Exploited CVEs gelistet',time:'LIVE'});
+            items.push({tag:'cve',tagLabel:'NVD-RADAR',text:fmt(kev.value)+' kritische CVEs gelistet (NVD)',time:'LIVE'});
         var rw=m.ransomware_30d;
         if(rw&&rw.status==='ok'&&rw.value!==null){
             var grp=rw.extra&&rw.extra.top_groups||[];
@@ -1063,6 +1063,6 @@ function initLiveStats(){
     if(typeof EventSource==='undefined'){setInterval(doFetch,60000);doFetch();return;}
     var es=new EventSource(STREAM);
     es.addEventListener('stats',function(e){try{applyMetrics(JSON.parse(e.data));}catch(ex){}});
-    es.onerror=function(){es.close();setTimeout(initLiveStats,15000);};
+    es.onerror=function(){es.close();setInterval(doFetch,60000);doFetch();};
     doFetch();
 }
