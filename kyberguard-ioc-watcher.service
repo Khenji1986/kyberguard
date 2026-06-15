@@ -1,0 +1,15 @@
+[Unit]
+Description=KyberGuard IOC-Watcher — Kunden-Assets täglich gegen Threat-Intelligence prüfen
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=ceuleeneo
+WorkingDirectory=/home/ceuleeneo
+EnvironmentFile=/home/ceuleeneo/friegun-projects/kyberguard/.env
+ExecStart=/home/ceuleeneo/friegun-projects/kyberguard/venv/bin/python \
+    /home/ceuleeneo/friegun-projects/kyberguard/ioc_watcher_job.py
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=kyberguard-ioc-watcher

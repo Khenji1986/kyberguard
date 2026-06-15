@@ -10,7 +10,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-BOT_DIR="/home/ceuleeneo/friegun-projects/security-bot"
+BOT_DIR="/home/ceuleeneo/friegun-projects/kyberguard"
 ENV_FILE="${BOT_DIR}/.env"
 BACKUP_DIR="${BOT_DIR}/backups"
 

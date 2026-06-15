@@ -33,7 +33,7 @@
 In deinem Terminal (WSL2):
 
 ```bash
-cd ~/friegun-projects/security-bot
+cd ~/friegun-projects/kyberguard
 cp .env.example .env
 nano .env
 ```
@@ -52,7 +52,7 @@ Speichern: `Ctrl+O`, Enter, `Ctrl+X`
 ## Schritt 4: Bot starten (2 Min)
 
 ```bash
-cd ~/friegun-projects/security-bot
+cd ~/friegun-projects/kyberguard
 docker-compose up -d
 ```
 

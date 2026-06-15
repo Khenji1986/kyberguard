@@ -1315,70 +1315,23 @@ class QuickScanRequest(BaseModel):
         return v.strip()
 
 
-@router.post("/quick-scan")
-@limiter.limit("3/hour")
-async def quick_scan(
-    request: Request,
-    body: QuickScanRequest,
-) -> JSONResponse:
-    """
-    Fuehrt passiven Security-Check einer Domain durch.
-    Rate-Limit: 3 Scans/IP/Stunde (verhindert Port-Scanner-Missbrauch).
-
-    Pruefungen (alle passiv, kein aktiver Angriff):
-    - SSL-Zertifikat (Ablauf, Gueltigkeit)
-    - DMARC/SPF/DKIM
-    - security.txt (RFC 9116)
-    - HTTP Security-Header
-
-    Sicherheitsmassnahmen:
-    1. Domain-Validierung (Laenge, Zeichen, Protokoll)
-    2. SSRF-Schutz via DNS-Aufloesung + IP-Check
-    3. Timeouts auf allen externen Requests (8s max)
-    4. IP-Hashing im Log (Privacy)
-    5. Kein Caching (immer frische Scan-Ergebnisse)
-    """
-    client_ip = get_remote_address(request)
-    ip_hash = _hash_ip(client_ip)
-
-    # --- Schritt 1: Domain validieren ---
-    is_valid, clean_domain, error = _validate_domain(body.domain)
-    if not is_valid:
-        logger.warning(f"Quick-Scan abgelehnt (IP-Hash: {ip_hash}): {error}")
-        return _safe_error_response(422, f"Ungueltige Domain: {error}")
-
-    # --- Schritt 2: SSRF-Schutz — DNS-Aufloesung pruefen ---
-    is_safe, ssrf_error = _resolve_and_check_ssrf(clean_domain)
-    if not is_safe:
-        logger.warning(
-            f"SSRF-Versuch blockiert (IP-Hash: {ip_hash}), Domain: {clean_domain[:30]}: {ssrf_error}"
-        )
-        return _safe_error_response(422, f"Domain nicht pruefbar: {ssrf_error}")
-
-    logger.info(f"Quick-Scan gestartet: {clean_domain} (IP-Hash: {ip_hash})")
-
-    # --- Schritt 3: Passiver Scan (alle Checks parallel mit Timeout) ---
+async def _run_domain_scan(clean_domain: str) -> dict:
+    """Core scan logic — shared between quick_scan (public/rate-limited) and domain_scan (authenticated)."""
+    import asyncio as _asyncio
     scan_start = time.monotonic()
 
     async with httpx.AsyncClient(
         timeout=HTTP_TIMEOUT,
         follow_redirects=False,
-        # Kein Proxy — verhindert dass SSRF via Proxy umgangen wird
-
-        # Verify TLS — kein SSL-Verify-Disable
         verify=True,
-        # Maximale Response-Groesse: 100KB
         limits=httpx.Limits(max_connections=10, max_keepalive_connections=5),
     ) as client:
-        import asyncio
-
-        # Alle Checks parallel — spart Zeit, respektiert Timeout
         (
             ssl_result, dns_result, sec_txt_result, headers_result,
             dns_security_result, asn_result, tech_result,
             mail_adv_result, lookalike_result, bucket_result,
             rp_threat_result, holehe_result,
-        ) = await asyncio.gather(
+        ) = await _asyncio.gather(
             _check_ssl(clean_domain),
             _check_dns_records(clean_domain),
             _check_security_txt(clean_domain, client),
@@ -1394,7 +1347,6 @@ async def quick_scan(
             return_exceptions=True,
         )
 
-    # Exceptions in gather abfangen
     if isinstance(ssl_result, Exception):
         ssl_result = {"valid": False, "error": "Pruefung fehlgeschlagen"}
     if isinstance(dns_result, Exception):
@@ -1427,10 +1379,9 @@ async def quick_scan(
 
     scan_duration_ms = round((time.monotonic() - scan_start) * 1000)
 
-    # Security-Score berechnen (Domain-Scanner v2: max. 13 Punkte)
     score = 0
     if ssl_result.get("valid") and (ssl_result.get("days_remaining") or 0) > 14:
-        score += 3  # SSL gueltig und nicht kurz vor Ablauf
+        score += 3
     if dns_result.get("spf", {}).get("exists"):
         score += 1
     if dns_result.get("dmarc", {}).get("exists"):
@@ -1441,9 +1392,8 @@ async def quick_scan(
     if sec_txt_result.get("exists"):
         score += 1
     header_score = headers_result.get("score", 0)
-    score += min(header_score, 2)  # max. 2 Punkte fuer Header
+    score += min(header_score, 2)
 
-    # DNS-Security v2 (max. 3 Punkte zusaetzlich)
     dnssec_status = dns_security_result.get("dnssec", {}).get("status", "unknown")
     if dnssec_status == "signed_and_validated":
         score += 2
@@ -1452,27 +1402,21 @@ async def quick_scan(
     if dns_security_result.get("caa", {}).get("exists"):
         score += 1
 
-    # Mail-Security-Advanced v2 Phase 2 (max. 2 Punkte)
     if mail_adv_result.get("mta_sts", {}).get("exists"):
         score += 1
     if mail_adv_result.get("tls_rpt", {}).get("exists"):
         score += 1
 
-    # Risiko-Indikatoren ziehen Punkte ab (max. -5)
     risk_penalty = 0
     if lookalike_result.get("live_count", 0) >= 1:
-        # Aktive Lookalikes = potenzielle Phishing-Vorbereitung
         risk_penalty += min(lookalike_result["live_count"], 2)
     if bucket_result.get("exposed"):
-        # Public-Read Cloud-Bucket = sofortige Datenexfil-Gefahr
         risk_penalty += min(len(bucket_result["exposed"]) * 2, 3)
-    # EvilGinx Reverse-Proxy: kuerzlich ausgestellte LE-Certs auf Lookalike-Domains
     evilginx_risk = rp_threat_result.get("evilginx_risk", "low")
     if evilginx_risk == "high":
         risk_penalty += 2
     elif evilginx_risk == "medium":
         risk_penalty += 1
-    # E-Mail-Exposition via holehe: viele registrierte Dienste = groessere Angriffsfläche
     holehe_hits = holehe_result.get("total_service_hits", 0) if holehe_result.get("checked") else 0
     if holehe_hits >= 10:
         risk_penalty += 2
@@ -1480,7 +1424,6 @@ async def quick_scan(
         risk_penalty += 1
     score = max(0, score - min(risk_penalty, 5))
 
-    # Grade-Schwellen passend auf 15-Punkte-Maximum (13 bonus + 2 mail-adv)
     if score >= 13:
         grade = "A"
     elif score >= 10:
@@ -1492,7 +1435,7 @@ async def quick_scan(
     else:
         grade = "F"
 
-    response_data = {
+    return {
         "domain": clean_domain,
         "ssl": {
             "valid": ssl_result.get("valid", False),
@@ -1571,11 +1514,38 @@ async def quick_scan(
         "scanned_at": datetime.now(timezone.utc).isoformat(),
     }
 
-    logger.info(
-        f"Quick-Scan abgeschlossen: {clean_domain} | Score: {score}/15 | "
-        f"Grade: {grade} | {scan_duration_ms}ms (IP-Hash: {ip_hash})"
-    )
 
+@router.post("/quick-scan")
+@limiter.limit("3/hour")
+async def quick_scan(
+    request: Request,
+    body: QuickScanRequest,
+) -> JSONResponse:
+    """
+    Fuehrt passiven Security-Check einer Domain durch.
+    Rate-Limit: 3 Scans/IP/Stunde (verhindert Port-Scanner-Missbrauch).
+    """
+    client_ip = get_remote_address(request)
+    ip_hash = _hash_ip(client_ip)
+
+    is_valid, clean_domain, error = _validate_domain(body.domain)
+    if not is_valid:
+        logger.warning(f"Quick-Scan abgelehnt (IP-Hash: {ip_hash}): {error}")
+        return _safe_error_response(422, f"Ungueltige Domain: {error}")
+
+    is_safe, ssrf_error = _resolve_and_check_ssrf(clean_domain)
+    if not is_safe:
+        logger.warning(
+            f"SSRF-Versuch blockiert (IP-Hash: {ip_hash}), Domain: {clean_domain[:30]}: {ssrf_error}"
+        )
+        return _safe_error_response(422, f"Domain nicht pruefbar: {ssrf_error}")
+
+    logger.info(f"Quick-Scan gestartet: {clean_domain} (IP-Hash: {ip_hash})")
+    response_data = await _run_domain_scan(clean_domain)
+    logger.info(
+        f"Quick-Scan abgeschlossen: {clean_domain} | Score: {response_data['security_score']}/15 | "
+        f"Grade: {response_data['security_grade']} | {response_data['scan_duration_ms']}ms (IP-Hash: {ip_hash})"
+    )
     return JSONResponse(content=response_data)
 
 
@@ -2911,5 +2881,116 @@ async def subdomain_probe_endpoint(
         "probed_count": len(valid_subs),
         "duration_ms": duration_ms,
         "results": results,
+        "checked_at": datetime.now(timezone.utc).isoformat(),
+    })
+
+
+# ---------------------------------------------------------------------------
+# ENDPOINT: POST /api/public/phishing-check
+# ---------------------------------------------------------------------------
+class PhishingCheckRequest(BaseModel):
+    url: str
+
+    @field_validator("url")
+    @classmethod
+    def url_must_be_valid(cls, v: str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("URL darf nicht leer sein")
+        if len(v) > 500:
+            raise ValueError("URL zu lang")
+        return v
+
+
+@router.post("/phishing-check")
+@limiter.limit("10/hour")
+async def phishing_check(
+    request: Request,
+    body: PhishingCheckRequest,
+) -> JSONResponse:
+    """
+    Prüft eine URL auf Phishing-Merkmale:
+    - Lookalike-Domain-Erkennung (eigene Heuristik, kein externer Dienst)
+    - Certificate-Transparency-Check (crt.sh, kein HTTP-Probing)
+    - Keine ausgehenden Verbindungen zur geprüften URL (SSRF-Schutz)
+    """
+    import re as _re
+    url_str = body.url
+    if not url_str.startswith(("http://", "https://")):
+        url_str = "https://" + url_str
+
+    # Domain extrahieren
+    domain_match = _re.match(r"https?://([^/\s?#]+)", url_str)
+    if not domain_match:
+        return _safe_error_response(422, "URL konnte nicht verarbeitet werden")
+    hostname = domain_match.group(1).lower().split(":")[0]
+
+    is_valid, clean_domain, err = _validate_domain(hostname)
+    if not is_valid:
+        return _safe_error_response(422, f"Ungültige Domain: {err}")
+
+    risk_indicators: list[str] = []
+    risk_score = 0
+
+    # 1. Lookalike-Domain-Check
+    async with httpx.AsyncClient(
+        timeout=httpx.Timeout(connect=5.0, read=12.0, write=5.0, pool=5.0)
+    ) as client:
+        lookalike_result = await _check_phishing_lookalikes(clean_domain)
+        ct_result = await _check_reverse_proxy_threat(clean_domain, client)
+
+    if lookalike_result.get("live_count", 0) > 0:
+        risk_score += 3
+        risk_indicators.append(
+            f"{lookalike_result['live_count']} aktive Lookalike-Domain(s) gefunden"
+        )
+
+    if ct_result.get("evilginx_risk") in ("medium", "high"):
+        risk_score += 3
+        risk_indicators.append(
+            f"Verdächtige Zertifikate in CT-Logs ({len(ct_result.get('recent_lookalike_certs', []))} Treffer)"
+        )
+
+    # 2. URL-Muster-Checks (keine ausgehende Verbindung)
+    suspicious_patterns = [
+        (_re.compile(r"@", _re.I), "@ in URL (mögliche Verschleierung)", 2),
+        (_re.compile(r"(?:paypal|amazon|google|microsoft|apple|sparkasse|dkb|ing).*\.(tk|ml|ga|cf|xyz|top|club|icu)", _re.I), "Bekannte Marke + verdächtige TLD", 3),
+        (_re.compile(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}"), "IP-Adresse statt Domain", 2),
+        (_re.compile(r"(?:secure|login|verify|account|update|confirm)-", _re.I), "Verdächtiges Prefix im Domainnamen", 1),
+        (_re.compile(r"(?:\.tk|\.ml|\.ga|\.cf|\.xyz|\.top|\.click)$", _re.I), "Häufig missbrauchte TLD", 1),
+    ]
+    for pattern, label, weight in suspicious_patterns:
+        if pattern.search(url_str):
+            risk_score += weight
+            risk_indicators.append(label)
+
+    risk_score = min(risk_score, 10)
+    if risk_score >= 6:
+        verdict = "PHISHING_VERDÄCHTIG"
+        risk_label = "Hohes Risiko"
+        recommendation = "Diese URL weist mehrere Phishing-Merkmale auf. Nicht öffnen."
+    elif risk_score >= 3:
+        verdict = "VORSICHT"
+        risk_label = "Mittleres Risiko"
+        recommendation = "Vorsicht geboten. URL unabhängig verifizieren."
+    else:
+        verdict = "UNBEDENKLICH"
+        risk_label = "Geringes Risiko"
+        recommendation = "Keine offensichtlichen Phishing-Merkmale gefunden."
+
+    ip_hash = _hash_ip(get_remote_address(request))
+    logger.info(f"Phishing-Check {clean_domain}: Score {risk_score} (IP-Hash: {ip_hash})")
+
+    return JSONResponse({
+        "url": body.url,
+        "domain": clean_domain,
+        "risk_score": risk_score,
+        "verdict": verdict,
+        "risk_label": risk_label,
+        "recommendation": recommendation,
+        "indicators": risk_indicators,
+        "lookalikes_checked": lookalike_result.get("variants_checked", 0),
+        "live_lookalikes": lookalike_result.get("live_lookalikes", []),
+        "ct_check": ct_result.get("checked", False),
         "checked_at": datetime.now(timezone.utc).isoformat(),
     })

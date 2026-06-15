@@ -40,8 +40,8 @@ logger = logging.getLogger('guardian')
 class GuardianConfig:
     TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "")
     ADMIN_USER_ID = int(os.getenv("ADMIN_USER_ID", "0"))
-    DB_PATH = '/app/data/securebot.db'
-    BOT_CONTAINER = 'securebot-ai'
+    DB_PATH = '/app/data/kyberguard.db'
+    BOT_CONTAINER = 'kyberguard'
     BACKUP_DIR = '/app/backups'
     STATUS_FILE = '/app/data/guardian_status.json'
     AUDIT_LOG = '/app/data/audit.log'

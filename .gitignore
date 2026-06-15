@@ -24,3 +24,8 @@ data/audit.log
 # IDE
 .vscode/
 .idea/
+
+# Videos (zu gross fuer git)
+video/
+*.mp4
+*.mp3

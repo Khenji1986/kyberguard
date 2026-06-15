@@ -77,17 +77,19 @@
     <li><strong>Threat Intelligence:</strong> Aktueller Feed zu Bedrohungsakteuren, TTPs und Indikatoren.</li>
     <li><strong>Domain OSINT:</strong> Erweiterte OSINT-Analyse: WHOIS, DNS-History, Technologien, Zertifikate.</li>
     <li><strong>Supplier Risk Score:</strong> Automatisierte Risikobewertung von Lieferanten und Drittanbietern (NVD + EPSS).</li>
+    <li><strong>IR-Playbook Generator (5 Playbooks/Monat):</strong> KI-generierte Incident-Response-Pläne nach NIS2/NIST-Framework. Erstellt via Claude Haiku 4.5 (Anthropic, USA); Datenverarbeitung gemäß §&nbsp;9 und Datenschutzerklärung Abschnitt 4.</li>
+    <li><strong>Post-Quantum Assessment (3 Scans/Monat):</strong> Bewertung der PQ-Kryptographie-Readiness gemäß BSI TR-02102 — lokal verarbeitet, kein externer KI-Aufruf.</li>
 </ul>
 
 <h3>2.3 Business-Features (Business-Plan und höher)</h3>
 <ul>
     <li>Alle Pro-Features</li>
-    <li><strong>KyberAssist KI (unbegrenzt):</strong> KI-Sicherheitsassistent ohne Anfragelimit, lokal auf EU-Servern betrieben.</li>
+    <li><strong>KyberAssist KI (unbegrenzt):</strong> KI-Sicherheitsassistent via Claude Haiku 4.5 (Anthropic, USA) mit lokalem Ollama-Fallback. Datenverarbeitung gemäß §&nbsp;9.</li>
     <li><strong>CVE-Radar (vollständig):</strong> Vollständiger CVE-Feed ohne Einschränkung der Ergebnismenge.</li>
-    <li><strong>IR-Playbook Generator:</strong> KI-generierte Incident-Response-Pläne nach NIST-Framework für konkrete Vorfallstypen.</li>
+    <li><strong>IR-Playbook Generator (unbegrenzt):</strong> KI-generierte Incident-Response-Pläne nach NIS2/NIST-Framework ohne Mengenbegrenzung.</li>
     <li><strong>NIS2-Auditbericht (PDF):</strong> Auditfähiger PDF-Report für BSI und Versicherer.</li>
     <li><strong>Threat Actor Intelligence:</strong> Live-Mapping aktiver APT-Gruppen gegen Ihre Branche und Ihren Technologie-Stack.</li>
-    <li><strong>Post-Quantum Assessment:</strong> Bewertung der PQ-Kryptographie-Readiness der eigenen Infrastruktur gemäß BSI TR-02102.</li>
+    <li><strong>Post-Quantum Assessment (unbegrenzt):</strong> Bewertung der PQ-Kryptographie-Readiness der eigenen Infrastruktur ohne Mengenbegrenzung.</li>
     <li><strong>Bis zu 5 Domains:</strong> Parallel-Überwachung mehrerer Domains.</li>
     <li><strong>SPHINX-Sentinel:</strong> Kontinuierliches Darknet- und Breach-Monitoring für die eigene Organisation.</li>
 </ul>
@@ -216,10 +218,11 @@
 
 <h2>9. KI-Hinweis (EU AI Act)</h2>
 <ul>
-    <li>Analysefunktionen werden durch lokal auf EU-Servern (Hetzner, Frankfurt) betriebene Open-Source-Sprachmodelle (z.&nbsp;B. Qwen 2.5) unterstützt. Anfragen verlassen dabei nicht die EU.</li>
-    <li>Der KyberAssist-Assistent ist KI-gestützt. Bei Bedarf erfolgt eine Weiterleitung an einen menschlichen Mitarbeiter.</li>
+    <li><strong>Lokale KI (Ollama / Mistral 7B (EU)):</strong> Analysefunktionen wie Phishing-Scanner und Domain-OSINT werden durch lokal auf EU-Servern (Hetzner, Nürnberg) betriebene Open-Source-Sprachmodelle verarbeitet. Diese Anfragen verlassen die EU nicht.</li>
+    <li><strong>Cloud-KI (Claude Haiku 4.5, Anthropic):</strong> KyberAssist (ab Business-Plan) und der IR-Playbook Generator (ab Pro-Plan) nutzen das Modell Claude Haiku 4.5 von Anthropic, Inc. (USA). Dabei werden Ihre Anfrageinhalte (kein Name, keine direkte Identifikation) an Anthropic übermittelt. Anthropic verarbeitet diese Daten im Rahmen eines Auftragsverarbeitungsvertrags (AVV, Art. 28 DSGVO) und verpflichtet sich, die Daten nicht zum Training eigener Modelle zu verwenden (Training-Opt-out aktiviert). Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung). Drittlandübermittlung gemäß Art. 46 DSGVO (Standardvertragsklauseln). Details: Datenschutzerklärung Abschnitt 4.</li>
+    <li>Der KyberAssist-Assistent ist KI-gestützt und gibt Orientierungshilfen. Er ersetzt keine professionelle Sicherheitsberatung.</li>
     <li>Es werden keine automatisierten Entscheidungen mit rechtlicher Wirkung getroffen (Art. 22 DSGVO).</li>
-    <li>KI-generierte Einschätzungen (z.&nbsp;B. Risiko-Scores) sind Orientierungshilfen, keine abschließenden Beurteilungen.</li>
+    <li>KI-generierte Einschätzungen (z.&nbsp;B. Risiko-Scores, Playbook-Inhalte) sind Orientierungshilfen, keine abschließenden Beurteilungen.</li>
 </ul>
 
 <h2>10. Verbotene Nutzung</h2>

@@ -6,6 +6,9 @@ COPY requirements-monitor.txt .
 RUN pip install --no-cache-dir -r requirements-monitor.txt
 
 COPY security_monitor.py .
-RUN mkdir -p /app/backups
+RUN groupadd -r guardian && useradd -r -g guardian -u 1002 guardian && \
+    mkdir -p /app/backups && chown -R guardian:guardian /app
+
+USER guardian
 
 CMD ["python", "-u", "security_monitor.py"]

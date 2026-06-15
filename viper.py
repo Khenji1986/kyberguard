@@ -406,7 +406,7 @@ async def analyze(number: str, is_pro: bool, conn: sqlite3.Connection) -> str:
         if score >= 45:
             lines.append("\nEmpfehlung: Nicht zurueckrufen!")
         lines.append(
-            f"\nVollanalyse (Carrier, Kampagnen, Trend) nur mit SecureBot Pro - /upgrade"
+            f"\nVollanalyse (Carrier, Kampagnen, Trend) nur mit KyberGuard Pro - /upgrade"
         )
         lines.append(f"Nummer melden: `/vreport {norm}`")
         return "\n".join(lines)

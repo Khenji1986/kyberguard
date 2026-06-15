@@ -1,0 +1,17 @@
+.env
+.env.*
+*.db
+backups/
+__pycache__/
+*.pyc
+*.pyo
+.git/
+.gitignore
+docs/
+landing/
+legal/
+marketing/
+secrets-harden.sh
+README.md
+ANLEITUNG-FUER-LEE.md
+test_features.py

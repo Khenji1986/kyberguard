@@ -68,7 +68,7 @@
 </ul>
 
 <h3>2.3 Bei Besuch der Webseite</h3>
-<p>Unsere Webseite (gehostet auf Hetzner Online, Frankfurt) erhebt:</p>
+<p>Unsere Webseite (gehostet auf Hetzner Online, Nürnberg) erhebt:</p>
 <ul>
     <li><strong>Spracheinstellung</strong> — Wird lokal in deinem Browser gespeichert (localStorage). Diese Daten verlassen dein Gerät nicht.</li>
     <li><strong>Technische Zugriffsdaten</strong> — IP-Adresse, Browser-Typ und Zugriffszeitpunkt werden durch den Webserver protokolliert. Diese Logs werden nach 7 Tagen automatisch gelöscht.</li>
@@ -85,17 +85,24 @@
 
 <h2>4. Drittanbieter und Datenübermittlung</h2>
 
-<h3>4.1 KI-Infrastruktur (lokal, EU)</h3>
-<p>Alle KI-gestützten Analysefunktionen (KyberAssist, IR-Playbook, Threat Intel u.&nbsp;a.) werden ausschließlich durch lokal auf unseren Hetzner-Servern (Frankfurt, Deutschland) betriebene Open-Source-Sprachmodelle verarbeitet. Deine Anfragen verlassen dabei nicht die EU. Es findet keine Übermittlung an externe KI-Anbieter außerhalb der EU statt.</p>
+<h3>4.1 KI-Infrastruktur — Übersicht</h3>
+<p>KyberGuard nutzt zwei KI-Schichten:</p>
+<ul>
+    <li><strong>Lokale KI (Ollama / Mistral 7B (EU), Hetzner Nürnberg):</strong> Phishing-Scanner, Domain-OSINT, GUARDIAN-Analyse und weitere Erkennungsfunktionen laufen ausschließlich auf unseren eigenen EU-Servern. Diese Daten verlassen die EU nicht.</li>
+    <li><strong>Cloud-KI (Claude Haiku 4.5, Anthropic Inc., USA):</strong> KyberAssist (ab Business) und der IR-Playbook Generator (ab Pro) verwenden Claude Haiku 4.5. Dabei werden Anfrageinhalte (Incident-Typ, Branche, Unternehmensgröße — kein Name, keine Kontaktdaten) an Anthropic übermittelt. Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO. Drittlandübermittlung: Art. 46 DSGVO (EU-Standardvertragsklauseln).</li>
+</ul>
 
-<h3>4.2 KyberAssist</h3>
-<p>KyberAssist ist vollständig lokal auf unseren Hetzner-Servern (Frankfurt, Deutschland) betrieben und nutzt das Open-Source-Sprachmodell Qwen 2.5. Deine Anfragen verlassen dabei nicht die EU. Die Verarbeitung erfolgt auf Basis von Art. 6 Abs. 1 lit. b DSGVO. KI-generierte Antworten sind Orientierungshilfen und ersetzen keine professionelle Beratung.</p>
+<h3>4.2 KyberAssist (Business-Plan und höher)</h3>
+<p>KyberAssist nutzt Claude Haiku 4.5 von Anthropic, Inc. (USA) als primäres Sprachmodell, mit lokalem Ollama (Mistral 7B (EU)) als Fallback. Anthropic verarbeitet die übermittelten Anfrageinhalte im Rahmen eines Auftragsverarbeitungsvertrags (AVV) nach Art. 28 DSGVO. Anthropic ist vertraglich verpflichtet, die Daten <strong>nicht</strong> zum Training eigener Modelle zu verwenden (Training-Opt-out). Deine Anfragen enthalten keine direkte Identifikation (kein Name, keine E-Mail). Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO. Drittlandübermittlung in die USA: Art. 46 DSGVO (Standardvertragsklauseln, SCCs). Mehr: <a href="https://www.anthropic.com/legal/privacy" target="_blank">Anthropic Privacy Policy</a></p>
+
+<h3>4.2a IR-Playbook Generator (Pro-Plan und höher)</h3>
+<p>Der IR-Playbook Generator übermittelt folgende Daten an Claude Haiku 4.5 (Anthropic): Incident-Typ (z.&nbsp;B. Ransomware), Branche, Unternehmensgröße und das betroffene System (aus einer vordefinierten Liste). Es werden <strong>keine</strong> Freitexteingaben, Namen, Firmennamen oder Kontaktdaten übertragen. Rechtsgrundlage und Drittlandübermittlung: identisch zu 4.2. Lokales Ollama dient als Fallback bei API-Nichtverfügbarkeit.</p>
 
 <h3>4.3 Mollie (nur bei Bezahl-Abos)</h3>
 <p>Bei Pro-, Business- oder Enterprise-Abos werden Zahlungen über Mollie B.V. abgewickelt. Mollie hat seinen Sitz in der EU (Keizersgracht 313, 1016 EE Amsterdam, Niederlande) und ist als Zahlungsinstitut durch die Nederlandsche Bank (DNB) lizenziert. Da Mollie ein EU-Unternehmen ist, findet keine Drittlandübermittlung statt. Wir speichern <strong>keine Kreditkartendaten</strong>. Mehr: <a href="https://www.mollie.com/de/privacy" target="_blank">Mollie Datenschutz</a></p>
 
 <h3>4.4 Hetzner Online (Hosting)</h3>
-<p>KyberGuard und die Webseite laufen auf Servern von <strong>Hetzner Online GmbH</strong> in <strong>Frankfurt am Main (Deutschland)</strong>. Hetzner ist ein europäischer Anbieter mit Serverstandort in der EU. Deine Daten verlassen die EU nur bei der Verarbeitung durch Claude AI (siehe 4.1). Mehr: <a href="https://www.hetzner.com/legal/privacy-policy" target="_blank">Hetzner Datenschutz</a></p>
+<p>KyberGuard und die Webseite laufen auf Servern von <strong>Hetzner Online GmbH</strong> in <strong>Nürnberg (Deutschland)</strong>. Hetzner ist ein europäischer Anbieter mit Serverstandort in der EU. Für KI-Funktionen via Claude Haiku 4.5 gilt die Drittlandübermittlung gemäß Abschnitt 4.1 und 4.2. Mehr: <a href="https://www.hetzner.com/legal/privacy-policy" target="_blank">Hetzner Datenschutz</a></p>
 
 <h3>4.5 Have I Been Pwned (HIBP) — Dark Web Monitor &amp; Free E-Mail-Check</h3>
 <p>Für den Dark Web Monitor und den kostenlosen E-Mail-Check nutzen wir die API von Have I Been Pwned (Troy Hunt, Australien). Die E-Mail-Adresse wird dabei über eine <strong>verschlüsselte HTTPS-Verbindung</strong> an HIBP übertragen, um einen Abgleich mit der Breach-Datenbank durchzuführen — eine vollständig anonyme Übertragung ist für diesen Check technisch nicht möglich. HIBP verpflichtet sich vertraglich, übermittelte E-Mail-Adressen ausschließlich zur Breach-Prüfung zu verwenden und nicht zu speichern oder weiterzugeben. Auf <strong>unseren</strong> Servern wird die E-Mail-Adresse nicht im Klartext protokolliert (nur ein SHA-256-Hashwert für interne Logs). Mehr: <a href="https://haveibeenpwned.com/Privacy" target="_blank">HIBP Privacy Policy</a></p>
@@ -158,7 +165,7 @@
 <p>Wir schützen deine Daten durch folgende Maßnahmen:</p>
 <ul>
     <li>Verschlüsselte Übertragung (HTTPS/TLS 1.3) bei allen Verbindungen</li>
-    <li>Server in Deutschland (Frankfurt, EU)</li>
+    <li>Server in Deutschland (Nürnberg, EU)</li>
     <li>Passwörter werden ausschließlich gehasht (bcrypt) gespeichert</li>
     <li>Optional: Zwei-Faktor-Authentifizierung (KyberShield / TOTP)</li>
     <li>Keine Speicherung von Zahlungsdaten durch uns</li>
